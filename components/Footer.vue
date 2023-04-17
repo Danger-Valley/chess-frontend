@@ -27,6 +27,7 @@
   position: absolute;
   bottom: 0;
   width: 100%;
+  padding: 40px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -61,5 +62,28 @@
 
 .event{
   margin-left: auto;
+}
+
+@media screen and (max-width: 1439px) {
+  .footer{
+    flex-wrap: wrap;
+    row-gap: 36px;
+    padding: 50px;
+  }
+  .event{
+    width: 100%;
+    order: 0;
+    margin-left: unset;
+  }
+  .lang{
+    margin-left: unset;
+  }
+}
+
+@media screen and (max-width: 833px) {
+  .footer{
+    row-gap: 24px;
+    padding: 33px 20px;
+  }
 }
 </style>
