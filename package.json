@@ -10,5 +10,14 @@
   },
   "devDependencies": {
     "nuxt": "^3.4.1"
+  },
+  "overrides": {
+    "vue": "latest"
+  },
+  "dependencies": {
+    "@pinia/nuxt": "^0.4.8",
+    "pinia": "^2.0.34",
+    "sass": "^1.62.0",
+    "sass-loader": "^13.2.2"
   }
 }
