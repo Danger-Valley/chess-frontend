@@ -22,6 +22,7 @@
 body {
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 .link {
@@ -35,21 +36,21 @@ body {
 
   &--small {
     font-size: 14px;
-    line-height: 160%;
+    line-height: 1.6;
     gap: 10px;
 
-    &__arrow {
-      width: 8px;
+    .link__arrow {
+      width: calc(8px * 1.25);
     }
   }
 
   &--normal {
     font-size: 22px;
-    line-height: 100%;
+    line-height: 1;
     gap: 15px;
 
-    &__arrow {
-      width: 16px;
+    .link__arrow {
+      width: calc(16px * 1.25);
     }
   }
 
@@ -58,7 +59,7 @@ body {
   }
 
   &--green {
-    color: #27F4BA;
+    color: $color1;
   }
 }
 </style>

@@ -14,13 +14,62 @@
     </div>
 
     <div class="menu">
-      Menu
+      <div class="menu__name" @click="toggleMenu()">
+        Menu
+      </div>
+
+      <div
+        class="menu__list"
+        :class="{ 'menu__list--toggled': isToggled }"
+      >
+        <div class="menu__mobile-close" @click="toggleMenu()">
+          Close
+        </div>
+        <NuxtLink
+          class="menu__item"
+          to=""
+        >Lobby</NuxtLink>
+        <NuxtLink
+          class="menu__item"
+          to=""
+        >Leaderboard</NuxtLink>
+        <NuxtLink
+          class="menu__item"
+          to=""
+        >Tournaments</NuxtLink>
+        <NuxtLink
+          class="menu__item"
+          to=""
+        >Chess tv</NuxtLink>
+        <NuxtLink
+          class="menu__item"
+          to=""
+        >Wiki</NuxtLink>
+        <NuxtLink
+          class="menu__item menu__item--action"
+          to=""
+        >
+          Create game
+          <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
+        </NuxtLink>
+
+        <div class="menu__item menu__item--signin">
+          Sign In
+        </div>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup>
-let activeBoards = ref(584)
+import IconArrow from "@/assets/imgs/Arrow.svg"
+
+let activeBoards = ref(584),
+  isToggled = ref(false)
+
+const toggleMenu = () => {
+  if(window.innerWidth <= 834) isToggled.value = !isToggled.value;
+}
 </script>
 
 <style lang="scss" scoped>
@@ -43,7 +92,7 @@ let activeBoards = ref(584)
   display: flex;
   flex-direction: row;
   gap: 40px;
-  align-items: flex-start;
+  align-items: baseline;
 }
 
 .logo {
@@ -57,14 +106,14 @@ let activeBoards = ref(584)
   &__heading {
     font-size: 22px;
     font-weight: 600;
-    line-height: 100%;
+    line-height: 1;
     color: #FFFFFF;
     text-transform: uppercase;
   }
 
   &__underheading {
     font-size: 14px;
-    line-height: 160%;
+    line-height: 1.6;
     color: #ffffff4d;
   }
 }
@@ -77,7 +126,7 @@ let activeBoards = ref(584)
 
   font-family: 'Neue Plak';
   font-size: 14px;
-  line-height: 160%;
+  line-height: 1.6;
   color: #FFFFFF;
 }
 
@@ -88,13 +137,15 @@ let activeBoards = ref(584)
   align-items: center;
   width: 19px;
   height: 19px;
-  &__dot{
+
+  &__dot {
     width: 7px;
     height: 7px;
     border-radius: 100%;
     background: #FFBF2E;
   }
-  &__bg{
+
+  &__bg {
     width: 100%;
     height: 100%;
     position: absolute;
@@ -108,11 +159,131 @@ let activeBoards = ref(584)
 }
 
 .menu {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
   width: 213px;
   height: 390px;
+  padding: 26px;
   background: radial-gradient(64.08% 15.68% at 14.32% 66.28%, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(50px);
   border-radius: 20px;
+
+  font-family: 'Neue Plak';
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1;
+  text-transform: uppercase;
+  color: #FFFFFF;
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+  }
+
+  &__name {
+    margin-bottom: 40px;
+    color: #ffffff4d;
+  }
+
+  &__mobile-close {
+    display: none;
+  }
+
+  &__item {
+    cursor: pointer;
+
+    &--action {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      color: $color1;
+    }
+
+    &--signin {
+      margin-top: auto;
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .header{
+    padding: 34px 40px;
+    align-items: flex-start;
+  }
+  .menu {
+    position: static;
+    width: unset;
+    height: unset;
+    backdrop-filter: unset;
+    padding: unset;
+    background: unset;
+    border: unset;
+
+    &__name {
+      margin: unset;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    &__list {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      left: 100vw;
+      top: 0;
+      width: 100vw;
+      height: 100vh;
+      padding: 34px 50px;
+      background-color: #0B0F16;
+      transition: .5s;
+
+      &--toggled {
+        left: 0;
+      }
+    }
+
+    &__item {
+      font-size: 16px;
+      line-height: 1;
+
+      &:first-of-type {
+        margin-top: 118px;
+      }
+
+      &--signin {
+        margin-top: 40px;
+      }
+    }
+
+    &__mobile-close {
+      display: block;
+      align-self: flex-end;
+      font-size: 18px;
+      line-height: 1;
+      color: #ffffff4d;
+      cursor: pointer;
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "mobile") + px}) {
+  .menu {
+    &__list {
+      align-items: center;
+    }
+    &__item {
+      &:first-of-type {
+        margin-top: 100px;
+      }
+    }
+  }
 }
 </style>

@@ -6,21 +6,27 @@
 
     <div class="socials">
       <NuxtLink to="" target="_blank" class="socials__item">
-        <img src="@/assets/imgs/discord-logo.svg" alt="discord"/>
+        <IconDiscord alt="discord"/>
       </NuxtLink>
 
       <NuxtLink to="" target="_blank" class="socials__item">
-        <img src="@/assets/imgs/twitter-logo.svg" alt="twitter"/>
+        <IconTwitter alt="twitter"/>
       </NuxtLink>
     </div>
 
     <NuxtLink class="event link link--small link--gray" to="">
       5 days left before the championship
 
-      <img class="link__arrow" src="@/assets/imgs/Arrow.svg" alt="arrow"/>
+      <IconArrow class="link__arrow" alt="arrow"/>
     </NuxtLink>
   </footer>
 </template>
+
+<script setup>
+import IconArrow from "@/assets/imgs/Arrow.svg"
+import IconDiscord from "@/assets/imgs/discord-logo.svg"
+import IconTwitter from "@/assets/imgs/twitter-logo.svg"
+</script>
 
 <style lang="scss" scoped>
 .footer{
@@ -44,7 +50,7 @@
   font-family: 'Neue Plak';
   font-weight: 600;
   font-size: 14px;
-  line-height: 160%;
+  line-height: 1.6;
   color: #fff;
 }
 
@@ -64,7 +70,7 @@
   margin-left: auto;
 }
 
-@media screen and (max-width: 1439px) {
+@media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
   .footer{
     flex-wrap: wrap;
     row-gap: 36px;
@@ -80,7 +86,7 @@
   }
 }
 
-@media screen and (max-width: 833px) {
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
   .footer{
     row-gap: 24px;
     padding: 33px 20px;

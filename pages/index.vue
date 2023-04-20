@@ -13,7 +13,7 @@
 
       <NuxtLink class="main__create-game link link--normal link--green" to="">
         Create Game
-        <img class="link__arrow" src="@/assets/imgs/Arrow.svg" alt="arrow"/>
+        <IconArrow class="link__arrow" alt="arrow"></IconArrow>
       </NuxtLink>
 
       <img class="main__img" src="@/assets/imgs/white-king-min.png"/>
@@ -24,12 +24,9 @@
 </template>
 
 <script setup>
-useHead({
-  title: 'Chess',
-  meta: [
-    { name: 'description', content: 'desc' }
-  ]
-})
+import IconArrow from "@/assets/imgs/Arrow.svg"
+
+console.log(IconArrow)
 </script>
 
 <style lang="scss" scoped>
@@ -47,8 +44,8 @@ useHead({
     font-family: 'Neue Plak';
     font-weight: 600;
     font-size: 14px;
-    line-height: 160%;
-    color: #38B7EC;
+    line-height: 1.6;
+    color: $color2;
     margin-bottom: 20px;
   }
 
@@ -57,7 +54,7 @@ useHead({
     font-family: 'Neue Plak';
     font-weight: 400;
     font-size: 100px;
-    line-height: 100%;
+    line-height: 1;
     color: #E9DEFF;
   }
 
@@ -81,7 +78,7 @@ useHead({
   -webkit-text-fill-color: transparent;
 }
 
-@media screen and (min-width: 2560px) {
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
   .main{
     margin-left: 530px;
     &__img{
@@ -90,7 +87,7 @@ useHead({
   }
 }
 
-@media screen and (min-width: 1440px) and (max-width: 1919px) {
+@media screen and (min-width: #{map-get($sizes, "desktop-low") + px}) and (max-width: #{map-get($sizes, "desktop")-1 + px}) {
   .main{
     margin-left: 143px;
     &__img{
@@ -99,7 +96,7 @@ useHead({
   }
 }
 
-@media screen and (min-width: 834px) and (max-width: 1439px) {
+@media screen and (min-width: #{map-get($sizes, "tablet") + px}) and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
   .main{
     margin-left: 50px;
     &__img{
@@ -110,7 +107,7 @@ useHead({
   }
 }
 
-@media screen and (max-width: 833px) {
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
   .main{
     margin-left: 20px;
     &__img{
