@@ -5,56 +5,64 @@
       <div class="logo__underheading">Multichain crypto chess</div>
     </div>
 
-    <div class="status">
-      <div class="animation">
-        <div class="animation__dot"></div>
-        <div class="animation__bg"></div>
-      </div>
-      {{ activeBoards }} active boadrs
-    </div>
-
-    <div class="menu">
-      <div class="menu__name" @click="toggleMenu()">
-        Menu
-      </div>
-
-      <div
-        class="menu__list"
-        :class="{ 'menu__list--toggled': isToggled }"
-      >
-        <div class="menu__mobile-close" @click="toggleMenu()">
-          Close
+    <div class="header__mobile">
+      <div class="status">
+        <div class="animation">
+          <div class="animation__dot"></div>
+          <div class="animation__bg"></div>
         </div>
-        <NuxtLink
-          class="menu__item"
-          to=""
-        >Lobby</NuxtLink>
-        <NuxtLink
-          class="menu__item"
-          to=""
-        >Leaderboard</NuxtLink>
-        <NuxtLink
-          class="menu__item"
-          to=""
-        >Tournaments</NuxtLink>
-        <NuxtLink
-          class="menu__item"
-          to=""
-        >Chess tv</NuxtLink>
-        <NuxtLink
-          class="menu__item"
-          to=""
-        >Wiki</NuxtLink>
-        <NuxtLink
-          class="menu__item menu__item--action"
-          to=""
-        >
-          Create game
-          <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
-        </NuxtLink>
+        {{ activeBoards }} active boadrs
+      </div>
 
-        <div class="menu__item menu__item--signin">
-          Sign In
+      <div class="menu">
+        <div
+          class="menu__name"
+          @click="toggleMenu()"
+        >
+          Menu
+        </div>
+
+        <div
+          class="menu__list"
+          :class="{ 'menu__list--toggled': isToggled }"
+        >
+          <div
+            class="menu__mobile-close"
+            @click="toggleMenu()"
+          >
+            Close
+          </div>
+          <NuxtLink
+            class="menu__item"
+            to=""
+          >Lobby</NuxtLink>
+          <NuxtLink
+            class="menu__item"
+            to=""
+          >Leaderboard</NuxtLink>
+          <NuxtLink
+            class="menu__item"
+            to=""
+          >Tournaments</NuxtLink>
+          <NuxtLink
+            class="menu__item"
+            to=""
+          >Chess tv</NuxtLink>
+          <NuxtLink
+            class="menu__item"
+            to=""
+          >Wiki</NuxtLink>
+          <NuxtLink
+            class="menu__item menu__item--action"
+            to=""
+          >
+            Create game
+            <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
+          </NuxtLink>
+
+          <div class="menu__item menu__item--signin">
+            Sign In
+          </div>
         </div>
       </div>
     </div>
@@ -68,7 +76,8 @@ let activeBoards = ref(584),
   isToggled = ref(false)
 
 const toggleMenu = () => {
-  if(window.innerWidth <= 834) isToggled.value = !isToggled.value;
+  // TODO get var from scss?
+  if (window.innerWidth <= 1440) isToggled.value = !isToggled.value;
 }
 </script>
 
@@ -93,6 +102,14 @@ const toggleMenu = () => {
   flex-direction: row;
   gap: 40px;
   align-items: baseline;
+
+  &__mobile {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 40px;
+    margin-left: auto;
+  }
 }
 
 .logo {
@@ -211,11 +228,27 @@ const toggleMenu = () => {
   }
 }
 
-@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
-  .header{
-    padding: 34px 40px;
-    align-items: flex-start;
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}){
+  .logo {
+    &__heading {
+      font-size: 28px;
+    }
+    &__underheading{
+      font-size: 18px;
+    }
   }
+}
+
+@media screen and (max-width: #{map-get($sizes, "desktop-low") + px}) {
+  .header {
+    max-height: unset;
+    padding: 34px 40px;
+  }
+
+  .logo{
+    margin: 16px 10px;
+  }
+
   .menu {
     position: static;
     width: unset;
@@ -274,16 +307,29 @@ const toggleMenu = () => {
   }
 }
 
-@media screen and (max-width: #{map-get($sizes, "mobile") + px}) {
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .header {
+    padding: 71px 20px;
+    &__mobile {
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      gap: 12px;
+    }
+  }
+
+  .logo{
+    margin: unset;
+  }
+
   .menu {
     &__list {
       align-items: center;
     }
+
     &__item {
       &:first-of-type {
         margin-top: 100px;
       }
     }
   }
-}
-</style>
+}</style>

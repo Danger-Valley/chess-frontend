@@ -17,5 +17,10 @@ export default defineNuxtConfig({
     plugins: [
       svgLoader({})
     ]
+  },
+  app: {
+    head: {
+      title: 'Chess'
+    }
   }
 })

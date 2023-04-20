@@ -70,6 +70,12 @@ import IconTwitter from "@/assets/imgs/twitter-logo.svg"
   margin-left: auto;
 }
 
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
+  .lang{
+    font-size: 18px;
+  }
+}
+
 @media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
   .footer{
     flex-wrap: wrap;

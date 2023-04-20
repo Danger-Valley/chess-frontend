@@ -25,8 +25,6 @@
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
-
-console.log(IconArrow)
 </script>
 
 <style lang="scss" scoped>
@@ -39,7 +37,18 @@ console.log(IconArrow)
 
 .main{
   position: relative;
-  margin-left: 450px;
+  
+  $margin_to_set: min(200px, 50vh);
+  /*
+  margin: #{$margin_to_set} 0;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - #{$margin_to_set} * 2);
+  justify-content: space-between;
+  */
+
+  margin-left: 23vw;
+
   &__heading{
     font-family: 'Neue Plak';
     font-weight: 600;
@@ -50,7 +59,7 @@ console.log(IconArrow)
   }
 
   &__text{
-    width: 580px;
+    max-width: min(580px, 70%);
     font-family: 'Neue Plak';
     font-weight: 400;
     font-size: 100px;
@@ -64,9 +73,10 @@ console.log(IconArrow)
 
   &__img{
     position: absolute;
-    width: clamp(400px, 19vw, 100vw);
+    width: clamp(355px, 19vw, 100vw);
     top: 0;
-    left: calc(50vw - (450px / 2) - 400px + 331px);
+    right: 22.2vw;
+    //left: calc(50vw - (450px / 2) - 400px + 331px);
   }
 }
 
@@ -80,19 +90,22 @@ console.log(IconArrow)
 
 @media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
   .main{
-    margin-left: 530px;
-    &__img{
-      left: calc(50vw - (530px / 2) - clamp(400px, 19vw, 100vw) + 431px);
+    margin-left: 20vw;
+    &__heading{
+      font-size: 18px;
+    }
+    &__text{
+      font-size: 120px;
+    }
+    &__create-game{
+      margin-top: 135px;
     }
   }
 }
 
 @media screen and (min-width: #{map-get($sizes, "desktop-low") + px}) and (max-width: #{map-get($sizes, "desktop")-1 + px}) {
   .main{
-    margin-left: 143px;
-    &__img{
-      left: calc(50vw - (143px / 2) - 400px + 201px);
-    }
+    margin-left: 10vw;
   }
 }
 
@@ -102,7 +115,7 @@ console.log(IconArrow)
     &__img{
       width: 431px;
       opacity: 0.1;
-      left: calc(50vw - (50px / 2) - (431px / 2) + 179px);
+      right: 22px;
     }
   }
 }
@@ -110,10 +123,13 @@ console.log(IconArrow)
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
   .main{
     margin-left: 20px;
+    &__text{
+      font-size: 68px;
+    }
     &__img{
       width: 324px;
       opacity: 0.1;
-      left: calc(50vw - (20px / 2) - (324px / 2) + 53px);
+      right: 0;
     }
   }
 }

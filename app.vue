@@ -62,4 +62,35 @@ body {
     color: $color1;
   }
 }
+
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
+  .link{
+    &--small {
+      font-size: 18px;
+      .link__arrow {
+        width: calc(13px * 1.25);
+      }
+    }
+
+    &--normal {
+      font-size: 26px;
+      gap: 19px;
+      .link__arrow {
+        width: calc(20px * 1.25);
+      }
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .link{
+    &--normal {
+      font-size: 18px;
+      gap: 12px;
+      .link__arrow {
+        width: calc(20px * 1.25);
+      }
+    }
+  }
+}
 </style>
