@@ -132,6 +132,26 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
       opacity: 0.1;
       right: 0;
     }
+    &__create-game{
+      margin-top: 60px;
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "mobile") + px}) {
+  .main{
+    margin-top: 50px;
+    margin-left: 15px;
+    &__text{
+      font-size: 48px;
+    }
+    &__img{
+      width: 180px;
+      right: 38px;
+    }
+    &__create-game{
+      margin-top: 40px;
+    }
   }
 }
 </style>

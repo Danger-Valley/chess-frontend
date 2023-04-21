@@ -84,7 +84,7 @@ import IconTwitter from "@/assets/imgs/twitter-logo.svg"
   }
   .event{
     width: 100%;
-    order: 0;
+    order: -1;
     margin-left: unset;
   }
   .lang{

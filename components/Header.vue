@@ -26,11 +26,17 @@
           class="menu__list"
           :class="{ 'menu__list--toggled': isToggled }"
         >
-          <div
-            class="menu__mobile-close"
-            @click="toggleMenu()"
-          >
-            Close
+          <div class="menu__list-inner">
+            <div class="logo">
+              <div class="logo__heading">The Chess</div>
+              <div class="logo__underheading">Multichain crypto chess</div>
+            </div>
+            <div
+              class="menu__mobile-close"
+              @click="toggleMenu()"
+            >
+              Close
+            </div>
           </div>
           <NuxtLink
             class="menu__item"
@@ -60,7 +66,10 @@
             <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
           </NuxtLink>
 
-          <div class="menu__item menu__item--signin" @click="singIn">
+          <div
+            class="menu__item menu__item--signin"
+            @click="singIn"
+          >
             Sign In
           </div>
         </div>
@@ -207,6 +216,14 @@ const singIn = async () => {
     flex-direction: column;
     gap: 20px;
     height: 100%;
+
+    &-inner {
+      display: none;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      width: 100%;
+    }
   }
 
   &__name {
@@ -235,24 +252,25 @@ const singIn = async () => {
   }
 }
 
-@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}){
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
   .logo {
     &__heading {
       font-size: 28px;
     }
-    &__underheading{
+
+    &__underheading {
       font-size: 18px;
     }
   }
 }
 
-@media screen and (max-width: #{map-get($sizes, "desktop-low") + px}) {
+@media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
   .header {
     max-height: unset;
     padding: 34px 40px;
   }
 
-  .logo{
+  .logo {
     margin: 16px 10px;
   }
 
@@ -281,12 +299,16 @@ const singIn = async () => {
       top: 0;
       width: 100vw;
       height: 100vh;
-      padding: 34px 50px;
+      padding: 71px 20px;
       background-color: #0B0F16;
       transition: .5s;
 
       &--toggled {
         left: 0;
+      }
+      
+      &-inner{
+        display: flex;
       }
     }
 
@@ -305,7 +327,6 @@ const singIn = async () => {
 
     &__mobile-close {
       display: block;
-      align-self: flex-end;
       font-size: 18px;
       line-height: 1;
       color: #ffffff4d;
@@ -314,9 +335,10 @@ const singIn = async () => {
   }
 }
 
-@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
   .header {
     padding: 71px 20px;
+
     &__mobile {
       flex-direction: column-reverse;
       align-items: flex-end;
@@ -324,7 +346,7 @@ const singIn = async () => {
     }
   }
 
-  .logo{
+  .logo {
     margin: unset;
   }
 
@@ -335,8 +357,21 @@ const singIn = async () => {
 
     &__item {
       &:first-of-type {
-        margin-top: 100px;
+        margin-top: 62px;
       }
     }
   }
-}</style>
+}
+
+@media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {
+  .header {
+    padding: 26px 15px;
+  }
+
+  .menu {
+    &__list {
+      padding: 26px 15px;
+    }
+  }
+}
+</style>
