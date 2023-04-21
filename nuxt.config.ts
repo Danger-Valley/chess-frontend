@@ -22,5 +22,10 @@ export default defineNuxtConfig({
     head: {
       title: 'Chess'
     }
+  },
+  runtimeConfig:{
+    public: {
+      API_URL: process.env.API_URL
+    }
   }
 })

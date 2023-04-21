@@ -60,7 +60,7 @@
             <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
           </NuxtLink>
 
-          <div class="menu__item menu__item--signin">
+          <div class="menu__item menu__item--signin" @click="singIn">
             Sign In
           </div>
         </div>
@@ -71,6 +71,7 @@
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
+let { $API } = useNuxtApp();
 
 let activeBoards = ref(584),
   isToggled = ref(false)
@@ -78,6 +79,12 @@ let activeBoards = ref(584),
 const toggleMenu = () => {
   // TODO get var from scss?
   if (window.innerWidth <= 1440) isToggled.value = !isToggled.value;
+}
+
+const singIn = async () => {
+  let resp = await $API().Auth.Google.front();
+  let body = await resp.json();
+  console.log(resp, body);
 }
 </script>
 

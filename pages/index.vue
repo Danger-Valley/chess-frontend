@@ -29,6 +29,7 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
 
 <style lang="scss" scoped>
 .page{
+  position: relative;
   width: 100%;
   height: 100vh;
   overflow: hidden;
