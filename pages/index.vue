@@ -37,8 +37,6 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
 }
 
 .main{
-  position: relative;
-  
   $margin_to_set: min(200px, 50vh);
   /*
   margin: #{$margin_to_set} 0;
@@ -75,8 +73,8 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
   &__img{
     position: absolute;
     width: clamp(355px, 19vw, 100vw);
-    top: 0;
     right: 22.2vw;
+    bottom: 0;
     //left: calc(50vw - (450px / 2) - 400px + 331px);
   }
 }
@@ -117,6 +115,8 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
       width: 431px;
       opacity: 0.1;
       right: 22px;
+      bottom: 50px;
+      filter: blur(5px);
     }
   }
 }
@@ -131,6 +131,8 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
       width: 324px;
       opacity: 0.1;
       right: 0;
+      bottom: -20px;
+      filter: blur(5px);
     }
     &__create-game{
       margin-top: 60px;
@@ -148,6 +150,8 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
     &__img{
       width: 180px;
       right: 38px;
+      bottom: 0;
+      filter: blur(5px);
     }
     &__create-game{
       margin-top: 40px;

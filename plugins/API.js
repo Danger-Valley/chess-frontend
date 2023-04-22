@@ -106,6 +106,22 @@ class Signatures {
     });
   }
 }
+class User{
+  constructor(path) {
+    this.localPath = `${path}/twitter`;
+  }
+
+  async get() {
+    
+    return await fetch(`${this.localPath}`, {
+      method: "POST",
+      body: JSON.stringify({
+        authCode
+      }),
+      headers: { 'content-type': 'application/json' }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
