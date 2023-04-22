@@ -32,7 +32,7 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
   position: relative;
   width: 100%;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background: #181B20;
 }
 

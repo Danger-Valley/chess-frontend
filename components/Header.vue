@@ -26,17 +26,11 @@
           class="menu__list"
           :class="{ 'menu__list--toggled': isToggled }"
         >
-          <div class="menu__list-inner">
-            <div class="logo">
-              <div class="logo__heading">The Chess</div>
-              <div class="logo__underheading">Multichain crypto chess</div>
-            </div>
-            <div
-              class="menu__mobile-close"
-              @click="toggleMenu()"
-            >
-              Close
-            </div>
+          <div
+            class="menu__mobile-close"
+            @click="toggleMenu()"
+          >
+            Close
           </div>
           <NuxtLink
             class="menu__item"
@@ -129,6 +123,8 @@ const singIn = async () => {
 }
 
 .logo {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 5px;
@@ -216,14 +212,6 @@ const singIn = async () => {
     flex-direction: column;
     gap: 20px;
     height: 100%;
-
-    &-inner {
-      display: none;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: flex-start;
-      width: 100%;
-    }
   }
 
   &__name {
@@ -306,10 +294,6 @@ const singIn = async () => {
       &--toggled {
         left: 0;
       }
-      
-      &-inner{
-        display: flex;
-      }
     }
 
     &__item {
@@ -326,6 +310,7 @@ const singIn = async () => {
     }
 
     &__mobile-close {
+      margin-left: auto;
       display: block;
       font-size: 18px;
       line-height: 1;

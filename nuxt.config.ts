@@ -20,7 +20,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'Chess'
+      title: 'The Chess'
     }
   },
   runtimeConfig:{
