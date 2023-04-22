@@ -6,6 +6,9 @@ import TwitterProvider from "next-auth/providers/twitter";
 console.log(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET)
 
 export default NuxtAuthHandler({
+  pages: {
+    signIn: '/ok'
+  },
   secret: process.env.AUTH_SECRET,
   providers: [
     DiscordProvider.default({
