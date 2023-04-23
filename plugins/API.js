@@ -44,17 +44,7 @@ class Discord {
     this.localPath = `${path}/discord`;
   }
 
-  async front(authCode) {
-    return await fetch(`${this.localPath}`, {
-      method: "POST",
-      body: JSON.stringify({
-        authCode
-      }),
-      headers: { 'content-type': 'application/json' }
-    });
-  }
-
-  async back(authCode) {
+  async checkAuth(authCode) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
       body: JSON.stringify({
@@ -69,13 +59,7 @@ class Google {
     this.localPath = `${path}/google`;
   }
 
-  async front() {
-    return await fetch(`/api/auth/google`, {
-      method: "POST"
-    });
-  }
-
-  async back(token) {
+  async checkAuth(token) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
       body: JSON.stringify({
@@ -132,9 +116,9 @@ export default defineNuxtPlugin(() => {
 
         return {
           Auth: {
-            Discord: new Discord(`${path}/api/v1/auth`),
-            Twitter: new Twitter(`${path}/api/v1/auth`),
-            Google: new Google(`${path}/api/v1/auth`)
+            Discord: new Discord(`${path}/auth/api/v1/auth`),
+            Twitter: new Twitter(`${path}/auth/api/v1/auth`),
+            Google: new Google(`${path}/auth/api/v1/auth`)
           }
         }
       }

@@ -58,5 +58,5 @@ export const useWalletStore = defineStore('wallet', () => {
     }
   }
 
-  return { count, increment }
+  return { getWallet, connectWallet }
 })

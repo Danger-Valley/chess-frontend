@@ -31,6 +31,12 @@ export default defineNuxtConfig({
           dev: process.env.DISCORD_REDIRECT_URL_DEV,
           prod: process.env.DISCORD_REDIRECT_URL_PROD
         }
+      },
+      Twitter: {
+        redirect: {
+          dev: process.env.TWITTER_REDIRECT_URL_DEV,
+          prod: process.env.TWITTER_REDIRECT_URL_PROD
+        }
       }
     }
   }

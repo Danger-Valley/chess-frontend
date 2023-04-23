@@ -17,7 +17,7 @@ onMounted(() => {
   const fragment = new URLSearchParams(window.location.search);
   const code = fragment.get('code');
 
-  if (code) localStorage.setItem("DISCORD_CODE", code);
+  if (code) localStorage.setItem("TWITTER_CODE", code);
 
   setInterval(() => {
     if (s.value === 1) close();
