@@ -25,7 +25,7 @@ const connectDiscord = async () => {
       if (localStorage.getItem("DISCORD_CODE")) {
         let resp, body;
 
-        resp = await $API().Discord.checkAuth(localStorage.getItem("DISCORD_CODE"));
+        resp = await $API().Auth.Discord.checkAuth(localStorage.getItem("DISCORD_CODE"));
         body = await resp.json();
         clearInterval(timer);
 
@@ -79,7 +79,7 @@ const connectTwitter = async (callback) => {
       if (localStorage.getItem("TWITTER_CODE")) {
         let resp, body;
 
-        resp = await $API().Twitter.checkAuth({
+        resp = await $API().Auth.Twitter.checkAuth({
           authCode: localStorage.getItem("TWITTER_CODE"),
           codeChallenge: rndStr
         });
