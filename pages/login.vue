@@ -103,8 +103,8 @@ const connectTwitter = async (callback) => {
 const handleOnSuccess = async (response) => {
   console.log("Access Token: ", response.access_token);
 
-  resp = await $API().Auth.Google.checkAuth(response.access_token);
-  body = await resp.json();
+  let resp = await $API().Auth.Google.checkAuth(response.access_token);
+  let body = await resp.json();
 
   if (body.errors) {
     //nuxtApp.$showToast(body.errors[0].message, "error");
