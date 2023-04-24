@@ -56,6 +56,7 @@ export const useWalletStore = defineStore('wallet', () => {
       type,
       time: Date.now()
     }
+    console.log(`Wallet saved!`, wallet.value)
   }
 
   return { getWallet, connectWallet }

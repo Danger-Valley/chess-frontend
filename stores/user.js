@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
       avatar,
       createdAt
     }
-    console.log(`User saved!`, arguments)
+    console.log(`User saved!`, user.value)
   }
 
   return { getUser, saveUser }
