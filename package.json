@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.8",
+    "nuxt-vue3-google-signin": "^0.0.8",
     "pinia": "^2.0.34",
     "sass": "^1.62.0",
     "sass-loader": "^13.2.2",

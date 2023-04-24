@@ -5,7 +5,11 @@ export default defineNuxtConfig({
   ssr: true,
   modules: [
     '@pinia/nuxt',
+    'nuxt-vue3-google-signin'
   ],
+  googleSignIn: {
+    clientId: process.env.GOOGLE_CLIENT_ID,
+  },
   vite: {
     css: {
       preprocessorOptions: {

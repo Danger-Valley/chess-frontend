@@ -1,11 +1,13 @@
 <template>
-  <button @click="signInWith('google')">Google</button>
-  <button @click="signInWith('twitter')">Twitter</button>
-  <button @click="signInWith('discord')">Discord</button>
+  <button @click="login">Google</button>
+  <button @click="connectTwitter">Twitter</button>
+  <button @click="connectDiscord">Discord</button>
 </template>
 
 <script setup>
 import { useUserStore } from '@/stores/user'
+import { useTokenClient } from "vue3-google-signin";
+
 let { $API } = useNuxtApp();
 
 let userStore = useUserStore()
@@ -37,8 +39,6 @@ const connectDiscord = async () => {
         localStorage.removeItem("DISCORD_CODE");
         console.log(body);
         userStore.saveUser(body)
-
-        callback(body);
       }
     }
   }, 500);
@@ -93,14 +93,34 @@ const connectTwitter = async (callback) => {
 
         localStorage.removeItem("TWITTER_CODE");
         userStore.saveUser(body)
-
-        callback(body);
       }
     }
   }, 500);
 }
 
-const signInWith = async (provider) => {
-  if (provider == 'discord') connectDiscord()
-}
+// google flow
+
+const handleOnSuccess = async (response) => {
+  console.log("Access Token: ", response.access_token);
+
+  resp = await $API().Auth.Google.checkAuth(response.access_token);
+  body = await resp.json();
+
+  if (body.errors) {
+    //nuxtApp.$showToast(body.errors[0].message, "error");
+    console.error(body);
+  }
+
+  console.log(body);
+  userStore.saveUser(body)
+};
+
+const handleOnError = (errorResponse) => {
+  console.log("Error: ", errorResponse);
+};
+
+const { isReady, login } = useTokenClient({
+  onSuccess: handleOnSuccess,
+  onError: handleOnError
+});
 </script>
