@@ -90,19 +90,50 @@ class Signatures {
     });
   }
 }
-class User{
+class User {
   constructor(path) {
-    this.localPath = `${path}/twitter`;
+    this.localPath = `${path}/users`;
   }
 
-  async get() {
-    
+  async get(accessToken) {
+    return await fetch(`${this.localPath}`, {
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async update({ accessToken, username, avatar, twitter: { authCode, codeChallenge }, discord: { authCode }, google: { token } }) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
-      body: JSON.stringify({
-        authCode
-      }),
-      headers: { 'content-type': 'application/json' }
+      body: {
+        username,
+        avatar,
+        twitter: {
+          authCode, codeChallenge
+        },
+        discord: {
+          authCode
+        },
+        google: {
+          token
+        }
+      },
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async delete(accessToken) {
+    return await fetch(`${this.localPath}`, {
+      method: "DELETE",
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
     });
   }
 }
@@ -119,7 +150,8 @@ export default defineNuxtPlugin(() => {
             Discord: new Discord(`${path}/auth/api/v1/auth`),
             Twitter: new Twitter(`${path}/auth/api/v1/auth`),
             Google: new Google(`${path}/auth/api/v1/auth`)
-          }
+          },
+          User: new User(`${path}/auth/api/v1`)
         }
       }
     }
