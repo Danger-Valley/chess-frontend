@@ -43,7 +43,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
               if (body.errors) {
                 //nuxtApp.$showToast(body.errors[0].message, "error");
-                console.error(body);
+                return console.error(body);
               }
 
               localStorage.removeItem("DISCORD_CODE");
@@ -88,7 +88,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
               if (body.errors) {
                 //nuxtApp.$showToast(body.errors[0].message, "error", 10);
-                console.error(body);
+                return console.error(body);
               }
 
               localStorage.removeItem("TWITTER_CODE");
@@ -110,7 +110,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         if (body.errors) {
           //nuxtApp.$showToast(body.errors[0].message, "error");
-          console.error(body);
+          return console.error(body);
         }
 
         console.log(body);
@@ -118,7 +118,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         close()
       },
       handleOnError(errorResponse) {
-        console.log("Error: ", errorResponse);
+        console.error("Error: ", errorResponse);
       }
     }
   }
