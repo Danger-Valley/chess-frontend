@@ -11,7 +11,9 @@
           <div class="animation__dot"></div>
           <div class="animation__bg"></div>
         </div>
-        {{ activeBoards }} active boadrs
+        <div>
+          {{ activeBoards }} active boadrs
+        </div>
       </div>
 
       <div
@@ -28,7 +30,7 @@
         <div
           v-else
           class="profile"
-          @click="navigateTo()"
+          @click="navigateTo('/profile')"
         >
           <img
             class="profile__avatar"
@@ -40,7 +42,7 @@
             :class="{ 'profile__cross--toggled': isToggled }"
             @click.stop="toggleMenu()"
           >
-            <CrossIcon></CrossIcon>
+            <IconCross></IconCross>
           </div>
         </div>
 
@@ -81,8 +83,9 @@
             <NuxtLink
               class="menu__item menu__item--action"
               to=""
+              @click="meme"
             >
-              Create game
+              <div>Create game</div>
               <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
             </NuxtLink>
 
@@ -101,7 +104,7 @@
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
-import CrossIcon from "@/assets/imgs/+.svg"
+import IconCross from "@/assets/imgs/+.svg"
 import { useUserStore } from "~/stores/user";
 let { $API, $togglePopup } = useNuxtApp();
 
@@ -118,7 +121,14 @@ const toggleMenu = () => {
 }
 
 const singIn = async () => {
-  if(!user.value) $togglePopup('SignInPopup')
+  if (!user.value) $togglePopup('SignInPopup')
+}
+
+function meme(){
+ document.querySelectorAll('div, a, span').forEach(el => {
+    console.log(el, el.innerHTML)
+    if(el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
+  })
 }
 </script>
 
@@ -251,6 +261,7 @@ const singIn = async () => {
       &--logged {
         height: 218px;
       }
+
       &--toggled {
         height: 0;
         //margin-top: 0;
@@ -460,4 +471,5 @@ const singIn = async () => {
       padding: 26px 15px;
     }
   }
-}</style>
+}
+</style>

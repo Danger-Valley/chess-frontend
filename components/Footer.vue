@@ -15,7 +15,7 @@
     </div>
 
     <NuxtLink class="event link link--small link--gray" to="">
-      5 days left before the championship
+      <div>5 days left before the championship</div>
 
       <IconArrow class="link__arrow" alt="arrow"/>
     </NuxtLink>

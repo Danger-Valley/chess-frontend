@@ -8,11 +8,13 @@
       </div>
 
       <div class="main__text">
-        Get a <span id="text-effect">completely</span>  another experience
+        <div>Get a </div>
+        <span id="text-effect">completely</span>
+        <div> another experience</div>
       </div>
 
       <NuxtLink class="main__create-game link link--normal link--green" to="">
-        Create Game
+        <div>Create Game</div>
         <IconArrow class="link__arrow" alt="arrow"></IconArrow>
       </NuxtLink>
 
