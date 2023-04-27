@@ -99,7 +99,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       // google flow
 
       async handleOnSuccess(response) {
-        if(userStore.getUser.value.googleUser) return;
+        if(userStore.getUser.value?.googleUser) return;
         console.log("Access Token: ", response.access_token);
 
         let resp = await nuxtApp.$API().Auth.Google.checkAuth(response.access_token);
