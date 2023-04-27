@@ -6,21 +6,22 @@ export const useUserStore = defineStore('user', () => {
 
   const getUser = computed(() => user)
 
-  function saveUser({ accessToken, id, username, avatar, createdAt }) {
-    user.value = {
-      accessToken,
-      id,
-      username,
-      avatar,
-      createdAt
-    }
+  async function saveUser(accessToken) {
     localStorage.setItem('accessToken', accessToken)
+    await obtainUser();
     console.log(`User saved!`, user.value)
   }
 
   async function obtainUser(){
-    user.value = localStorage.getItem('accessToken')
-    if(user.value) await $API().User.get()
+    if(!process.client) return
+    
+    let accessToken = localStorage.getItem('accessToken')
+    console.log(accessToken, user.value)
+    if(accessToken && !user.value) {
+      let resp = await $API().User.get(accessToken)
+      let body = await resp.json()
+      user.value = body;
+    }
     else return false
   }
 

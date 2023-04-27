@@ -1,20 +1,10 @@
 <template>
-  <NuxtPage></NuxtPage>
+  <ClientOnly>
+    <NuxtPage></NuxtPage>
+  </ClientOnly>
 </template>
 
 <style lang="scss">
-@font-face {
-  font-family: 'Neue Plak';
-  src: url('~/assets/fonts/NeuePlak/NeuePlak-Regular.ttf');
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: 'Neue Plak';
-  src: url('~/assets/fonts/NeuePlak/NeuePlak-SemiBold.ttf');
-  font-weight: 600;
-}
-
 * {
   box-sizing: border-box;
 }

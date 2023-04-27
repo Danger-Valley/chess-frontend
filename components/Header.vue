@@ -14,57 +14,84 @@
         {{ activeBoards }} active boadrs
       </div>
 
-      <div class="menu">
+      <div
+        class="menu"
+        :class="{ 'menu--logged': user }"
+      >
         <div
+          v-if="!user"
           class="menu__name"
           @click="toggleMenu()"
         >
           Menu
         </div>
+        <div
+          v-else
+          class="profile"
+          @click="navigateTo()"
+        >
+          <img
+            class="profile__avatar"
+            :src="user.avatar"
+          />
+          <div class="profile__name">{{ user.username || user.email }}</div>
+          <div
+            class="profile__cross"
+            :class="{ 'profile__cross--toggled': isToggled }"
+            @click.stop="toggleMenu()"
+          >
+            <CrossIcon></CrossIcon>
+          </div>
+        </div>
 
         <div
-          class="menu__list"
-          :class="{ 'menu__list--toggled': isToggled }"
+          class="menu__list-wrapper"
+          :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user }"
         >
           <div
-            class="menu__mobile-close"
-            @click="toggleMenu()"
+            class="menu__list"
+            :class="{ 'menu__list--logged': user }"
           >
-            Close
-          </div>
-          <NuxtLink
-            class="menu__item"
-            to=""
-          >Lobby</NuxtLink>
-          <NuxtLink
-            class="menu__item"
-            to=""
-          >Leaderboard</NuxtLink>
-          <NuxtLink
-            class="menu__item"
-            to=""
-          >Tournaments</NuxtLink>
-          <NuxtLink
-            class="menu__item"
-            to=""
-          >Chess tv</NuxtLink>
-          <NuxtLink
-            class="menu__item"
-            to=""
-          >Wiki</NuxtLink>
-          <NuxtLink
-            class="menu__item menu__item--action"
-            to=""
-          >
-            Create game
-            <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
-          </NuxtLink>
+            <div
+              class="menu__mobile-close"
+              @click="toggleMenu()"
+            >
+              Close
+            </div>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Lobby</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Leaderboard</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Tournaments</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Chess tv</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Wiki</NuxtLink>
+            <NuxtLink
+              class="menu__item menu__item--action"
+              to=""
+            >
+              Create game
+              <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
+            </NuxtLink>
 
-          <div
-            class="menu__item menu__item--signin"
-            @click="singIn"
-          >
-            Sign In
+            <div
+              class="menu__item menu__item--signin"
+              @click="singIn"
+            >
+              Sign In
+            </div>
           </div>
         </div>
       </div>
@@ -74,20 +101,24 @@
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
-let { $API } = useNuxtApp();
+import CrossIcon from "@/assets/imgs/+.svg"
+import { useUserStore } from "~/stores/user";
+let { $API, $togglePopup } = useNuxtApp();
 
 let activeBoards = ref(584),
   isToggled = ref(false)
 
+const store = useUserStore()
+
+const user = computed(() => store.getUser.value?.user)
+
 const toggleMenu = () => {
   // TODO get var from scss?
-  if (window.innerWidth <= 1440) isToggled.value = !isToggled.value;
+  isToggled.value = !isToggled.value;
 }
 
 const singIn = async () => {
-  let resp = await $API().Auth.Google.front();
-  let body = await resp.json();
-  console.log(resp, body);
+  if(!user.value) $togglePopup('SignInPopup')
 }
 </script>
 
@@ -193,12 +224,12 @@ const singIn = async () => {
   display: flex;
   flex-direction: column;
   width: 213px;
-  height: 390px;
-  padding: 26px;
-  background: radial-gradient(64.08% 15.68% at 14.32% 66.28%, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
+  padding: 16px 20px;
+  background: radial-gradient(136px 60.5px at 24px 255px, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(50px);
   border-radius: 20px;
+  transition: .5s;
 
   font-family: 'Neue Plak';
   font-weight: 600;
@@ -207,15 +238,39 @@ const singIn = async () => {
   text-transform: uppercase;
   color: #FFFFFF;
 
+  &--logged {
+    background: radial-gradient(136px 60.5px at 24px 255px, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
+  }
+
   &__list {
+    &-wrapper {
+      height: 304px;
+      transition: .5s height;
+      overflow: hidden;
+
+      &--logged {
+        height: 218px;
+      }
+      &--toggled {
+        height: 0;
+        //margin-top: 0;
+        //margin-bottom: 0;
+      }
+    }
+
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: 100%;
+    overflow: hidden;
+    margin: 12px 6px;
+
+    &--logged {
+      margin-top: 28px;
+    }
   }
 
   &__name {
-    margin-bottom: 40px;
+    margin: 12px 6px 28px 6px;
     color: #ffffff4d;
   }
 
@@ -235,7 +290,54 @@ const singIn = async () => {
     }
 
     &--signin {
-      margin-top: auto;
+      margin-top: 62px;
+    }
+  }
+}
+
+.profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  &__avatar {
+    width: 38.4px;
+    aspect-ratio: 1;
+    clip-path: path();
+  }
+
+  &__name {
+    font-family: 'Neue Plak';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #FFFFFF;
+    text-transform: initial;
+    max-width: 76px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__cross {
+    padding: 8px;
+    margin-left: auto;
+    rotate: 0deg;
+    transition: .2s;
+
+    svg {
+      transition: .2s;
+      color: #ffffff4d;
+    }
+
+    &--toggled {
+      rotate: 45deg;
+
+      svg {
+        color: #fff;
+      }
     }
   }
 }
@@ -358,5 +460,4 @@ const singIn = async () => {
       padding: 26px 15px;
     }
   }
-}
-</style>
+}</style>

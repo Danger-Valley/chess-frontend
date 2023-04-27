@@ -1,0 +1,38 @@
+.popup{
+  &__wrapper{
+    position: absolute;
+    top: 0;
+    z-index: -1;
+    width: 100vw;
+    height: 100vh;
+    background: #000000cc;
+    opacity: 0;
+    transition: .5s;
+    &--active{
+      opacity: 1;
+      z-index: 100;
+
+      .popup{
+        scale: 1;
+      }
+    }
+  }
+
+  width: fit-content;
+  padding: 20px;
+  margin: 100px auto;
+  background: #ffffff0d;
+  border: 1px solid #ffffff1a;
+  backdrop-filter: blur(50px);
+  scale: 0.2;
+  transition: .5s;
+
+  &__heading{
+    font-family: 'Montserrat';
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 100%;
+    text-transform: uppercase;
+    color: #FFFFFF;
+  }
+}
