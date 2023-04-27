@@ -106,7 +106,7 @@
 import IconArrow from "@/assets/imgs/Arrow.svg"
 import IconCross from "@/assets/imgs/+.svg"
 import { useUserStore } from "~/stores/user";
-let { $API, $togglePopup } = useNuxtApp();
+let { $togglePopup } = useNuxtApp();
 
 let activeBoards = ref(584),
   isToggled = ref(false)
@@ -369,6 +369,7 @@ function meme() {
   .header {
     max-height: unset;
     padding: 34px 40px;
+    align-items: flex-start;
   }
 
   .logo {
@@ -392,20 +393,21 @@ function meme() {
     }
 
     &__list {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
+      margin: 0;
       gap: 40px;
-      left: 100vw;
-      top: 0;
-      width: 100vw;
-      height: 100vh;
-      padding: 71px 20px;
-      background-color: #0B0F16;
-      transition: .5s;
+      &-wrapper{
+        position: absolute;
+        left: 100vw;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        padding: 34px 50px;
+        background-color: #0B0F16;
+        transition: .5s;
 
-      &--toggled {
-        left: 0;
+        &--toggled {
+          left: 0;
+        }
       }
     }
 
@@ -450,6 +452,9 @@ function meme() {
 
   .menu {
     &__list {
+      &-wrapper{
+        padding: 71px 20px;
+      }
       align-items: center;
     }
 
@@ -467,7 +472,7 @@ function meme() {
   }
 
   .menu {
-    &__list {
+    &__list-wrapper {
       padding: 26px 15px;
     }
   }
