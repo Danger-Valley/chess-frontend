@@ -2,6 +2,21 @@ import { useUserStore } from "~/stores/user";
 
 export default defineNuxtPlugin((nuxtApp) => {
   let userStore = useUserStore()
+  const close = () => {
+    if(document.querySelector('#SignInPopup')) nuxtApp.$togglePopup('SignInPopup')
+  }
+  const randomString = () => {
+    let res = "";
+    let abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    // [10;20]
+    let num = Math.ceil(Math.random() * 10) + 10;
+
+    for (let i = 0; i < num; i++) {
+      // [0;len(abc)]
+      res += abc[Math.round(Math.random() * abc.length)];
+    }
+    return res;
+  }
   
   return {
     provide: {
@@ -34,24 +49,12 @@ export default defineNuxtPlugin((nuxtApp) => {
               localStorage.removeItem("DISCORD_CODE");
               console.log(body);
               await userStore.saveUser(body.accessToken)
-              nuxtApp.$togglePopup('SignInPopup')
+              close()
             }
           }
         }, 500);
       },
 
-      randomString() {
-        let res = "";
-        let abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        // [10;20]
-        let num = Math.ceil(Math.random() * 10) + 10;
-
-        for (let i = 0; i < num; i++) {
-          // [0;len(abc)]
-          res += abc[Math.round(Math.random() * abc.length)];
-        }
-        return res;
-      },
       async connectTwitter() {
         if(userStore.getUser.value.twitterUser) return;
         let env = useRuntimeConfig();
@@ -90,7 +93,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
               localStorage.removeItem("TWITTER_CODE");
               await userStore.saveUser(body.accessToken)
-              nuxtApp.$togglePopup('SignInPopup')
+              close()
             }
           }
         }, 500);
@@ -112,7 +115,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         console.log(body);
         await userStore.saveUser(body.accessToken)
-        nuxtApp.$togglePopup('SignInPopup')
+        close()
       },
       handleOnError(errorResponse) {
         console.log("Error: ", errorResponse);
