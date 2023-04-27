@@ -124,10 +124,10 @@ const singIn = async () => {
   if (!user.value) $togglePopup('SignInPopup')
 }
 
-function meme(){
- document.querySelectorAll('div, a, span').forEach(el => {
+function meme() {
+  document.querySelectorAll('div, a, span').forEach(el => {
     console.log(el, el.innerHTML)
-    if(el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
+    if (el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
   })
 }
 </script>
