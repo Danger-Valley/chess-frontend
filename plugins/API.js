@@ -104,22 +104,25 @@ class User {
     });
   }
 
-  async update({ accessToken, username, avatar, twitter: { twitterAuthCode, codeChallenge }, discord: { discordAuthCode }, google: { token } }) {
+  async update(body) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
-      body: {
-        username,
-        avatar,
-        twitter: {
-          twitterAuthCode, codeChallenge
+      /**
+       * body: {
+          username,
+          avatar,
+          twitter: {
+            twitterAuthCode, codeChallenge
+          },
+          discord: {
+            discordAuthCode
+          },
+          google: {
+            token
+          }
         },
-        discord: {
-          discordAuthCode
-        },
-        google: {
-          token
-        }
-      },
+       */
+      body,
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
