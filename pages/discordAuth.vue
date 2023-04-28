@@ -19,10 +19,12 @@ onMounted(() => {
 
   if (code) localStorage.setItem("DISCORD_CODE", code);
 
+  /*
   setInterval(() => {
     if (s.value === 1) close();
     s.value--;
   }, 1000)
+  */
 });
 </script>
 <style lang="scss" scoped>
