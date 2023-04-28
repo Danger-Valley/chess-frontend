@@ -104,7 +104,7 @@ class User {
     });
   }
 
-  async update(body) {
+  async update(accessToken, body) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
       /**

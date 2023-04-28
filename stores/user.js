@@ -13,7 +13,9 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function updateUser(objToPass) {
-    let resp = await $API().User.update(objToPass);
+    let accessToken = localStorage.getItem('accessToken')
+
+    let resp = await $API().User.update(accessToken, objToPass);
     let body = await resp.json();
     user.value = body.user;
     console.log(`User updated!`, user.value)
