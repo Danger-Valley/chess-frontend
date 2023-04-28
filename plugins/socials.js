@@ -38,19 +38,22 @@ export default defineNuxtPlugin((nuxtApp) => {
         let timer = setInterval(async () => {
           if (discordTab.closed) {
             if (localStorage.getItem("DISCORD_CODE")) {
-              let resp, body;
+              if (connectType == 'auth') {
+                let resp, body;
 
-              resp = await nuxtApp.$API().Auth.Discord.checkAuth(localStorage.getItem("DISCORD_CODE"));
-              body = await resp.json();
-              clearInterval(timer);
+                resp = await nuxtApp.$API().Auth.Discord.checkAuth(localStorage.getItem("DISCORD_CODE"));
+                body = await resp.json();
+                clearInterval(timer);
 
-              if (body.errors) {
-                //nuxtApp.$showToast(body.errors[0].message, "error");
-                return console.error(body);
+                if (body.errors) {
+                  //nuxtApp.$showToast(body.errors[0].message, "error");
+                  return console.error(body);
+                }
+
+                console.log(body);
+
+                await userStore.saveUser(body.accessToken)
               }
-
-              console.log(body);
-              if (connectType == 'auth') await userStore.saveUser(body.accessToken)
               else if (connectType == 'update') {
                 await userStore.updateUser({ discord: { authCode: localStorage.getItem("DISCORD_CODE") } })
               }
@@ -87,21 +90,23 @@ export default defineNuxtPlugin((nuxtApp) => {
         let timer = setInterval(async () => {
           if (twitterTab.closed) {
             if (localStorage.getItem("TWITTER_CODE")) {
-              let resp, body;
+              if (connectType == 'auth') {
+                let resp, body;
 
-              resp = await nuxtApp.$API().Auth.Twitter.checkAuth({
-                authCode: localStorage.getItem("TWITTER_CODE"),
-                codeChallenge: rndStr
-              });
-              body = await resp.json();
-              clearInterval(timer);
+                resp = await nuxtApp.$API().Auth.Twitter.checkAuth({
+                  authCode: localStorage.getItem("TWITTER_CODE"),
+                  codeChallenge: rndStr
+                });
+                body = await resp.json();
+                clearInterval(timer);
 
-              if (body.errors) {
-                //nuxtApp.$showToast(body.errors[0].message, "error", 10);
-                return console.error(body);
+                if (body.errors) {
+                  //nuxtApp.$showToast(body.errors[0].message, "error", 10);
+                  return console.error(body);
+                }
+
+                await userStore.saveUser(body.accessToken)
               }
-
-              if (connectType == 'auth') await userStore.saveUser(body.accessToken)
               else if (connectType == 'update') {
                 await userStore.updateUser({ twitter: { authCode: localStorage.getItem("TWITTER_CODE"), codeChallenge: rndStr } })
               }
@@ -121,16 +126,18 @@ export default defineNuxtPlugin((nuxtApp) => {
         if (userStore.getUser?.value?.googleUser) return;
         console.log("Access Token: ", response.access_token);
 
-        let resp = await nuxtApp.$API().Auth.Google.checkAuth(response.access_token);
-        let body = await resp.json();
+        if (connectType == 'auth') {
+          let resp = await nuxtApp.$API().Auth.Google.checkAuth(response.access_token);
+          let body = await resp.json();
 
-        if (body.errors) {
-          //nuxtApp.$showToast(body.errors[0].message, "error");
-          return console.error(body);
+          if (body.errors) {
+            //nuxtApp.$showToast(body.errors[0].message, "error");
+            return console.error(body);
+          }
+
+          console.log(body);
+          await userStore.saveUser(body.accessToken)
         }
-
-        console.log(body);
-        if (connectType == 'auth') await userStore.saveUser(body.accessToken)
         else if (connectType == 'update') {
           await userStore.updateUser({ google: { token: response.access_token } })
         }
