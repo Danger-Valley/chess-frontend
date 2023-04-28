@@ -1,9 +1,12 @@
 <template>
   <header class="header">
-    <div class="logo">
+    <NuxtLink
+      class="logo"
+      to="/"
+    >
       <div class="logo__heading">The Chess</div>
       <div class="logo__underheading">Multichain crypto chess</div>
-    </div>
+    </NuxtLink>
 
     <div class="header__mobile">
       <div class="status">
@@ -113,7 +116,7 @@ let activeBoards = ref(584),
 
 const store = useUserStore()
 
-const user = computed(() => store.getUser.value?.user)
+const user = computed(() => store.getUser.value)
 
 const toggleMenu = () => {
   // TODO get var from scss?
@@ -260,6 +263,10 @@ function meme() {
 
       &--logged {
         height: 218px;
+
+        .menu__item--signin {
+          height: 0;
+        }
       }
 
       &--toggled {
@@ -395,7 +402,9 @@ function meme() {
     &__list {
       margin: 0;
       gap: 40px;
-      &-wrapper{
+      align-items: center;
+
+      &-wrapper {
         position: absolute;
         left: 100vw;
         top: 0;
@@ -452,10 +461,9 @@ function meme() {
 
   .menu {
     &__list {
-      &-wrapper{
+      &-wrapper {
         padding: 71px 20px;
       }
-      align-items: center;
     }
 
     &__item {
@@ -476,5 +484,4 @@ function meme() {
       padding: 26px 15px;
     }
   }
-}
-</style>
+}</style>

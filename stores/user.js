@@ -12,17 +12,24 @@ export const useUserStore = defineStore('user', () => {
     console.log(`User saved!`, user.value)
   }
 
-  async function obtainUser(){
-    if(!process.client) return;
-    
+  async function updateUser(objToPass) {
+    let resp = await $API().User.update(objToPass);
+    let body = await resp.json();
+    user.value = body.user;
+    console.log(`User updated!`, user.value)
+  }
+
+  async function obtainUser() {
+    if (!process.client) return;
+
     let accessToken = localStorage.getItem('accessToken')
     console.log(accessToken, user.value)
-    if(accessToken) {
+    if (accessToken) {
       let resp = await $API().User.get(accessToken)
       let body = await resp.json()
-      user.value = body;
+      user.value = body.user;
     }
   }
 
-  return { getUser, saveUser, obtainUser }
+  return { getUser, saveUser, obtainUser, updateUser }
 })

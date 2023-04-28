@@ -2,13 +2,14 @@
   <div
     class="popup__wrapper"
     id="SignInPopup"
+    @click="$togglePopup('SignInPopup')"
   >
     <div class="popup">
       <div class="popup__heading">Sign In</div>
 
       <div
         class="sign-in"
-        @click="$connectDiscord"
+        @click.stop="$connectDiscord"
       >
         <IconDiscord
           class="sign-in__icon"
@@ -19,7 +20,7 @@
 
       <div
         class="sign-in"
-        @click="$connectTwitter"
+        @click.stop="$connectTwitter"
       >
         <IconTwitter
           class="sign-in__icon"
@@ -30,7 +31,7 @@
 
       <div
         class="sign-in"
-        @click="login"
+        @click.stop="login"
       >
         <IconGoogle
           class="sign-in__icon"
@@ -86,4 +87,13 @@ const { isReady, login } = useTokenClient({
     line-height: 100%;
     color: #FFFFFF;
   }
-}</style>
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
+  // assuming it's height is always 270px
+  .popup{
+    height: 270px;
+    margin-top: calc((100vh - 270px) / 2);
+  }
+}
+</style>

@@ -15,6 +15,10 @@ body {
   overflow-x: hidden;
 }
 
+a {
+  text-decoration: unset;
+}
+
 .link {
   display: flex;
   flex-direction: row;
@@ -54,9 +58,10 @@ body {
 }
 
 @media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
-  .link{
+  .link {
     &--small {
       font-size: 18px;
+
       .link__arrow {
         width: calc(13px * 1.25);
       }
@@ -65,6 +70,7 @@ body {
     &--normal {
       font-size: 26px;
       gap: 19px;
+
       .link__arrow {
         width: calc(20px * 1.25);
       }
@@ -73,10 +79,11 @@ body {
 }
 
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
-  .link{
+  .link {
     &--normal {
       font-size: 18px;
       gap: 12px;
+
       .link__arrow {
         width: calc(20px * 1.25);
       }

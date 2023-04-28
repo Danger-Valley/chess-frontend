@@ -3,7 +3,7 @@ import { useUserStore } from "~/stores/user";
 export default defineNuxtPlugin((nuxtApp) => {
   let userStore = useUserStore()
   const close = () => {
-    if(document.querySelector('#SignInPopup')) nuxtApp.$togglePopup('SignInPopup')
+    if (document.querySelector('#SignInPopup')) nuxtApp.$togglePopup('SignInPopup')
   }
   const randomString = () => {
     let res = "";
@@ -17,11 +17,14 @@ export default defineNuxtPlugin((nuxtApp) => {
     }
     return res;
   }
-  
+
   return {
     provide: {
-      async connectDiscord() {
-        if(userStore.getUser.value.discordUser) return;
+      /**
+       * @param {string} connectType 'auth' or 'update' (profile)
+       */
+      async connectDiscord(connectType = 'auth') {
+        if (userStore.getUser?.value?.discordUser) return;
 
         let env = useRuntimeConfig();
         let url;
@@ -46,17 +49,24 @@ export default defineNuxtPlugin((nuxtApp) => {
                 return console.error(body);
               }
 
-              localStorage.removeItem("DISCORD_CODE");
               console.log(body);
-              await userStore.saveUser(body.accessToken)
+              if (connectType == 'auth') await userStore.saveUser(body.accessToken)
+              else if (connectType == 'update') {
+                await userStore.updateUser({ discord: { authCode: localStorage.getItem("DISCORD_CODE") } })
+              }
+
+              localStorage.removeItem("DISCORD_CODE");
               close()
             }
           }
         }, 500);
       },
 
-      async connectTwitter() {
-        if(userStore.getUser.value.twitterUser) return;
+      /**
+       * @param {string} connectType 'auth' or 'update' (profile)
+       */
+      async connectTwitter(connectType = 'auth') {
+        if (userStore.getUser?.value?.twitterUser) return;
         let env = useRuntimeConfig();
         let url;
 
@@ -91,8 +101,11 @@ export default defineNuxtPlugin((nuxtApp) => {
                 return console.error(body);
               }
 
+              if (connectType == 'auth') await userStore.saveUser(body.accessToken)
+              else if (connectType == 'update') {
+                await userStore.updateUser({ twitter: { authCode: localStorage.getItem("TWITTER_CODE"), codeChallenge: rndStr } })
+              }
               localStorage.removeItem("TWITTER_CODE");
-              await userStore.saveUser(body.accessToken)
               close()
             }
           }
@@ -101,8 +114,11 @@ export default defineNuxtPlugin((nuxtApp) => {
 
       // google flow
 
-      async handleOnSuccess(response) {
-        if(userStore.getUser.value?.googleUser) return;
+      /**
+       * @param {string} connectType 'auth' or 'update' (profile)
+       */
+      async handleOnSuccess(response, connectType = 'auth') {
+        if (userStore.getUser?.value?.googleUser) return;
         console.log("Access Token: ", response.access_token);
 
         let resp = await nuxtApp.$API().Auth.Google.checkAuth(response.access_token);
@@ -114,7 +130,10 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
 
         console.log(body);
-        await userStore.saveUser(body.accessToken)
+        if (connectType == 'auth') await userStore.saveUser(body.accessToken)
+        else if (connectType == 'update') {
+          await userStore.updateUser({ google: { token: response.access_token } })
+        }
         close()
       },
       handleOnError(errorResponse) {
