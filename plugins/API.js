@@ -105,13 +105,6 @@ class User {
   }
 
   async update(accessToken, body) {
-    console.log(accessToken, body, {
-      method: "POST",
-      body: body,
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      }})
     return await fetch(`${this.localPath}`, {
       method: "POST",
       /**
