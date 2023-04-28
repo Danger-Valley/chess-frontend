@@ -129,7 +129,7 @@ class User {
           }
         },
        */
-      body: body,
+      body: JSON.stringify(body),
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
