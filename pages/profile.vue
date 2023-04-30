@@ -163,8 +163,8 @@ const user = computed(() => store.getUser.value)
 let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError } = useNuxtApp();
 
 const { isReady, login } = useTokenClient({
-  onSuccess: (e) => {
-    $handleOnSuccess(e, 'update')
+  onSuccess: async (e) => {
+    await $handleOnSuccess(e, 'update')
     document.querySelectorAll("#social-google svg path").forEach(el => {
       if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
       else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
