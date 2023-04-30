@@ -1,30 +1,48 @@
 <template>
   <div class="page">
-
-    <NuxtLink
-      id="goBack"
-      to="/"
-    >
-      Back to The Chess
-    </NuxtLink>
   </div>
 </template>
 
 <script setup>
-let s = ref(1);
+import { useUserStore } from '~/stores/user';
 
-onMounted(() => {
+let userStore = useUserStore(),
+  { $API } = useNuxtApp()
+
+onMounted(async () => {
   const fragment = new URLSearchParams(window.location.search);
   const code = fragment.get('code');
 
-  if (code) localStorage.setItem("TWITTER_CODE", code);
+  if (!code) return;
 
-  /*
-  setInterval(() => {
-    if (s.value === 1) close();
-    s.value--;
-  }, 1000)
-  */
+  if (localStorage.getItem("connectType") == 'auth') {
+    let resp, body;
+
+    resp = await $API().Auth.Twitter.checkAuth({
+      authCode: code,
+      codeChallenge: localStorage.getItem("codeChallenge")
+    });
+    body = await resp.json();
+
+    if (body.errors) {
+      return console.error(body);
+    }
+
+    console.log(body);
+
+    await userStore.saveUser(body.accessToken)
+  }
+  else if (localStorage.getItem("connectType") == 'update') {
+    await userStore.updateUser({ twitter: { authCode: code, codeChallenge: localStorage.getItem("codeChallenge") } })
+  }
+
+  let redirect_original_url = localStorage.getItem("redirect_original_url")
+
+  localStorage.removeItem("redirect_original_url");
+  localStorage.removeItem("connectType");
+  localStorage.removeItem("codeChallenge");
+
+  navigateTo(redirect_original_url);
 });
 </script>
 <style lang="scss" scoped>

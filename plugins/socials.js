@@ -2,9 +2,6 @@ import { useUserStore } from "~/stores/user";
 
 export default defineNuxtPlugin((nuxtApp) => {
   let userStore = useUserStore()
-  const close = () => {
-    if (document.querySelector('#SignInPopup')) nuxtApp.$togglePopup('SignInPopup')
-  }
   const randomString = () => {
     let res = "";
     let abc = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -25,6 +22,8 @@ export default defineNuxtPlugin((nuxtApp) => {
        */
       async connectDiscord(connectType = 'auth') {
         if (userStore.getUser?.value?.discordUser) return;
+        localStorage.setItem("redirect_original_url", location.href);
+        localStorage.setItem("connectType", connectType)
 
         let env = useRuntimeConfig();
         let url;
@@ -34,35 +33,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         else
           url = env.public.Discord.redirect.prod;
 
-        let discordTab = open(url, "Discord login");
-        let timer = setInterval(async () => {
-          if (discordTab.closed) {
-            if (localStorage.getItem("DISCORD_CODE")) {
-              if (connectType == 'auth') {
-                let resp, body;
-
-                resp = await nuxtApp.$API().Auth.Discord.checkAuth(localStorage.getItem("DISCORD_CODE"));
-                body = await resp.json();
-                clearInterval(timer);
-
-                if (body.errors) {
-                  //nuxtApp.$showToast(body.errors[0].message, "error");
-                  return console.error(body);
-                }
-
-                console.log(body);
-
-                await userStore.saveUser(body.accessToken)
-              }
-              else if (connectType == 'update') {
-                await userStore.updateUser({ discord: { authCode: localStorage.getItem("DISCORD_CODE") } })
-              }
-
-              localStorage.removeItem("DISCORD_CODE");
-              close()
-            }
-          }
-        }, 500);
+        await navigateTo(url, {
+          external: true
+        })
+      },
+      async disconnectDiscord() {
+        await userStore.updateUser({ discord: "null" })
       },
 
       /**
@@ -70,6 +46,9 @@ export default defineNuxtPlugin((nuxtApp) => {
        */
       async connectTwitter(connectType = 'auth') {
         if (userStore.getUser?.value?.twitterUser) return;
+        localStorage.setItem("redirect_original_url", location.href);
+        localStorage.setItem("connectType", connectType)
+
         let env = useRuntimeConfig();
         let url;
 
@@ -83,38 +62,16 @@ export default defineNuxtPlugin((nuxtApp) => {
         console.log(`Random string for Twitter's code challenge: ${rndStr}`);
 
         url = url.replace("NEW_RANDOM_STRING_EACH_TIME", rndStr);
+        localStorage.setItem("codeChallenge", rndStr)
 
         console.log(`Url for redirect: ${url}`);
 
-        let twitterTab = open(url, "Twitter login");
-        let timer = setInterval(async () => {
-          if (twitterTab.closed) {
-            if (localStorage.getItem("TWITTER_CODE")) {
-              if (connectType == 'auth') {
-                let resp, body;
-
-                resp = await nuxtApp.$API().Auth.Twitter.checkAuth({
-                  authCode: localStorage.getItem("TWITTER_CODE"),
-                  codeChallenge: rndStr
-                });
-                body = await resp.json();
-                clearInterval(timer);
-
-                if (body.errors) {
-                  //nuxtApp.$showToast(body.errors[0].message, "error", 10);
-                  return console.error(body);
-                }
-
-                await userStore.saveUser(body.accessToken)
-              }
-              else if (connectType == 'update') {
-                await userStore.updateUser({ twitter: { authCode: localStorage.getItem("TWITTER_CODE"), codeChallenge: rndStr } })
-              }
-              localStorage.removeItem("TWITTER_CODE");
-              close()
-            }
-          }
-        }, 500);
+        await navigateTo(url, {
+          external: true
+        })
+      },
+      async disconnectTwitter() {
+        await userStore.updateUser({ twitter: "null" })
       },
 
       // google flow

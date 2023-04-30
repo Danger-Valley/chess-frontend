@@ -8,7 +8,7 @@
           v-for="(tab, counter) in ['Profile', 'Last games']"
           class="nav__tab"
           :class="{ 'nav__tab--active': counter == chosenTabIndex }"
-          @click="chosenTabIndex = counter"
+          @click="chooseTabIndex(counter)"
         >
           {{ tab }}
         </div>
@@ -18,8 +18,20 @@
         <template v-if="chosenTabIndex == 0">
           <div class="tab">
             <div class="tab__heading">Your name</div>
-            <div>
-              <!-- не впевнений в дизайну тож потім зроблю -->
+            <div class="tab__item info">
+              <img
+                class="info__avatar"
+                :src="user?.avatar"
+              />
+              <div
+                class="info__nickname"
+                id="nickname"
+                :contenteditable="isNameEditorToggled"
+              >{{ user.nickname || 'Your name' }}</div>
+              <IconEdit
+                class="info__edit"
+                @click="toggleEditName"
+              ></IconEdit>
             </div>
           </div>
 
@@ -29,7 +41,7 @@
             <div class="tab__item">
               <div
                 class="social"
-                :class="{ 'social--connected': user?.discrodUser }"
+                :class="{ 'social--connected': user?.discordUser?.id }"
                 id="social-discord"
                 @click="$connectDiscord('update')"
               >
@@ -38,14 +50,17 @@
                   alt="discord icon"
                 ></IconDiscord>
                 <div class="user">
-                  <template v-if="user?.discrodUser">
+                  <template v-if="user?.discordUser">
                     <img
                       class="user__avatar"
-                      v-if="user.discrodUser.avatar"
-                      :src="user.discrodUser.avatar"
+                      v-if="user.discordUser.avatar"
+                      :src="user.discordUser.avatar"
                     />
-                    <div class="user__username">{{ user.discrodUser.username }}</div>
-                    <div class="user__disconnect">Disconnect</div>
+                    <div class="user__username">{{ user.discordUser.username }}</div>
+                    <div
+                      class="user__disconnect"
+                      @click.stop="$disconnectDiscord()"
+                    >Disconnect</div>
                   </template>
 
                   <template v-else>
@@ -72,7 +87,10 @@
                       :src="user.twitterUser.avatar"
                     />
                     <div class="user__username">{{ user.twitterUser.username }}</div>
-                    <div class="user__disconnect">Disconnect</div>
+                    <div
+                      class="user__disconnect"
+                      @click.stop="$disconnectTwitter()"
+                    >Disconnect</div>
                   </template>
 
                   <template v-else>
@@ -99,7 +117,6 @@
                       :src="user.googleUser.avatar"
                     />
                     <div class="user__username">{{ user.googleUser.username }}</div>
-                    <div class="user__disconnect">Disconnect</div>
                   </template>
                   <template v-else>
                     Connect Google
@@ -133,23 +150,44 @@
 import IconDiscord from "@/assets/imgs/discord-logo.svg"
 import IconTwitter from "@/assets/imgs/twitter-logo.svg"
 import IconGoogle from "@/assets/imgs/google-logo.svg"
+import IconEdit from "@/assets/imgs/edit.svg"
 import { useUserStore } from "~/stores/user"
 
-let chosenTabIndex = ref(0)
+let chosenTabIndex = ref(0),
+  isNameEditorToggled = ref(false)
 
 const store = useUserStore()
 
 const user = computed(() => store.getUser.value)
 
-let { $connectDiscord, $connectTwitter, $handleOnSuccess, $handleOnError } = useNuxtApp();
+let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError } = useNuxtApp();
 
 const { isReady, login } = useTokenClient({
-  onSuccess: (e) => $handleOnSuccess(e, 'update'),
+  onSuccess: (e) => {
+    $handleOnSuccess(e, 'update')
+    document.querySelectorAll("#social-google svg path").forEach(el => {
+      if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
+      else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
+      else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
+      else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
+    })
+  },
   onError: $handleOnError
 });
 
+const chooseTabIndex = (index) => {
+  chosenTabIndex.value = index;
+  location.hash = index;
+}
+
+const toggleEditName = () => {
+  isNameEditorToggled.value = !isNameEditorToggled.value;
+  if (isNameEditorToggled.value) document.querySelector('#nickname').focus();
+}
+
 onMounted(() => {
-  console.log(user.value)
+  console.log(user.value, location.hash)
+  chosenTabIndex.value = location.hash.slice(1);
 })
 </script>
 
@@ -226,6 +264,34 @@ onMounted(() => {
   }
 }
 
+.info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+
+  &__avatar {
+    width: 75px;
+    aspect-ratio: 1;
+    cursor: pointer;
+  }
+
+  &__nickname {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: 'Neue Plak';
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 30px;
+    color: #FFFFFF;
+  }
+
+  &__edit{
+    cursor: pointer;
+  }
+}
+
 .social {
   display: flex;
   flex-direction: row;
@@ -251,13 +317,13 @@ onMounted(() => {
       }
 
       &-twitter {
-        border: 2px solid red;
-        background-color: red;
+        border: 2px solid #1D9BF0;
+        background-color: #1D9BF0;
       }
 
       &-google {
-        border: 2px solid red;
-        background-color: red;
+        border: 2px solid #fff;
+        background-color: #fff;
       }
     }
   }

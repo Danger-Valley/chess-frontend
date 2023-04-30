@@ -42,8 +42,8 @@
           <div class="profile__name">{{ user.username || user.email }}</div>
           <div
             class="profile__cross"
-            :class="{ 'profile__cross--toggled': isToggled }"
-            @click.stop="toggleMenu()"
+            :class="{ 'profile__cross--closed': isClosed }"
+            @click.stop="isClosed = !isClosed"
           >
             <IconCross></IconCross>
           </div>
@@ -51,7 +51,7 @@
 
         <div
           class="menu__list-wrapper"
-          :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user }"
+          :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user, 'menu__list-wrapper--closed': isClosed }"
         >
           <div
             class="menu__list"
@@ -112,7 +112,10 @@ import { useUserStore } from "~/stores/user";
 let { $togglePopup } = useNuxtApp();
 
 let activeBoards = ref(584),
-  isToggled = ref(false)
+  // for mobile
+  isToggled = ref(false),
+  // for desktop
+  isClosed = ref(false)
 
 const store = useUserStore()
 
@@ -269,7 +272,7 @@ function meme() {
         }
       }
 
-      &--toggled {
+      &--closed {
         height: 0;
         //margin-top: 0;
         //margin-bottom: 0;
@@ -350,7 +353,7 @@ function meme() {
       color: #ffffff4d;
     }
 
-    &--toggled {
+    &--closed {
       rotate: 45deg;
 
       svg {
