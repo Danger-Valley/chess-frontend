@@ -17,6 +17,15 @@ body {
 
 a {
   text-decoration: unset;
+  color: unset;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow-x: hidden;
+  background: #181B20;
 }
 
 .link {

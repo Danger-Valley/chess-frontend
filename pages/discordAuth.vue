@@ -42,14 +42,6 @@ onMounted(async () => {
 });
 </script>
 <style lang="scss" scoped>
-.page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100vw;
-  height: 100vh;
-}
-
 #anim {
   width: 100%;
   max-width: 400px;

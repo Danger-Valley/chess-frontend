@@ -65,7 +65,7 @@
             </div>
             <NuxtLink
               class="menu__item"
-              to=""
+              to="/lobby"
             >Lobby</NuxtLink>
             <NuxtLink
               class="menu__item"
@@ -136,6 +136,10 @@ function meme() {
     if (el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
   })
 }
+
+onMounted(() => {
+  if(user.value) isClosed.value = true;
+})
 </script>
 
 <style lang="scss" scoped>

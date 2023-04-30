@@ -32,14 +32,6 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
 </script>
 
 <style lang="scss" scoped>
-.page{
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow-x: hidden;
-  background: #181B20;
-}
-
 .main{
   $margin_to_set: min(200px, 50vh);
   /*

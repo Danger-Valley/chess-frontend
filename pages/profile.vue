@@ -27,7 +27,7 @@
                 class="info__nickname"
                 id="nickname"
                 :contenteditable="isNameEditorToggled"
-              >{{ user.nickname || 'Your name' }}</div>
+              >{{ user.nickname || 'Your username' }}</div>
               <IconEdit
                 class="info__edit"
                 @click="toggleEditName"
@@ -192,14 +192,6 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.page {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  overflow-x: hidden;
-  background: #181B20;
-}
-
 .main {
   margin: 8px 110px;
 }
