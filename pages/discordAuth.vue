@@ -13,6 +13,8 @@ onMounted(async () => {
   const fragment = new URLSearchParams(window.location.search);
   const code = fragment.get('code');
 
+  console.log(localStorage, localStorage.getItem("connectType"), code)
+
   if (!code) return;
 
   if (localStorage.getItem("connectType") == 'auth') {
@@ -35,8 +37,8 @@ onMounted(async () => {
 
   let redirect_original_url = localStorage.getItem("redirect_original_url")
 
-  localStorage.removeItem("redirect_original_url");
-  localStorage.removeItem("connectType");
+  //localStorage.removeItem("redirect_original_url");
+  //localStorage.removeItem("connectType");
 
   //navigateTo(redirect_original_url, { external: true });
 });
