@@ -38,7 +38,7 @@ onMounted(async () => {
   localStorage.removeItem("redirect_original_url");
   localStorage.removeItem("connectType");
 
-  navigateTo(redirect_original_url);
+  navigateTo(redirect_original_url, { external: true });
 });
 </script>
 <style lang="scss" scoped>
