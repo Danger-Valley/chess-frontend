@@ -9,7 +9,7 @@
 
       <div
         class="sign-in"
-        @click.stop="$connectDiscord"
+        @click.stop="$connectDiscord('auth')"
       >
         <IconDiscord
           class="sign-in__icon"
@@ -20,7 +20,7 @@
 
       <div
         class="sign-in"
-        @click.stop="$connectTwitter"
+        @click.stop="$connectTwitter('auth')"
       >
         <IconTwitter
           class="sign-in__icon"
@@ -52,7 +52,7 @@ import { useTokenClient } from "vue3-google-signin";
 let { $connectDiscord, $connectTwitter, $handleOnSuccess, $handleOnError } = useNuxtApp();
 
 const { isReady, login } = useTokenClient({
-  onSuccess: $handleOnSuccess,
+  onSuccess: (e) => $handleOnSuccess(e, 'auth'),
   onError: $handleOnError
 });
 </script>
