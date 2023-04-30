@@ -37,10 +37,10 @@ onMounted(async () => {
 
   let redirect_original_url = localStorage.getItem("redirect_original_url")
 
-  //localStorage.removeItem("redirect_original_url");
-  //localStorage.removeItem("connectType");
+  localStorage.removeItem("redirect_original_url");
+  localStorage.removeItem("connectType");
 
-  //navigateTo(redirect_original_url, { external: true });
+  navigateTo(redirect_original_url, { external: true });
 });
 </script>
 <style lang="scss" scoped>
