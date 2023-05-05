@@ -18,10 +18,12 @@
   },
   "dependencies": {
     "@pinia/nuxt": "^0.4.8",
+    "@solana/wallet-adapter-wallets": "^0.19.16",
     "nuxt-vue3-google-signin": "^0.0.8",
     "pinia": "^2.0.34",
     "sass": "^1.62.0",
     "sass-loader": "^13.2.2",
+    "solana-wallets-vue": "^0.6.0",
     "vite-svg-loader": "^4.0.0"
   }
 }

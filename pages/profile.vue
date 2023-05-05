@@ -132,17 +132,32 @@
             <div class="tab__item">
               <div
                 class="wallet"
-                v-for="walletType in ['Ethereum', 'Solana', 'Polygon', 'Bitcoin', 'Stellar']"
+                v-for="walletType in ['Solana', 'Ethereum', 'Polygon', 'Bitcoin', 'Stellar']"
               >
                 <div class="wallet__type">{{ walletType }} Wallets</div>
                 <div class="wallet__amount">0 Wallets Connected</div>
-                <div class="wallet__connect">Connect Wallet</div>
+                <div
+                  class="wallet__connect"
+                  :class="{ 'wallet__connect--soon': walletType != 'Solana', 'wallet__connect--connected': wallet && walletType == 'Solana' }"
+                  @click="openWalletModalProvider(walletType)"
+                >
+                  <template v-if="walletType == 'Solana'">
+                    <template v-if="wallet">{{ publicKey?.toString().slice(0,4) }}...{{ publicKey?.toString().slice(-4) }}</template>
+                    <template v-else>Connect Wallet</template>
+                  </template>
+                  <template v-else>Soon!</template>
+                </div>
               </div>
             </div>
           </div>
         </template>
       </div>
     </main>
+
+    <WalletModalProvider
+      dark
+      ref="walletModalProviderRef"
+    ></WalletModalProvider>
   </div>
 </template>
 
@@ -152,9 +167,13 @@ import IconTwitter from "@/assets/imgs/twitter-logo.svg"
 import IconGoogle from "@/assets/imgs/google-logo.svg"
 import IconEdit from "@/assets/imgs/edit.svg"
 import { useUserStore } from "~/stores/user"
+import { WalletModalProvider, useWallet } from "solana-wallets-vue";
 
 let chosenTabIndex = ref(0),
-  isNameEditorToggled = ref(false)
+  isNameEditorToggled = ref(false),
+  walletModalProviderRef = ref()
+
+const { publicKey, wallet, disconnect } = useWallet();
 
 const store = useUserStore()
 
@@ -175,6 +194,16 @@ const { isReady, login } = useTokenClient({
   onError: $handleOnError
 });
 
+const openWalletModalProvider = (walletType) => {
+  console.log(wallet.value, walletType)
+  if (!wallet.value) {
+    if (walletType == 'Solana') walletModalProviderRef.value.openModal();
+  }
+  else {
+    if (walletType == 'Solana') disconnect();
+  }
+}
+
 const chooseTabIndex = (index) => {
   chosenTabIndex.value = index;
   location.hash = index;
@@ -186,7 +215,6 @@ const toggleEditName = () => {
 }
 
 onMounted(() => {
-  console.log(user.value, location.hash)
   chosenTabIndex.value = location.hash.slice(1);
 })
 </script>
@@ -279,7 +307,7 @@ onMounted(() => {
     color: #FFFFFF;
   }
 
-  &__edit{
+  &__edit {
     cursor: pointer;
   }
 }
@@ -405,6 +433,14 @@ onMounted(() => {
     color: #FFFFFF;
     text-align: center;
     cursor: pointer;
+
+    &--soon {
+      border: unset;
+      cursor: not-allowed;
+    }
+    &--connected{
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
   }
 
 }</style>

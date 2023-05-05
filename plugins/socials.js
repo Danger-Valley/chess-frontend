@@ -59,12 +59,8 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         let rndStr = randomString();
 
-        console.log(`Random string for Twitter's code challenge: ${rndStr}`);
-
         url = url.replace("NEW_RANDOM_STRING_EACH_TIME", rndStr);
         localStorage.setItem("codeChallenge", rndStr)
-
-        console.log(`Url for redirect: ${url}`);
 
         await navigateTo(url, {
           external: true
@@ -81,6 +77,7 @@ export default defineNuxtPlugin((nuxtApp) => {
        */
       async handleOnSuccess(response, connectType = 'auth') {
         if (userStore.getUser?.value?.googleUser) return;
+        console.log("resp", response);
         console.log("Access Token: ", response.access_token);
 
         if (connectType == 'auth') {

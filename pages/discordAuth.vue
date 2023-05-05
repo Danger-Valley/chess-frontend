@@ -13,8 +13,6 @@ onMounted(async () => {
   const fragment = new URLSearchParams(window.location.search);
   const code = fragment.get('code');
 
-  console.log(localStorage, localStorage.getItem("connectType"), code)
-
   if (!code) return;
 
   if (localStorage.getItem("connectType") == 'auth') {
@@ -26,8 +24,6 @@ onMounted(async () => {
     if (body.errors) {
       return console.error(body);
     }
-
-    console.log(body);
 
     await userStore.saveUser(body.accessToken)
   }

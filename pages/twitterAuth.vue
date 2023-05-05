@@ -28,8 +28,6 @@ onMounted(async () => {
       return console.error(body);
     }
 
-    console.log(body);
-
     await userStore.saveUser(body.accessToken)
   }
   else if (localStorage.getItem("connectType") == 'update') {

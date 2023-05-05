@@ -132,7 +132,6 @@ const singIn = async () => {
 
 function meme() {
   document.querySelectorAll('div, a, span').forEach(el => {
-    console.log(el, el.innerHTML)
     if (el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
   })
 }

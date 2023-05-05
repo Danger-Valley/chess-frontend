@@ -11,6 +11,12 @@ export default defineNuxtConfig({
     clientId: process.env.GOOGLE_CLIENT_ID,
   },
   vite: {
+    optimizeDeps: {
+      include: ["@project-serum/anchor", "@solana/web3.js", "buffer"],
+      esbuildOptions: {
+        target: "esnext",
+      },
+    },
     css: {
       preprocessorOptions: {
         scss: {
