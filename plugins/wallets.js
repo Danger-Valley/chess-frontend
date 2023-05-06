@@ -54,6 +54,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           walletAddress: publicKey.value,
           signatureId: body.id,
           signature: signedMessage,
+          signatureArray: signedMessageArr,
           signatureType: 'LOGIN',
           accessToken: localStorage.getItem('accessToken')
         })
