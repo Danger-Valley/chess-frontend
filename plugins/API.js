@@ -154,6 +154,7 @@ class Wallet {
     walletAddress,
     signatureId,
     signature,
+    signatureArray,
     signatureType,
     accessToken
   }) {
@@ -164,6 +165,7 @@ class Wallet {
         walletAddress,
         signatureId,
         signature,
+        signatureArray,
         signatureType
       }),
       headers: {
