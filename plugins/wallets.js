@@ -42,8 +42,8 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
 
         let enc = new TextEncoder()
-        let signedMessage = await signMessage.value(enc.encode(body.message))
-        console.log(signedMessage, signedMessage.toString())
+        let signedMessage = enc.decode(await signMessage.value(enc.encode(body.message)))
+        console.log(signedMessage, signedMessage)
 
         if(!signedMessage) return false;
 
@@ -51,7 +51,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           blockchain,
           walletAddress: publicKey.value,
           signatureId: body.id,
-          signature: signedMessage.toString(),
+          signature: signedMessage,
           signatureType: 'LOGIN',
           accessToken: localStorage.getItem('accessToken')
         })
