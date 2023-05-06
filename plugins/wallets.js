@@ -8,6 +8,7 @@ import {
   BraveWalletAdapter,
   WalletConnectWalletAdapter
 } from "@solana/wallet-adapter-wallets";
+import base58 from "bs58";
 
 const walletOptions = {
   wallets: [
@@ -44,8 +45,9 @@ export default defineNuxtPlugin((nuxtApp) => {
         let enc = new TextEncoder()
         let signedMessageArr = await signMessage.value(enc.encode(body.message))
         // console.log(signedMessage, signedMessage.toString())
-        let dec = new TextDecoder()
-        let signedMessage = dec.decode(signedMessageArr)
+        // let dec = new TextDecoder()
+        // let signedMessage = dec.decode(signedMessageArr)
+        const signedMessage = base58.encode(signedMessageArr);
 
         if(!signedMessage) return false;
 
@@ -54,7 +56,6 @@ export default defineNuxtPlugin((nuxtApp) => {
           walletAddress: publicKey.value,
           signatureId: body.id,
           signature: signedMessage,
-          signatureArray: signedMessageArr,
           signatureType: 'LOGIN',
           accessToken: localStorage.getItem('accessToken')
         })
