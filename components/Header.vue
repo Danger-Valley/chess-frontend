@@ -169,6 +169,7 @@ onMounted(() => {
     align-items: baseline;
     gap: 40px;
     margin-left: auto;
+    max-height: 72.38px;
   }
 }
 
@@ -179,6 +180,7 @@ onMounted(() => {
   flex-direction: column;
   gap: 5px;
   margin: 10px;
+  align-self: center;
 
   font-family: 'Neue Plak';
 
@@ -202,6 +204,7 @@ onMounted(() => {
   flex-direction: row;
   gap: 9px;
   margin-left: auto;
+  align-self: center;
 
   font-family: 'Neue Plak';
   font-size: 14px;
@@ -258,6 +261,7 @@ onMounted(() => {
   color: #FFFFFF;
 
   &--logged {
+    align-self: flex-start;
     background: radial-gradient(136px 60.5px at 24px 255px, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
   }
 

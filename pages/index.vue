@@ -43,6 +43,7 @@ import IconArrow from "@/assets/imgs/Arrow.svg"
   */
 
   margin-left: 23vw;
+  margin-top: 76px;
 
   &__heading{
     font-family: 'Neue Plak';

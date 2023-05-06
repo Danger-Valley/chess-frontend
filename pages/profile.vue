@@ -142,7 +142,7 @@
                   @click="openWalletModalProvider(walletType)"
                 >
                   <template v-if="walletType == 'Solana'">
-                    <template v-if="wallet">{{ publicKey?.toString().slice(0,4) }}...{{ publicKey?.toString().slice(-4) }}</template>
+                    <template v-if="connected">{{ publicKey?.toString().slice(0,4) }}...{{ publicKey?.toString().slice(-4) }}</template>
                     <template v-else>Connect Wallet</template>
                   </template>
                   <template v-else>Soon!</template>
@@ -159,6 +159,8 @@
       ref="walletModalProviderRef"
     ></WalletModalProvider>
   </div>
+
+  <PopupsSignInPopup></PopupsSignInPopup>
 </template>
 
 <script setup>
