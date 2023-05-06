@@ -173,13 +173,18 @@ let chosenTabIndex = ref(0),
   isNameEditorToggled = ref(false),
   walletModalProviderRef = ref()
 
-const { publicKey, wallet, disconnect } = useWallet();
+const { publicKey, wallet, disconnect, connected } = useWallet();
+
+watch(connected, async () => {
+  console.log(connected.value)
+  if(connected.value) await $connectWallet()
+})
 
 const store = useUserStore()
 
 const user = computed(() => store.getUser.value)
 
-let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError } = useNuxtApp();
+let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $connectWallet } = useNuxtApp();
 
 const { isReady, login } = useTokenClient({
   onSuccess: async (e) => {

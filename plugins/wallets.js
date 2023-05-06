@@ -1,5 +1,5 @@
 import "solana-wallets-vue/styles.css";
-import SolanaWallets from "solana-wallets-vue";
+import SolanaWallets, { useWallet } from "solana-wallets-vue";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   PhantomWalletAdapter,
@@ -15,11 +15,54 @@ const walletOptions = {
     new SlopeWalletAdapter(),
     new SolflareWalletAdapter({ network: WalletAdapterNetwork.Devnet }),
     new BraveWalletAdapter(),
-    new WalletConnectWalletAdapter()
+    //new WalletConnectWalletAdapter()
   ],
   autoConnect: true,
 };
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(SolanaWallets, walletOptions);
+  let { publicKey, signMessage } = useWallet();
+
+  return {
+    provide: {
+      async connectWallet(blockchain = 'SOLANA') {
+        let resp = await nuxtApp.$API().Signatures.create({
+          blockchain,
+          walletAddress: publicKey.value,
+          signatureType: 'LOGIN',
+          accessToken: localStorage.getItem('accessToken')
+        })
+        let body = await resp.json();
+        console.log(body)
+
+        if (body.errors) {
+          console.error(body);
+          return false;
+        }
+
+        let signedMessage = await signMessage.value(body.message)
+
+        if(!signedMessage) return false;
+
+        resp = await nuxtApp.$API().Wallet.connect({
+          blockchain,
+          walletAddress: publicKey.value,
+          signatureId: body.id,
+          signature: signedMessage,
+          signatureType: 'LOGIN',
+          accessToken: localStorage.getItem('accessToken')
+        })
+        body = await resp.json();
+
+        console.log(body)
+        if (body.errors) {
+          console.error(body);
+          return false;
+        }
+
+        return true;
+      }
+    }
+  }
 });

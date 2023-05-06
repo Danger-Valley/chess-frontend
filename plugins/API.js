@@ -75,9 +75,10 @@ class Signatures {
   }
 
   async create({
-    blockchain = 'SOLANA',
+    blockchain,
     walletAddress,
-    signatureType
+    signatureType,
+    accessToken
   }) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
@@ -86,7 +87,10 @@ class Signatures {
         walletAddress,
         signatureType
       }),
-      headers: { 'content-type': 'application/json' }
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
     });
   }
 }
@@ -140,13 +144,65 @@ class User {
     });
   }
 }
+class Wallet {
+  constructor(path) {
+    this.localPath = `${path}/users/wallets`;
+  }
+
+  async connect({
+    blockchain,
+    walletAddress,
+    signatureId,
+    signature,
+    signatureType,
+    accessToken
+  }) {
+    return await fetch(`${this.localPath}`, {
+      method: "POST",
+      body: JSON.stringify({
+        blockchain,
+        walletAddress,
+        signatureId,
+        signature,
+        signatureType
+      }),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async disconnect({
+    walletAddress,
+    accessToken
+  }) {
+    return await fetch(`${this.localPath}/${walletAddress}`, {
+      method: "DELETE",
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async get(accessToken) {
+    return await fetch(`${this.localPath}`, {
+      method: "GET",
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
     provide: {
       API() {
         let env = useRuntimeConfig();
-        let path = env.public.API_URL || "https://api-dev.thechess.io/auth";
+        let path = env.public.API_URL || "https://api-dev.thechess.io";
 
         return {
           Auth: {
@@ -154,7 +210,9 @@ export default defineNuxtPlugin(() => {
             Twitter: new Twitter(`${path}/auth/api/v1/auth`),
             Google: new Google(`${path}/auth/api/v1/auth`)
           },
-          User: new User(`${path}/auth/api/v1`)
+          User: new User(`${path}/auth/api/v1`),
+          Wallet: new Wallet(`${path}/auth/api/v1`),
+          Signatures: new Signatures(`${path}/auth/api/v1`)
         }
       }
     }
