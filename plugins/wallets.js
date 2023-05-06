@@ -42,10 +42,12 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
 
         let enc = new TextEncoder()
-        let signedMessage = await signMessage.value(enc.encode(body.message));
-        console.log('1', 'signedMessage', signedMessage)
-        // signedMessage = signedMessage.toString();
-        console.log('2', 'signedMessage', signedMessage.toString())
+        let signedMessageArr = await signMessage.value(enc.encode(body.message))
+        // console.log(signedMessage, signedMessage.toString())
+
+        const buffer = Buffer.from(signedMessageArr);
+        const signedMessage = buffer.toString('base64');
+        console.log('signedMessage', signedMessage);
 
         if(!signedMessage) return false;
 
