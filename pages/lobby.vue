@@ -79,7 +79,7 @@ let rating = ref({
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin: 8px 110px;
+  margin: 8px 350px;
 }
 
 .heading {
@@ -268,11 +268,117 @@ let rating = ref({
   }
 }
 
-@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {}
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
+  .main {
+    margin: 8px 534px;
+  }
+}
 
-@media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {}
+@media screen and (max-width: #{map-get($sizes, "desktop")-1 + px}) {
+  .main {
+    margin: 8px 110px;
+  }
+}
 
-@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {}
+@media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
+  .main {
+    grid-template-columns: repeat(2, 1fr);
+    margin: 8px 147px;
+  }
 
-@media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {}
+  .heading {
+    &--double {
+      display: none;
+    }
+  }
+
+  .block {
+    &--double {
+      grid-column: span 1;
+
+      &:not(.event-2) {
+        display: none;
+      }
+    }
+
+    &--half {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 117px;
+      padding: 0 147px;
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      background: #181B20;
+      box-shadow: 0px -12px 50px rgba(0, 0, 0, 0.25);
+    }
+
+    &__half {
+      height: 77px;
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
+  .main {
+    margin: 8px 20px;
+    grid-template-rows: auto 141px 210px;
+  }
+
+  .block {
+    aspect-ratio: unset;
+    padding: 10px;
+
+    &--half {
+      padding: 0 20px;
+    }
+  }
+
+  .rating {
+    &__points {
+      font-size: 32px;
+      line-height: 44px;
+    }
+
+    &__text {
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    &__position {
+      font-size: 16px;
+      line-height: 22px;
+    }
+  }
+
+  .active-games {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .event-1, .event-2{
+    &__heading{
+      font-size: 16px;
+      line-height: 22px;
+    }
+    &__underheading{
+      font-size: 12px;
+      line-height: 16px;
+    }
+    &__text{
+      font-size: 16px;
+      line-height: 22px;
+    }
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {
+  .main{
+    //TODO
+  }
+}
 </style>
