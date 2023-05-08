@@ -25,81 +25,100 @@
       >
         <div
           v-if="!user"
-          class="menu__name"
+          class="menu__name menu__name--desktop"
           @click="toggleMenu()"
         >
           Menu
         </div>
-        <div
-          v-else
-          class="profile"
-          @click="navigateTo('/profile')"
-        >
-          <img
-            class="profile__avatar"
-            :src="user.avatar"
-          />
-          <div class="profile__name">{{ user.username || user.email }}</div>
+        <template v-else>
           <div
-            class="profile__cross"
-            :class="{ 'profile__cross--closed': isClosed }"
-            @click.stop="isClosed = !isClosed"
+            class="menu__name menu__name--mobile"
+            @click="toggleMenu()"
           >
-            <IconCross></IconCross>
+            Menu
           </div>
-        </div>
-
-        <div
-          class="menu__list-wrapper"
-          :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user, 'menu__list-wrapper--closed': isClosed }"
-        >
           <div
-            class="menu__list"
-            :class="{ 'menu__list--logged': user }"
+            class="profile profile--desktop"
+            @click="navigateTo('/profile')"
           >
+            <img
+              class="profile__avatar"
+              :src="user.avatar"
+            />
+            <div class="profile__name">{{ user.username || user.email }}</div>
             <div
-              class="menu__mobile-close"
-              @click="toggleMenu()"
+              class="profile__cross"
+              :class="{ 'profile__cross--closed': isClosed }"
+              @click.stop="isClosed = !isClosed"
             >
-              Close
-            </div>
-            <NuxtLink
-              class="menu__item"
-              to="/lobby"
-            >Lobby</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
-            >Leaderboard</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
-            >Tournaments</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
-            >Chess tv</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
-            >Wiki</NuxtLink>
-            <NuxtLink
-              class="menu__item menu__item--action"
-              to=""
-              @click="meme"
-            >
-              <div>Create game</div>
-              <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
-            </NuxtLink>
-
-            <div
-              class="menu__item menu__item--signin"
-              @click="singIn"
-            >
-              Sign In
+              <IconCross></IconCross>
             </div>
           </div>
-        </div>
+
+          <div
+            class="menu__list-wrapper"
+            :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user, 'menu__list-wrapper--closed': isClosed }"
+          >
+            <div
+              class="menu__list"
+              :class="{ 'menu__list--logged': user }"
+            >
+              <div
+                class="menu__mobile-close"
+                @click="toggleMenu()"
+              >
+                Close
+              </div>
+              <NuxtLink
+                v-if="user"
+                class="menu__item profile profile--mobile"
+                to="/profile"
+              >
+                <img
+                  class="profile__avatar"
+                  :src="user.avatar"
+                />
+                <div class="profile__name">{{ user.username || user.email }}</div>
+              </NuxtLink>
+              <NuxtLink
+                class="menu__item"
+                to="/lobby"
+              >Lobby</NuxtLink>
+              <NuxtLink
+                class="menu__item"
+                to=""
+              >Leaderboard</NuxtLink>
+              <NuxtLink
+                class="menu__item"
+                to=""
+              >Tournaments</NuxtLink>
+              <NuxtLink
+                class="menu__item"
+                to=""
+              >Chess tv</NuxtLink>
+              <NuxtLink
+                class="menu__item"
+                to=""
+              >Wiki</NuxtLink>
+              <NuxtLink
+                class="menu__item menu__item--action"
+                to=""
+                @click="meme"
+              >
+                <div>Create game</div>
+                <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
+              </NuxtLink>
+
+              <div
+                class="menu__item menu__item--signin"
+                @click="singIn"
+              >
+                Sign In
+              </div>
+            </div>
+          </div>
+        </template>
+
       </div>
     </div>
   </header>
@@ -137,7 +156,7 @@ function meme() {
 }
 
 onMounted(() => {
-  if(user.value) isClosed.value = true;
+  if (user.value) isClosed.value = true;
 })
 </script>
 
@@ -300,6 +319,10 @@ onMounted(() => {
   &__name {
     margin: 12px 6px 28px 6px;
     color: #ffffff4d;
+
+    &--mobile {
+      display: none;
+    }
   }
 
   &__mobile-close {
@@ -329,6 +352,10 @@ onMounted(() => {
   align-items: center;
   gap: 10px;
   cursor: pointer;
+
+  &--mobile {
+    display: none;
+  }
 
   &__avatar {
     width: 38.4px;
@@ -401,8 +428,10 @@ onMounted(() => {
     padding: unset;
     background: unset;
     border: unset;
+    margin-left: auto;
 
     &__name {
+      display: block;
       margin: unset;
       font-size: 18px;
       line-height: 1;
@@ -452,6 +481,22 @@ onMounted(() => {
       cursor: pointer;
     }
   }
+
+  .profile {
+    &--desktop {
+      display: none;
+    }
+
+    &--mobile {
+      display: flex;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(50px);
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+  }
 }
 
 @media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
@@ -494,4 +539,5 @@ onMounted(() => {
       padding: 26px 15px;
     }
   }
-}</style>
+}
+</style>

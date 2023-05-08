@@ -111,12 +111,7 @@
                 ></IconGoogle>
                 <div class="user">
                   <template v-if="user?.googleUser">
-                    <img
-                      class="user__avatar"
-                      v-if="user.googleUser.avatar"
-                      :src="user.googleUser.avatar"
-                    />
-                    <div class="user__username">{{ user.googleUser.username }}</div>
+                    <div class="user__username">{{ user.googleUser.email }}</div>
                   </template>
                   <template v-else>
                     Connect Google
@@ -142,7 +137,8 @@
                   @click="openWalletModalProvider(walletType)"
                 >
                   <template v-if="walletType == 'Solana'">
-                    <template v-if="connected">{{ publicKey?.toString().slice(0,4) }}...{{ publicKey?.toString().slice(-4) }}</template>
+                    <template v-if="connected">{{ publicKey?.toString().slice(0, 4) }}...{{ publicKey?.toString().slice(-4)
+                    }}</template>
                     <template v-else>Connect Wallet</template>
                   </template>
                   <template v-else>Soon!</template>
@@ -179,7 +175,7 @@ const { publicKey, wallet, disconnect, connected } = useWallet();
 
 watch(connected, async () => {
   console.log(connected.value)
-  if(connected.value) await $connectWallet()
+  if (connected.value) await $connectWallet()
 })
 
 const store = useUserStore()
@@ -223,6 +219,23 @@ const toggleEditName = () => {
 
 onMounted(() => {
   chosenTabIndex.value = location.hash.slice(1);
+  console.log(user.value.googleUser);
+  document.querySelectorAll("#social-google svg path").forEach(el => {
+    if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
+    else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
+    else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
+    else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
+  })
+})
+
+watch(user, () => {
+  console.log(user.value.googleUser);
+  document.querySelectorAll("#social-google svg path").forEach(el => {
+    if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
+    else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
+    else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
+    else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
+  })
 })
 </script>
 
@@ -445,7 +458,8 @@ onMounted(() => {
       border: unset;
       cursor: not-allowed;
     }
-    &--connected{
+
+    &--connected {
       border: 1px solid rgba(255, 255, 255, 0.7);
     }
   }
