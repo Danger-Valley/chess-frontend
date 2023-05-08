@@ -4,6 +4,10 @@
 
     <main class="main">
 
+      <div class="heading">Rating</div>
+      <div class="heading">Active games</div>
+      <div class="heading heading--double">Daily mission</div>
+
       <div class="block rating">
         <div class="rating__points">{{ rating.points }}</div>
         <div class="rating__text">Leaderboard position</div>
@@ -76,6 +80,19 @@ let rating = ref({
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   margin: 8px 110px;
+}
+
+.heading {
+  font-family: 'Neue Plak';
+  font-size: 14px;
+  line-height: 19px;
+  text-transform: uppercase;
+  color: #FFFFFF;
+  margin-bottom: -5px;
+
+  &--double {
+    grid-column: span 2;
+  }
 }
 
 .block {
@@ -250,4 +267,12 @@ let rating = ref({
     width: calc(10px * 1.25);
   }
 }
+
+@media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {}
+
+@media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {}
+
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {}
+
+@media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {}
 </style>
