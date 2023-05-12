@@ -378,7 +378,23 @@ let rating = ref({
 
 @media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {
   .main{
-    //TODO
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+  .block{
+    height: 141px;
+  }
+  .rating{
+    order: -1;
+  }
+  .heading{
+    &:nth-of-type(1){
+      order: -2;
+    }
+    &:nth-of-type(2){
+      order: 0;
+    }
   }
 }
 </style>
