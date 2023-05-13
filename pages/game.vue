@@ -1,10 +1,13 @@
 <template>
   <div class="page">
-    <GamePlayer :player-type="'opponent'"></GamePlayer>
+    <GamePlayer
+      class="player"
+      :player-type="'opponent'"
+    ></GamePlayer>
 
     <main class="main">
       <aside class="aside chat">
-        <div class="aside__heading aside__heading--capitalize">Chat</div>
+        <div class="aside__heading aside__heading--uppercase">Chat</div>
         <div class="aside__divider"></div>
 
         <div
@@ -126,19 +129,17 @@
         </div>
       </aside>
 
-      <div class="field">
-
-      </div>
+      <TheChessboard />
 
       <aside class="aside info">
         <div class="aside__heading">
           Information
-          <ArrowIcon></ArrowIcon>
+          <DropdownArrowIcon></DropdownArrowIcon>
         </div>
         <div class="aside__divider"></div>
         <div class="aside__heading">
           History
-          <ArrowIcon></ArrowIcon>
+          <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
         </div>
         <div
           class="turn"
@@ -178,15 +179,98 @@
       </aside>
     </main>
 
-    <GamePlayer :player-type="'me'"></GamePlayer>
+    <GamePlayer
+      class="player"
+      :player-type="'me'"
+    ></GamePlayer>
   </div>
 </template>
 
 <script setup>
-import ArrowIcon from "@/assets/imgs/Arrow.svg"
+import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
 import { useWallet } from "solana-wallets-vue";
+import { TheChessboard } from 'vue3-chessboard';
+import '@/assets/styles/chess.css';
 
 const { publicKey, wallet, disconnect, connected } = useWallet();
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.page {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  grid-template-columns: 283px auto 283px;
+  grid-template-rows: 35px auto 35px;
+  gap: 25px 20px;
+  padding: 20px 33px;
+  background-color: #181B20;
+}
+
+.main {
+  grid-row: 2;
+  grid-column: span 3;
+  display: grid;
+  grid-template-columns: inherit;
+  gap: inherit;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  grid-column: span 1;
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(50px);
+
+  &__heading {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Neue Plak';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 22px;
+    color: #FFFFFF;
+
+    &--uppercase {
+      text-transform: uppercase;
+    }
+  }
+
+  &__divider {
+    width: 100%;
+    height: 1px;
+    margin: 7px 0;
+    background-color: #3A3D40;
+
+    &--bottom {
+      margin-top: auto;
+    }
+  }
+}
+
+.player {
+  grid-column: 2;
+}
+
+.panel {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  &__container {
+    width: 39px;
+    aspect-ratio: 1;
+    background: #181B20;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+.rotated{
+  rotate: 90deg;
+}
+</style>

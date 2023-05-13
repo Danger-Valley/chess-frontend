@@ -24,6 +24,7 @@
     "sass": "^1.62.0",
     "sass-loader": "^13.2.2",
     "solana-wallets-vue": "^0.6.0",
-    "vite-svg-loader": "^4.0.0"
+    "vite-svg-loader": "^4.0.0",
+    "vue3-chessboard": "^1.1.5"
   }
 }

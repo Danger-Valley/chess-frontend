@@ -1,0 +1,87 @@
+[
+  {
+    "id": "3600_0",
+    "type": "CLASSIC",
+    "name": "1 hour"
+  },
+  {
+    "id": "86400_0",
+    "type": "CLASSIC",
+    "name": "1 day"
+  },
+  {
+    "id": "600_0",
+    "type": "RAPID",
+    "name": "10 min"
+  },
+  {
+    "id": "600_5",
+    "type": "RAPID",
+    "name": "10 | 5"
+  },
+  {
+    "id": "900_10",
+    "type": "RAPID",
+    "name": "15 | 10"
+  },
+  {
+    "id": "1200_0",
+    "type": "RAPID",
+    "name": "20 min"
+  },
+  {
+    "id": "1800_0",
+    "type": "RAPID",
+    "name": "30 min"
+  },
+  {
+    "id": "180_0",
+    "type": "BLITZ",
+    "name": "3 min"
+  },
+  {
+    "id": "180_2",
+    "type": "BLITZ",
+    "name": "3 | 2"
+  },
+  {
+    "id": "300_0",
+    "type": "BLITZ",
+    "name": "5 min"
+  },
+  {
+    "id": "300_2",
+    "type": "BLITZ",
+    "name": "5 | 2"
+  },
+  {
+    "id": "300_5",
+    "type": "BLITZ",
+    "name": "5 | 5"
+  },
+  {
+    "id": "60_0",
+    "type": "BULLET",
+    "name": "1 min"
+  },
+  {
+    "id": "60_1",
+    "type": "BULLET",
+    "name": "1 | 1"
+  },
+  {
+    "id": "120_1",
+    "type": "BULLET",
+    "name": "2 | 1"
+  },
+  {
+    "id": "30_0",
+    "type": "BULLET",
+    "name": "30 sec"
+  },
+  {
+    "id": "20_1",
+    "type": "BULLET",
+    "name": "20 sec | 1"
+  }
+]
