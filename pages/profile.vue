@@ -155,8 +155,6 @@
       ref="walletModalProviderRef"
     ></WalletModalProvider>
   </div>
-
-  <PopupsSignInPopup></PopupsSignInPopup>
 </template>
 
 <script setup>

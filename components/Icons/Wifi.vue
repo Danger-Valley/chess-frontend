@@ -7,7 +7,7 @@
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      :opacity="props.status > 2 ? 1 : 0.2"
+      :opacity="props.ms < 50 ? 1 : 0.2"
       d="M2 8.35961C8.06 3.67961 15.94 3.67961 22 8.35961"
       stroke="white"
       stroke-width="1.5"
@@ -15,7 +15,7 @@
       stroke-linejoin="round"
     />
     <path
-      :opacity="props.status > 1 ? 1 : 0.2"
+      :opacity="props.ms < 100 ? 1 : 0.2"
       d="M4.91016 11.8396C9.21016 8.51961 14.8002 8.51961 19.1002 11.8396"
       stroke="white"
       stroke-width="1.5"
@@ -23,7 +23,7 @@
       stroke-linejoin="round"
     />
     <path
-      :opacity="props.status > 0 ? 1 : 0.2"
+      :opacity="props.ms < 150 ? 1 : 0.2"
       d="M6.78906 15.4902C9.93906 13.0502 14.0491 13.0502 17.1991 15.4902"
       stroke="white"
       stroke-width="1.5"
@@ -42,5 +42,5 @@
 </template>
 
 <script setup>
-let props = defineProps(['status'])
+let props = defineProps(['ms'])
 </script>

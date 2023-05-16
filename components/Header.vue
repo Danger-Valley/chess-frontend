@@ -54,74 +54,76 @@
               <IconCross></IconCross>
             </div>
           </div>
+        </template>
 
+        <div
+          class="menu__list-wrapper"
+          :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user, 'menu__list-wrapper--closed': isClosed }"
+        >
           <div
-            class="menu__list-wrapper"
-            :class="{ 'menu__list-wrapper--toggled': isToggled, 'menu__list-wrapper--logged': user, 'menu__list-wrapper--closed': isClosed }"
+            class="menu__list"
+            :class="{ 'menu__list--logged': user }"
           >
             <div
-              class="menu__list"
-              :class="{ 'menu__list--logged': user }"
+              class="menu__mobile-close"
+              @click="toggleMenu()"
             >
-              <div
-                class="menu__mobile-close"
-                @click="toggleMenu()"
-              >
-                Close
-              </div>
-              <NuxtLink
-                v-if="user"
-                class="menu__item profile profile--mobile"
-                to="/profile"
-              >
-                <img
-                  class="profile__avatar"
-                  :src="user.avatar"
-                />
-                <div class="profile__name">{{ user.username || user.email }}</div>
-              </NuxtLink>
-              <NuxtLink
-                class="menu__item"
-                to="/lobby"
-              >Lobby</NuxtLink>
-              <NuxtLink
-                class="menu__item"
-                to=""
-              >Leaderboard</NuxtLink>
-              <NuxtLink
-                class="menu__item"
-                to=""
-              >Tournaments</NuxtLink>
-              <NuxtLink
-                class="menu__item"
-                to=""
-              >Chess tv</NuxtLink>
-              <NuxtLink
-                class="menu__item"
-                to=""
-              >Wiki</NuxtLink>
-              <NuxtLink
-                class="menu__item menu__item--action"
-                to=""
-                @click="meme"
-              >
-                <div>Create game</div>
-                <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
-              </NuxtLink>
+              Close
+            </div>
+            <NuxtLink
+              v-if="user"
+              class="menu__item profile profile--mobile"
+              to="/profile"
+            >
+              <img
+                class="profile__avatar"
+                :src="user.avatar"
+              />
+              <div class="profile__name">{{ user.username || user.email }}</div>
+            </NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to="/lobby"
+            >Lobby</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Leaderboard</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Tournaments</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Chess tv</NuxtLink>
+            <NuxtLink
+              class="menu__item"
+              to=""
+            >Wiki</NuxtLink>
+            <NuxtLink
+              class="menu__item menu__item--action"
+              to=""
+              @click="meme"
+            >
+              <div>Create game</div>
+              <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
+            </NuxtLink>
 
-              <div
-                class="menu__item menu__item--signin"
-                @click="singIn"
-              >
-                Sign In
-              </div>
+            <div
+              class="menu__item menu__item--signin"
+              @click="singIn"
+            >
+              Sign In
             </div>
           </div>
-        </template>
+        </div>
 
       </div>
     </div>
   </header>
+
+  <PopupsSignInPopup></PopupsSignInPopup>
 </template>
 
 <script setup>

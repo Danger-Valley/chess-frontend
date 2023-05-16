@@ -23,8 +23,6 @@
 
     <Footer></Footer>
   </div>
-
-  <PopupsSignInPopup></PopupsSignInPopup>
 </template>
 
 <script setup>

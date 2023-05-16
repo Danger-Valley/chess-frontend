@@ -10,6 +10,7 @@ export const useUserStore = defineStore('user', () => {
     localStorage.setItem('accessToken', accessToken)
     await obtainUser();
     console.log(`User saved!`, user.value)
+    document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
   }
 
   async function updateUser(objToPass) {

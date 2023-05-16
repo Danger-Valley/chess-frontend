@@ -48,9 +48,9 @@
       </div>
 
       <div class="block block--half">
-        <div class="block__half play">
+        <div class="block__half play" @click="openGameSearchPopup">
           Play now
-          <div class="settings">
+          <div class="settings" @click.stop="$togglePopup('GameSettingsPopup')">
             <SettingsIcon></SettingsIcon>
           </div>
         </div>
@@ -60,6 +60,9 @@
         </div>
       </div>
     </main>
+    
+    <PopupsGameSearchPopup ref="GameSearchPopupRef"></PopupsGameSearchPopup>
+    <PopupsGameSettingsPopup></PopupsGameSettingsPopup>
   </div>
 </template>
 
@@ -68,10 +71,18 @@ import NoGamesIcon from "@/assets/imgs/no-icon.svg"
 import ArrowIcon from "@/assets/imgs/Arrow.svg"
 import SettingsIcon from "@/assets/imgs/settings.svg"
 
+let { $togglePopup } = useNuxtApp();
+
 let rating = ref({
   points: 1488,
   position: [23, 100]
-})
+}),
+  GameSearchPopupRef = ref()
+
+const openGameSearchPopup = () => {
+  $togglePopup('GameSearchPopup')
+  GameSearchPopupRef.value.startTimeTracking()
+}
 </script>
 
 <style lang="scss" scoped>

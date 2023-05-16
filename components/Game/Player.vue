@@ -4,13 +4,13 @@
       class="player__avatar"
       :src="user?.avatar"
     />
-    <div class="player__nickname">{{ player.nickname }}</div>
+    <div class="player__nickname">{{ user.username || user.email }}</div>
     <div class="player__rating">({{ player.rating }})</div>
     <img
       class="player__country"
       :src="player.country"
     />
-    <IconsWifi class="player__connection-status" :status="networkStatus"></IconsWifi>
+    <IconsWifi class="player__connection-status" :ms="ms"></IconsWifi>
     <div class="player__ms">{{ ms }}ms</div>
     <div class="timer">
       {{ timer.m }}:{{ timer.s }}:<span class="timer__ms">{{ timer.ms }}</span>
@@ -26,8 +26,6 @@ const user = computed(() => useUserStore().getUser.value)
 let props = defineProps(['playerType']) //'me' or 'opponent'
 
 let player = ref({
-  avatar: '',
-  nickname: 'nickname',
   rating: '1423',
   country: ''
 }),
@@ -37,14 +35,6 @@ let player = ref({
     s: '00',
     ms: 0
   })
-
-let networkStatus = computed(() => {
-  // means additional wifi bars
-  if(ms.value < 50) return 3
-  else if(ms.value < 100) return 2
-  else if(ms.value < 150) return 1
-  else return 0
-})
 </script>
 
 <style lang="scss" scoped>
