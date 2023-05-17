@@ -4,7 +4,7 @@
     id="GameSearchPopup"
     @click="closePopup"
   >
-    <div class="popup">
+    <div class="popup" @click.stop>
       <div class="game-search">
         <div class="game-search__heading">Game search</div>
         <div class="game-search__time">{{ formatTime }}</div>

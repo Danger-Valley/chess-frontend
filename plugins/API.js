@@ -1,28 +1,3 @@
-class Auth {
-  constructor(path) {
-    this.localPath = `${path}/auth`;
-  }
-
-  async auth({
-    walletAddress,
-    blockchain = "SOLANA",
-    signatureId,
-    signature
-  }) {
-    let referralCode = localStorage.getItem("REF_KEY")
-    return await fetch(`${this.localPath}`, {
-      method: "POST",
-      body: JSON.stringify({
-        signatureId,
-        signature,
-        walletAddress,
-        blockchain,
-        referralCode
-      }),
-      headers: { 'content-type': 'application/json' }
-    });
-  }
-}
 class Twitter {
   constructor(path) {
     this.localPath = `${path}/twitter`;
@@ -196,6 +171,52 @@ class Wallet {
     });
   }
 }
+class Chess {
+  constructor(path) {
+    this.localPath = `${path}/games`;
+  }
+
+  async find_create({mode, color, accessToken}){
+    return await fetch(`${this.localPath}/init`, {
+      method: "POST",
+      body: JSON.stringify({
+        mode, color
+      }),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async get({id, accessToken}){
+    return await fetch(`${this.localPath}/${id}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async join({id, accessToken}){
+    return await fetch(`${this.localPath}/${id}/join`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async move({move, accessToken}){
+    return await fetch(`${this.localPath}/${id}/join`, {
+      method: "POST",
+      body: JSON.stringify({move}),
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  } 
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -212,7 +233,8 @@ export default defineNuxtPlugin(() => {
           },
           User: new User(`${path}/auth/api/v1`),
           Wallet: new Wallet(`${path}/auth/api/v1`),
-          Signatures: new Signatures(`${path}/auth/api/v1`)
+          Signatures: new Signatures(`${path}/auth/api/v1`),
+          Chess: new Chess(`${path}/game/api/v1`)
         }
       }
     }

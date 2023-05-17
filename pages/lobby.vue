@@ -62,7 +62,7 @@
     </main>
     
     <PopupsGameSearchPopup ref="GameSearchPopupRef"></PopupsGameSearchPopup>
-    <PopupsGameSettingsPopup></PopupsGameSettingsPopup>
+    <PopupsGameSettingsPopup ref="GameSettingsPopupRef"></PopupsGameSettingsPopup>
   </div>
 </template>
 
@@ -71,17 +71,28 @@ import NoGamesIcon from "@/assets/imgs/no-icon.svg"
 import ArrowIcon from "@/assets/imgs/Arrow.svg"
 import SettingsIcon from "@/assets/imgs/settings.svg"
 
-let { $togglePopup } = useNuxtApp();
+let { $togglePopup, $API } = useNuxtApp();
 
 let rating = ref({
   points: 1488,
   position: [23, 100]
 }),
-  GameSearchPopupRef = ref()
+  GameSearchPopupRef = ref(),
+  GameSettingsPopupRef = ref()
 
-const openGameSearchPopup = () => {
+const openGameSearchPopup = async () => {
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
+  let body = {
+    mode: GameSettingsPopupRef.value.option
+  }
+  if(GameSettingsPopupRef.value.color) body = {
+    ...body,
+    color: GameSettingsPopupRef.value.color
+  }
+  let resp = await $API().Chess.find_create(body);
+  body = await resp.json();
+  console.log(body);
 }
 </script>
 

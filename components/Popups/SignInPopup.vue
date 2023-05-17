@@ -4,7 +4,7 @@
     id="SignInPopup"
     @click="$togglePopup('SignInPopup')"
   >
-    <div class="popup">
+    <div class="popup" @click.stop>
       <div class="popup__heading">Sign In</div>
 
       <div

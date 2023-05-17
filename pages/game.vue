@@ -191,11 +191,11 @@ import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
 import { useWallet } from "solana-wallets-vue";
 import { TheChessboard } from 'vue3-chessboard';
 import '@/assets/styles/chess.css';
-import { useGameStore } from "~/stores/game";
+import { useSocketStore } from "~/stores/socket";
 
 const { publicKey, wallet, disconnect, connected } = useWallet();
 
-const store = useGameStore()
+const store = useSocketStore()
 
 const socket = computed(() => store.socketGetter)
 </script>
