@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useSocketStore } from './socket'
 
 export const useUserStore = defineStore('user', () => {
   let { $API } = useNuxtApp()
@@ -11,6 +12,7 @@ export const useUserStore = defineStore('user', () => {
     await obtainUser();
     console.log(`User saved!`, user.value)
     document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
+    useSocketStore().emit('auth', JSON.stringify({accessToken}))
   }
 
   async function updateUser(objToPass) {

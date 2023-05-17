@@ -11,8 +11,14 @@ export const useSocketStore = defineStore('socket', () => {
 
     socket.value = io(url)
 
+    /*
     socket.value.on('disconnect', () => {
       console.warn("DISCONNECT")
+    })
+    */
+
+    socket.value.on('info_message', (resp) => {
+      console.log(resp)
     })
   }
 
@@ -21,6 +27,7 @@ export const useSocketStore = defineStore('socket', () => {
   }
 
   function emit(name, body){
+    console.log(socket.value)
     socket.value.emit(name, body)
   }
 
@@ -28,5 +35,5 @@ export const useSocketStore = defineStore('socket', () => {
     socket.value.on(name, callback)
   }
 
-  return {socketGetter, init}
+  return {socketGetter, init, emit, listen}
 })

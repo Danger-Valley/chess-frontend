@@ -129,7 +129,7 @@
         </div>
       </aside>
 
-      <TheChessboard />
+      <TheChessboard v-if="canInit" :board-config="boardConfig" />
 
       <aside class="aside info">
         <div class="aside__heading">
@@ -193,11 +193,48 @@ import { TheChessboard } from 'vue3-chessboard';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
 
+let { $API } = useNuxtApp();
+
 const { publicKey, wallet, disconnect, connected } = useWallet();
 
 const store = useSocketStore()
 
 const socket = computed(() => store.socketGetter)
+
+let boardConfig = ref({}),
+  reply = ref(),
+  turns = ref(),
+  canInit = ref(false)
+
+onMounted(async () => {
+  let resp = await $API().Chess.get({
+    id: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(resp, body)
+  boardConfig.value = {
+    fen: body.game.state.fen,
+    movable: {
+      free: false,
+      color: "white"
+      //color: body.game.playerOne.color == 'w' ? 'white' : 'black'
+    },
+    events: {
+      move: (from, to, capture) => {
+        console.log(from, to, capture)
+      }
+    }
+  }
+
+  canInit.value = true;
+
+  store.emit('room', JSON.stringify({gameId: body.game.id}))
+
+  store.listen('game_event', (resp) => {
+    console.log(resp)
+  })
+})
 </script>
 
 <style lang="scss" scoped>

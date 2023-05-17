@@ -84,7 +84,8 @@ const openGameSearchPopup = async () => {
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
   let body = {
-    mode: GameSettingsPopupRef.value.option
+    mode: GameSettingsPopupRef.value.option,
+    accessToken: localStorage.getItem('accessToken')
   }
   if(GameSettingsPopupRef.value.color) body = {
     ...body,
@@ -93,6 +94,7 @@ const openGameSearchPopup = async () => {
   let resp = await $API().Chess.find_create(body);
   body = await resp.json();
   console.log(body);
+  await navigateTo(`game/${body.game.id}`)
 }
 </script>
 

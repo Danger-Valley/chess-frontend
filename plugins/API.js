@@ -207,8 +207,8 @@ class Chess {
     });
   }
 
-  async move({move, accessToken}){
-    return await fetch(`${this.localPath}/${id}/join`, {
+  async move({id, move, accessToken}){
+    return await fetch(`${this.localPath}/${id}/move`, {
       method: "POST",
       body: JSON.stringify({move}),
       headers: {

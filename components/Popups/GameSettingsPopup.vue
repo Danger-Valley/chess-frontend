@@ -76,7 +76,7 @@ import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 console.log(gameModes)
 
 let option = ref(gameModes?.[0]?.items?.[0].id),
-  color = ref('any')
+  color = ref(null)
 
 defineExpose({option, color})
 </script>
