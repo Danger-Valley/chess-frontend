@@ -129,7 +129,11 @@
         </div>
       </aside>
 
-      <TheChessboard v-if="canInit" :board-config="boardConfig" />
+      <TheChessboard
+        @move="afterMove"
+        v-if="canInit"
+        :board-config="boardConfig"
+      />
 
       <aside class="aside info">
         <div class="aside__heading">
@@ -206,6 +210,15 @@ let boardConfig = ref({}),
   turns = ref(),
   canInit = ref(false)
 
+const afterMove = (e) => {
+  console.log(e)
+  $API().Chess.move({
+    id: useRoute().params.id,
+    move: e.san,
+    accessToken: localStorage.getItem('accessToken')
+  })
+}
+
 onMounted(async () => {
   let resp = await $API().Chess.get({
     id: useRoute().params.id,
@@ -229,7 +242,7 @@ onMounted(async () => {
 
   canInit.value = true;
 
-  store.emit('room', JSON.stringify({gameId: body.game.id}))
+  store.emit('room', JSON.stringify({ gameId: body.game.id }))
 
   store.listen('game_event', (resp) => {
     console.log(resp)
@@ -312,7 +325,6 @@ onMounted(async () => {
   }
 }
 
-.rotated{
+.rotated {
   rotate: 90deg;
-}
-</style>
+}</style>
