@@ -1,14 +1,15 @@
 <template>
-  <div class="player">
+  <div class="player" v-if="props.player">
     <img
       class="player__avatar"
-      :src="user?.avatar"
+      :src="props.player.user?.avatar"
     />
-    <div class="player__nickname">{{ user.username || user.email }}</div>
-    <div class="player__rating">({{ player.rating }})</div>
+    <div class="player__nickname">{{ props.player.user.username || props.player.user.email }}</div>
+    <div class="player__rating">({{ props.player.user.rating }})</div>
     <img
+      v-if="props.player?.user?.country"
       class="player__country"
-      :src="player.country"
+      :src="props.player.user.country"
     />
     <IconsWifi class="player__connection-status" :ms="ms"></IconsWifi>
     <div class="player__ms">{{ ms }}ms</div>
@@ -19,22 +20,21 @@
 </template>
 
 <script setup>
-import { useUserStore } from "~/stores/user";
+import { useSocketStore } from "~/stores/socket";
 
-const user = computed(() => useUserStore().getUser.value)
+const ms = computed(() => useSocketStore().pingGetter)
 
-let props = defineProps(['playerType']) //'me' or 'opponent'
+let props = defineProps(['player']) //'me' or 'opponent'
 
-let player = ref({
-  rating: '1423',
-  country: ''
-}),
-  ms = ref(150),
-  timer = ref({
-    m: '00',
-    s: '00',
-    ms: 0
-  })
+let timer = ref({
+      m: '00',
+      s: '00',
+      ms: 0
+    })
+
+watch(() => props.player, () => {
+  console.log(props.player)
+})
 </script>
 
 <style lang="scss" scoped>

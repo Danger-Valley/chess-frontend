@@ -2,7 +2,7 @@
   <div class="page">
     <GamePlayer
       class="player"
-      :player-type="'opponent'"
+      :player="playerOpponent"
     ></GamePlayer>
 
     <main class="main">
@@ -150,8 +150,8 @@
           v-for="(turn, counter) in turns"
         >
           <div class="turn__counter">{{ counter }}.</div>
-          <div>-</div>
-          <div>-</div>
+          <div class="turn__item">{{ turn.from }}</div>
+          <div class="turn__item">{{ turn.to }}</div>
         </div>
 
         <div class="aside__divider aside__divider--bottom"></div>
@@ -185,7 +185,7 @@
 
     <GamePlayer
       class="player"
-      :player-type="'me'"
+      :player="playerMe"
     ></GamePlayer>
   </div>
 </template>
@@ -207,8 +207,10 @@ const socket = computed(() => store.socketGetter)
 
 let boardConfig = ref({}),
   reply = ref(),
-  turns = ref(),
-  canInit = ref(false)
+  turns = ref([]),
+  canInit = ref(false),
+  playerMe = ref(),
+  playerOpponent = ref()
 
 const afterMove = (e) => {
   console.log(e)
@@ -217,6 +219,19 @@ const afterMove = (e) => {
     move: e.san,
     accessToken: localStorage.getItem('accessToken')
   })
+  turns.value.push({
+    from: e.from,
+    to: e.to
+  })
+}
+
+const join = async () => {
+  let resp = await $API().Chess.join({
+    id: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(body);
 }
 
 onMounted(async () => {
@@ -226,12 +241,30 @@ onMounted(async () => {
   })
   let body = await resp.json();
   console.log(resp, body)
+
+  join();
+
+  let meResp = await $API().User.get(localStorage.getItem('accessToken'))
+  let meBody = await meResp.json();
+  console.log(meBody)
+
+  if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
+    playerMe.value = body.game.playerOne;
+    if (body.game.playerTwo.joined) playerOpponent = body.game.playerTwo;
+  }
+  else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
+    playerMe.value = body.game.playerTwo;
+    if (body.game.playerOne.joined) playerOpponent = body.game.playerOne;
+  }
+
+  console.log(playerMe);
+
   boardConfig.value = {
     fen: body.game.state.fen,
     movable: {
       free: false,
-      color: "white"
-      //color: body.game.playerOne.color == 'w' ? 'white' : 'black'
+      color: playerMe.value.color == 'w' ? 'white' : 'black'
+      //color: 
     },
     events: {
       move: (from, to, capture) => {
@@ -308,6 +341,23 @@ onMounted(async () => {
   }
 }
 
+.turn {
+  display: flex;
+  gap: 30px;
+  
+  font-family: 'Neue Plak';
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  &__counter{
+    color: #FFFFFF4d;
+  }
+  &__item{
+    width: 40%;
+    color: #FFFFFF;
+  }
+}
+
 .player {
   grid-column: 2;
 }
@@ -327,4 +377,5 @@ onMounted(async () => {
 
 .rotated {
   rotate: 90deg;
-}</style>
+}
+</style>

@@ -212,7 +212,8 @@ class Chess {
       method: "POST",
       body: JSON.stringify({move}),
       headers: {
-        'Authorization': `Bearer ${accessToken}`
+        'Authorization': `Bearer ${accessToken}`,
+        'content-type': 'application/json'
       }
     });
   } 
