@@ -70,7 +70,7 @@
 import gameModes from "@/assets/content/gameModes.json"
 
 import BlackFigure from "@/assets/imgs/blackFigure.svg"
-import AnyFigure from "@/assets/imgs/anyFigure.svg"
+import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
 console.log(gameModes)

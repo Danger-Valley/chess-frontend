@@ -187,6 +187,9 @@
       class="player"
       :player="playerMe"
     ></GamePlayer>
+
+    <PopupsGameBeginsPopup :game="game"></PopupsGameBeginsPopup>
+    <PopupsGameChooseFigurePromotionPopup></PopupsGameChooseFigurePromotionPopup>
   </div>
 </template>
 
@@ -209,6 +212,7 @@ let boardConfig = ref({}),
   reply = ref(),
   turns = ref([]),
   canInit = ref(false),
+  game = ref(),
   playerMe = ref(),
   playerOpponent = ref()
 
@@ -241,6 +245,7 @@ onMounted(async () => {
   })
   let body = await resp.json();
   console.log(resp, body)
+  game.value = body.game;
 
   join();
 
@@ -257,7 +262,7 @@ onMounted(async () => {
     if (body.game.playerOne.joined) playerOpponent = body.game.playerOne;
   }
 
-  console.log(playerMe);
+  console.log(playerMe.value);
 
   boardConfig.value = {
     fen: body.game.state.fen,
