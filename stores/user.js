@@ -33,6 +33,7 @@ export const useUserStore = defineStore('user', () => {
       let resp = await $API().User.get(accessToken)
       let body = await resp.json()
       user.value = body.user;
+      useSocketStore().emit('auth', JSON.stringify({accessToken}))
     }
   }
 

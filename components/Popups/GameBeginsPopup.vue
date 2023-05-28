@@ -30,6 +30,7 @@
         ></IconsWifi>
         <div class="player__ms">{{ ms }}ms</div>
       </div>
+      <div class="connecting" v-else>Opponent is connecting...</div>
 
       <div class="center">VS</div>
       <div class="start">game will start in {{ timeout }} sec</div>
@@ -55,6 +56,7 @@
         ></IconsWifi>
         <div class="player__ms">{{ ms }}ms</div>
       </div>
+      <div class="connecting" v-else>Opponent is connecting...</div>
     </div>
   </div>
 </template>
@@ -139,5 +141,15 @@ watch(() => props.game, () => {
   &:last-of-type {
     margin-top: auto;
   }
+}
+
+.connecting{
+  width: 100%;
+  text-align: center;
+  font-family: 'Neue Plak';
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #FFFFFF4d;
 }
 </style>

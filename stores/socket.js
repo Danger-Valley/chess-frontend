@@ -13,17 +13,20 @@ export const useSocketStore = defineStore('socket', () => {
 
     socket.value = io(url)
 
-    /*
     socket.value.on('disconnect', () => {
       console.warn("DISCONNECT")
+      socket.value.connect()
+      console.warn("RECONNECTED")
+      if(process.client && localStorage.getItem('accessToken')) emit("auth", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
+      let route = useRoute();
+      if(process.client && route.params.id) emit('room', JSON.stringify({ gameId: route.params.id }))
     })
-    */
 
     socket.value.on('info_message', (resp) => {
       console.log(resp)
     })
 
-    setInterval(getPing, 1000);
+    setInterval(getPing, 10000);
   }
 
   function disconnect(){
@@ -31,7 +34,7 @@ export const useSocketStore = defineStore('socket', () => {
   }
 
   function emit(name, body){
-    //console.log(socket.value)
+    //console.log(name)
     socket.value.emit(name, body)
   }
 
