@@ -16,8 +16,18 @@ export const useSocketStore = defineStore('socket', () => {
     socket.value.on('disconnect', () => {
       console.warn("DISCONNECT")
       socket.value.connect()
+    })
+
+    socket.value.on("reconnection_attempt", () => {
+      console.warn("RECONNECTION ATTEMPT")
+    })
+
+    socket.value.on("reconnect", () => {
       console.warn("RECONNECTED")
-      if(process.client && localStorage.getItem('accessToken')) emit("auth", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
+      if(process.client && localStorage.getItem('accessToken')) {
+        emit("auth", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
+        console.error("SEND AUTH", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
+      }
       let route = useRoute();
       if(process.client && route.params.id) emit('room', JSON.stringify({ gameId: route.params.id }))
     })
@@ -34,7 +44,7 @@ export const useSocketStore = defineStore('socket', () => {
   }
 
   function emit(name, body){
-    //console.log(name)
+    console.log(name, body)
     socket.value.emit(name, body)
   }
 

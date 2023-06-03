@@ -247,7 +247,7 @@ onMounted(async () => {
   console.log(resp, body)
   game.value = body.game;
 
-  join();
+  await join();
 
   let meResp = await $API().User.get(localStorage.getItem('accessToken'))
   let meBody = await meResp.json();
@@ -268,7 +268,7 @@ onMounted(async () => {
     fen: body.game.state.fen,
     movable: {
       free: false,
-      color: playerMe.value.color == 'w' ? 'white' : 'black'
+      color: playerMe.value?.color == 'w' ? 'white' : 'black'
       //color: 
     },
     events: {

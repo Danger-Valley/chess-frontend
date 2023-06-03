@@ -4,6 +4,7 @@ import { useSocketStore } from './socket'
 export const useUserStore = defineStore('user', () => {
   let { $API } = useNuxtApp()
   const user = ref()
+  const socket = useSocketStore()
 
   const getUser = computed(() => user)
 
@@ -12,7 +13,8 @@ export const useUserStore = defineStore('user', () => {
     await obtainUser();
     console.log(`User saved!`, user.value)
     document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
-    useSocketStore().emit('auth', JSON.stringify({accessToken}))
+    socket.error('auth', JSON.stringify({accessToken}))
+    console.warn("SEND AUTH", JSON.stringify({accessToken}))
   }
 
   async function updateUser(objToPass) {
@@ -33,7 +35,8 @@ export const useUserStore = defineStore('user', () => {
       let resp = await $API().User.get(accessToken)
       let body = await resp.json()
       user.value = body.user;
-      useSocketStore().emit('auth', JSON.stringify({accessToken}))
+      socket.emit('auth', JSON.stringify({accessToken}))
+      console.error("SEND AUTH", JSON.stringify({accessToken}))
     }
   }
 
