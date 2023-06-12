@@ -19,7 +19,10 @@
             pieces,
             complete daily quests,<br />play with your friends, and be #1 on the leaderboard!
           </div>
-          <div class="slide__join">
+          <div
+            class="slide__join"
+            @click="togglePopup"
+          >
             Join waitlist
             <img src="@/assets/arrow.svg" />
           </div>
@@ -42,7 +45,10 @@
             Rise up the ranks, claim victory, and earn prestigious rewards.<br />
             It's time to prove your mettle and become a chess champion.
           </div>
-          <div class="slide__join">
+          <div
+            class="slide__join"
+            @click="togglePopup"
+          >
             Join waitlist
             <img src="@/assets/arrow.svg" />
           </div>
@@ -66,7 +72,10 @@
             Experience the transparency and security of blockchain<br />technology, ensuring fair play and trust in every
             game.
           </div>
-          <div class="slide__join">
+          <div
+            class="slide__join"
+            @click="togglePopup"
+          >
             Join waitlist
             <img src="@/assets/arrow.svg" />
           </div>
@@ -89,7 +98,10 @@
             these<br />missions, you'll unlock exclusive in-game rewards, enhancing your<br />chess experience and
             showcasing your progress.
           </div>
-          <div class="slide__join">
+          <div
+            class="slide__join"
+            @click="togglePopup"
+          >
             Join waitlist
             <img src="@/assets/arrow.svg" />
           </div>
@@ -107,12 +119,16 @@
             <div class="slide__heading--gradient">Danger Valley</div>
           </div>
           <div class="slide__text">
-            We are the team that always delivers. We build games, tools, top-<br/>notch art, community, and utility for all our
-            holders and the Solana<br/>ecosystem.<br/><br/>
-            We love chess, and it’s time to reimagine how people play it.<br/>
+            We are the team that always delivers. We build games, tools, top-<br />notch art, community, and utility for
+            all our
+            holders and the Solana<br />ecosystem.<br /><br />
+            We love chess, and it’s time to reimagine how people play it.<br />
             Join the waitlist to be one of the first “Chess 3.0” players with us!
           </div>
-          <div class="slide__join">
+          <div
+            class="slide__join"
+            @click="togglePopup"
+          >
             Join waitlist
             <img src="@/assets/arrow.svg" />
           </div>
@@ -151,19 +167,80 @@
         src="@/assets/twi.png"
       /></a>
   </footer>
+
+  <div
+    class="popup__wrapper"
+    @click="togglePopup"
+  >
+    <div
+      class="popup"
+      @click.stop
+    >
+      <template v-if="!sent">
+        <div class="popup__heading">Join waitlist</div>
+        <div class="popup__text">We’ll notify you once The Chess is available!</div>
+        <div class="popup__func">
+          <input
+            class="popup__input"
+            type="email"
+            placeholder="Your email"
+          />
+          <div
+            class="popup__join"
+            @click="joinByMail"
+          >
+            Join waitlist
+            <img src="@/assets/arrow.svg" />
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <div class="popup__heading">Congratulations!</div>
+        <div class="popup__text">
+          Your email address has been successfully registered.<br/><br/>You will be notified when the platform is available!
+        /</div>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
-let chosenSlideNumber = ref(1)
+let chosenSlideNumber = ref(1),
+  sent = ref(false)
 
 const goToSlide = (num) => {
-  console.log(num);
   chosenSlideNumber.value = num;
   document.querySelector('.main').style.translate = `0 ${-100 * (num - 1)}vh`;
-  console.log(document.querySelector('.main').style.translate);
 }
+
+const togglePopup = () => {
+  document.querySelector('.popup__wrapper').classList.toggle('popup__wrapper--active');
+}
+
+const joinByMail = async () => {
+  let mail = document.querySelector('input.popup__input');
+
+  if (mail.value.length == 0 || !mail.checkValidity()) return;
+
+  let resp = await fetch('https://api-dev.thechess.io/auth/api/v1/waitlist', {
+    method: "POST",
+    headers: { 'content-type': 'application/json' },
+    body: {
+      email: mail.value
+    }
+  })
+  let body = await resp.json();
+  console.log(body);
+  sent.value = true;
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    document.querySelector("#app").style.opacity = 1;
+  }, 500);
+})
 </script>
 
 <style lang="scss">
@@ -178,6 +255,11 @@ body {
   height: 100vh;
   overflow: hidden;
   background-color: #181B20;
+}
+
+#app {
+  opacity: 0;
+  transition: 2s;
 }
 
 @font-face {
@@ -336,4 +418,103 @@ body {
   &__img {
     width: 20px;
   }
-}</style>
+}
+
+.popup {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 640px;
+  height: 390px;
+  scale: .5;
+  transition: .5s;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(50px);
+  padding: 64px;
+
+  &__wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    opacity: 0;
+    transition: .5s;
+    background-color: rgba(0, 0, 0, 0.8);
+
+    &--active {
+      opacity: 1;
+      z-index: 100;
+
+      .popup {
+        scale: 1;
+      }
+    }
+  }
+
+  &__heading {
+    font-family: 'Neue Plak';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 55px;
+    line-height: 1.2;
+    text-align: center;
+    color: #E9DEFF;
+  }
+
+  &__text {
+    font-family: 'Neue Plak';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 1.6;
+    text-align: center;
+    color: #8D9197;
+  }
+
+  &__func {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__input {
+    height: 50px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: unset;
+    outline: unset;
+    border-radius: 10px;
+
+    font-family: 'Neue Plak';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 30px;
+    color: #fff;
+
+    &::placeholder {
+      color: #5D5F63;
+    }
+  }
+
+  &__join {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    font-family: 'Neue Plak';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: #27F4BA;
+    cursor: pointer;
+  }
+}
+</style>
