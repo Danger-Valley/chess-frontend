@@ -15,9 +15,9 @@
             <div class="slide__heading--gradient">chess platform</div>
           </div>
           <div class="slide__text">
-            The Chess introduces a new interpretation<br />of the most played board game in the world.<br />Collect chess
+            The Chess introduces a new interpretation of the most played board game in the world. Collect chess
             pieces,
-            complete daily quests,<br />play with your friends, and be #1 on the leaderboard!
+            complete daily quests, play with your friends, and be #1 on the leaderboard!
           </div>
           <div
             class="slide__join"
@@ -40,9 +40,9 @@
             <div class="slide__heading--gradient">between OG communities</div>
           </div>
           <div class="slide__text">
-            Step into the competitive arena and challenge NFT communities to<br />epic chess tournaments. Compete against
-            players from around the<br />world and showcase your skills on the grand stage.<br /><br />
-            Rise up the ranks, claim victory, and earn prestigious rewards.<br />
+            Step into the competitive arena and challenge NFT communities to epic chess tournaments. Compete against
+            players from around the world and showcase your skills on the grand stage.<br /><br />
+            Rise up the ranks, claim victory, and earn prestigious rewards. 
             It's time to prove your mettle and become a chess champion.
           </div>
           <div
@@ -66,10 +66,10 @@
             <div class="slide__heading--gradient">on Solana</div>
           </div>
           <div class="slide__text">
-            Elevate your chess matches to a whole new level with our on-chain<br />mode. Every move you make is recorded
+            Elevate your chess matches to a whole new level with our on-chain mode. Every move you make is recorded
             on the
-            Solana blockchain,<br />providing an immutable proof of movement.<br /><br />
-            Experience the transparency and security of blockchain<br />technology, ensuring fair play and trust in every
+            Solana blockchain, providing an immutable proof of movement.<br /><br />
+            Experience the transparency and security of blockchain technology, ensuring fair play and trust in every
             game.
           </div>
           <div
@@ -93,9 +93,9 @@
             <div class="slide__heading--gradient">Daily Missions</div>
           </div>
           <div class="slide__text">
-            Sharpen your chess skills while reaping exciting rewards with our<br />daily missions. Embark on new chess
-            missions every day, ranging<br />from tactical puzzles to strategic challenges. As you conquer
-            these<br />missions, you'll unlock exclusive in-game rewards, enhancing your<br />chess experience and
+            Sharpen your chess skills while reaping exciting rewards with our daily missions. Embark on new chess
+            missions every day, ranging from tactical puzzles to strategic challenges. As you conquer
+            these missions, you'll unlock exclusive in-game rewards, enhancing your chess experience and
             showcasing your progress.
           </div>
           <div
@@ -119,10 +119,10 @@
             <div class="slide__heading--gradient">Danger Valley</div>
           </div>
           <div class="slide__text">
-            We are the team that always delivers. We build games, tools, top-<br />notch art, community, and utility for
+            We are the team that always delivers. We build games, tools, top- notch art, community, and utility for
             all our
-            holders and the Solana<br />ecosystem.<br /><br />
-            We love chess, and it’s time to reimagine how people play it.<br />
+            holders and the Solana ecosystem.<br /><br />
+            We love chess, and it’s time to reimagine how people play it. 
             Join the waitlist to be one of the first “Chess 3.0” players with us!
           </div>
           <div
@@ -197,8 +197,9 @@
       <template v-else>
         <div class="popup__heading">Congratulations!</div>
         <div class="popup__text">
-          Your email address has been successfully registered.<br/><br/>You will be notified when the platform is available!
-        /</div>
+          Your email address has been successfully registered.<br /><br />You will be notified when the platform is
+          available!
+          /</div>
       </template>
     </div>
   </div>
@@ -343,6 +344,7 @@ body {
   }
 
   &__text {
+    max-width: 400px;
     font-family: 'Neue Plak';
     font-style: normal;
     font-weight: 400;
@@ -517,4 +519,79 @@ body {
     cursor: pointer;
   }
 }
+
+@media screen and (max-width: 1200px) {
+  .header {
+    top: 26px;
+    left: 15px;
+  }
+
+  .footer {
+    width: fit-content;
+    top: 26px;
+    bottom: unset;
+    left: unset;
+    right: 15px;
+    z-index: 3;
+  }
+
+  .main {
+    width: 100%;
+    top: 88px;
+    left: unset;
+    gap: 88px;
+  }
+
+  .slide {
+    flex-direction: column;
+    height: calc(100vh - 88px);
+
+    &__content {
+      width: auto;
+      padding: 0 15px 15px 15px;
+      margin: auto;
+    }
+
+    &__heading {
+      font-size: 30px;
+    }
+
+    &__text {
+      font-size: 12px;
+    }
+
+    &__img {
+      width: inherit;
+      height: 63vmax;
+      margin: auto;
+    }
+  }
+
+  .bullet {
+    &--active {
+      border-color: #ffffff99;
+    }
+
+    &__inner {
+      background-color: #ffffff99;
+    }
+
+    &s {
+      width: 100%;
+      height: auto;
+      right: unset;
+      left: 0;
+      bottom: 9px;
+      flex-direction: row;
+    }
+  }
+
+  .popup{
+    width: 80vw;
+    &__func{
+      flex-direction: column;
+    }
+  }
+}
+
 </style>
