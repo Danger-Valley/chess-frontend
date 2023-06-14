@@ -14,7 +14,6 @@ export const useUserStore = defineStore('user', () => {
     console.log(`User saved!`, user.value)
     document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
     socket.error('auth', JSON.stringify({accessToken}))
-    console.warn("SEND AUTH", JSON.stringify({accessToken}))
   }
 
   async function updateUser(objToPass) {
@@ -36,7 +35,6 @@ export const useUserStore = defineStore('user', () => {
       let body = await resp.json()
       user.value = body.user;
       socket.emit('auth', JSON.stringify({accessToken}))
-      console.error("SEND AUTH", JSON.stringify({accessToken}))
     }
   }
 

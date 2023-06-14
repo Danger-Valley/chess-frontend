@@ -26,16 +26,16 @@ export const useSocketStore = defineStore('socket', () => {
       console.warn("RECONNECTED")
       if(process.client && localStorage.getItem('accessToken')) {
         emit("auth", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
-        console.error("SEND AUTH", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
       }
       let route = useRoute();
       if(process.client && route.params.id) emit('room', JSON.stringify({ gameId: route.params.id }))
     })
 
     socket.value.on('info_message', (resp) => {
-      console.log(resp)
+      //console.log(resp)
     })
 
+    getPing();
     setInterval(getPing, 10000);
   }
 
@@ -44,7 +44,7 @@ export const useSocketStore = defineStore('socket', () => {
   }
 
   function emit(name, body){
-    console.log(name, body)
+    //console.log(name, body)
     socket.value.emit(name, body)
   }
 

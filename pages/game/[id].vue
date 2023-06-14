@@ -133,6 +133,8 @@
         @move="afterMove"
         v-if="canInit"
         :board-config="boardConfig"
+        @board-created="(api) => (boardAPI = api)"
+        :player-color="playerMe.value?.color == 'w' ? 'white' : 'black'"
       />
 
       <aside class="aside info">
@@ -214,7 +216,8 @@ let boardConfig = ref({}),
   canInit = ref(false),
   game = ref(),
   playerMe = ref(),
-  playerOpponent = ref()
+  playerOpponent = ref(),
+  boardAPI = ref()
 
 const afterMove = (e) => {
   console.log(e)
@@ -236,6 +239,7 @@ const join = async () => {
   })
   let body = await resp.json();
   console.log(body);
+  return body;
 }
 
 onMounted(async () => {
@@ -247,25 +251,26 @@ onMounted(async () => {
   console.log(resp, body)
   game.value = body.game;
 
-  await join();
+  body = await join();
 
   let meResp = await $API().User.get(localStorage.getItem('accessToken'))
   let meBody = await meResp.json();
-  console.log(meBody)
+  console.log(meBody, body.game.playerOne, body.game.playerTwo)
 
   if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
     playerMe.value = body.game.playerOne;
-    if (body.game.playerTwo.joined) playerOpponent = body.game.playerTwo;
+    if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
   }
   else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
     playerMe.value = body.game.playerTwo;
-    if (body.game.playerOne.joined) playerOpponent = body.game.playerOne;
+    if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
   }
 
-  console.log(playerMe.value);
+  console.log(playerMe.value, playerOpponent.value);
 
   boardConfig.value = {
     fen: body.game.state.fen,
+    orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
     movable: {
       free: false,
       color: playerMe.value?.color == 'w' ? 'white' : 'black'
@@ -284,6 +289,10 @@ onMounted(async () => {
 
   store.listen('game_event', (resp) => {
     console.log(resp)
+    if(resp.type == 'GAME_MOVE' && resp.gameId == body.game.id){
+      // it will throw an error but also MAKE move - to investigate later 
+      boardAPI.value.move(resp.payload.move)
+    }
   })
 })
 </script>

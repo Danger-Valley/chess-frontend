@@ -1,6 +1,6 @@
 <template>
   <div
-    class="popup__wrapper"
+    class="popup__wrapper popup__wrapper--active"
     id="GameBeginsPopup"
     @click="$togglePopup('GameBeginsPopup')"
     v-if="game"
@@ -62,14 +62,28 @@
 </template>
 
 <script setup>
+import { useSocketStore } from '~/stores/socket';
+
 let { $togglePopup } = useNuxtApp();
 
 let timeout = ref(5)
 
+const ms = computed(() => useSocketStore().pingGetter)
+
 let props = defineProps(['game'])
 
 watch(() => props.game, () => {
-  console.log(props.game.playerOne);
+  console.log(props.game.playerOne, props.game.playerTwo);
+
+  if(props.game.playerOne.joined && props.game.playerTwo.joined){
+    let closeInterval = setInterval(() => {
+      timeout.value--;
+      if(timeout.value == 0){
+        $togglePopup('GameBeginsPopup');
+        clearInterval(closeInterval);
+      }
+    }, 1000)
+  }
 })
 </script>
 
@@ -127,6 +141,10 @@ watch(() => props.game, () => {
     margin-left: 30px;
     margin-right: 15px;
     border-radius: 100%;
+  }
+
+  &__connection-status{
+    margin-left: auto;
   }
 
   &__ms {
