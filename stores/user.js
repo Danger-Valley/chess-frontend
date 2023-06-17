@@ -2,11 +2,17 @@ import { defineStore } from 'pinia'
 import { useSocketStore } from './socket'
 
 export const useUserStore = defineStore('user', () => {
-  let { $API } = useNuxtApp()
-  const user = ref()
+  let { $API, $getWallets, $connectWallet, $formatWallet } = useNuxtApp()
+  const user = ref(),
+    wallets = ref()
   const socket = useSocketStore()
 
   const getUser = computed(() => user)
+  const getWallets = computed(() => wallets)
+
+  function saveWallets(wallets_) {
+    wallets.value = wallets_;
+  }
 
   async function saveUser(accessToken) {
     localStorage.setItem('accessToken', accessToken)
@@ -34,9 +40,11 @@ export const useUserStore = defineStore('user', () => {
       let resp = await $API().User.get(accessToken)
       let body = await resp.json()
       user.value = body.user;
+      localStorage.setItem('userId', body.user.id)
       socket.emit('auth', JSON.stringify({accessToken}))
+      $getWallets();
     }
   }
 
-  return { getUser, saveUser, obtainUser, updateUser }
+  return { getUser, getWallets, saveUser, obtainUser, updateUser, saveWallets }
 })

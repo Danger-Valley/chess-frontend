@@ -25,12 +25,14 @@
               />
               <div
                 class="info__nickname"
+                :class="{ 'info__nickname--edit': isNameEditorToggled }"
                 id="nickname"
                 :contenteditable="isNameEditorToggled"
-              >{{ user.nickname || 'Your username' }}</div>
+              >{{ user.username || 'Your username' }}</div>
               <IconEdit
                 class="info__edit"
                 @click="toggleEditName"
+                title="Click to edit/save"
               ></IconEdit>
             </div>
           </div>
@@ -130,18 +132,55 @@
                 v-for="walletType in ['Solana', 'Ethereum', 'Polygon', 'Bitcoin', 'Stellar']"
               >
                 <div class="wallet__type">{{ walletType }} Wallets</div>
-                <div class="wallet__amount">0 Wallets Connected</div>
+                <div class="wallet__amount">{{ userWallets?.filter(el => el.blockchain.toUpperCase() ==
+                  walletType.toUpperCase())?.length || 0 }} Wallets Connected</div>
                 <div
                   class="wallet__connect"
                   :class="{ 'wallet__connect--soon': walletType != 'Solana', 'wallet__connect--connected': wallet && walletType == 'Solana' }"
                   @click="openWalletModalProvider(walletType)"
                 >
                   <template v-if="walletType == 'Solana'">
-                    <template v-if="connected">{{ publicKey?.toString().slice(0, 4) }}...{{ publicKey?.toString().slice(-4)
-                    }}</template>
+                    <template v-if="connected">{{ $formatWallet(publicKey?.toString()) }}</template>
                     <template v-else>Connect Wallet</template>
                   </template>
                   <template v-else>Soon!</template>
+                </div>
+                <div
+                  class="wallet__connected"
+                  v-if="walletType == 'Solana' && userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())?.length > 0"
+                  v-for="connectedWallet in userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())"
+                >
+                  <div class="connectedWallet">
+                    {{ $formatWallet(connectedWallet?.walletAddress) }}
+                    <svg
+                      @click="$disconnectWallet(connectedWallet?.walletAddress)"
+                      class="connectedWallet__delete"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.8996 4.04973C10.7196 3.82973 8.51961 3.71973 6.32961 3.71973C5.02961 3.71973 3.72961 3.78972 2.43961 3.91972L1.09961 4.04973"
+                        stroke="#646669"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M4.70898 3.38994L4.84898 2.52994C4.94898 1.90994 5.02898 1.43994 6.13898 1.43994H7.85898C8.96898 1.43994 9.04897 1.92994 9.14897 2.52994L9.28897 3.37994"
+                        stroke="#646669"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                      <path
+                        d="M11.49 4.12988L11.06 10.7299C10.99 11.7599 10.93 12.5599 9.10001 12.5599H4.89C3.06 12.5599 2.99999 11.7599 2.92999 10.7299L2.5 4.12988"
+                        stroke="#646669"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
@@ -169,18 +208,20 @@ let chosenTabIndex = ref(0),
   isNameEditorToggled = ref(false),
   walletModalProviderRef = ref()
 
-const { publicKey, wallet, disconnect, connected } = useWallet();
+const { publicKey, wallet, disconnect, connect, connected } = useWallet();
 
-watch(connected, async () => {
-  console.log(connected.value)
+watch([connected, wallet], async () => {
+  console.log(connected.value, wallet.value)
+  if (wallet?.value?.readyState == "Installed") connect();
   if (connected.value) await $connectWallet()
 })
 
 const store = useUserStore()
 
-const user = computed(() => store.getUser.value)
+const user = computed(() => store.getUser.value),
+  userWallets = computed(() => store.getWallets.value)
 
-let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $connectWallet } = useNuxtApp();
+let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $formatWallet, $connectWallet, $disconnectWallet } = useNuxtApp();
 
 const { isReady, login } = useTokenClient({
   onSuccess: async (e) => {
@@ -210,30 +251,36 @@ const chooseTabIndex = (index) => {
   location.hash = index;
 }
 
-const toggleEditName = () => {
+const uploadAvatar = async () => {
+
+}
+
+const toggleEditName = async () => {
   isNameEditorToggled.value = !isNameEditorToggled.value;
-  if (isNameEditorToggled.value) document.querySelector('#nickname').focus();
+  if (!isNameEditorToggled.value) {
+    let body = {
+      username: document.querySelector('.info__nickname').innerText
+    }
+    await store.updateUser(body)
+  }
+}
+
+const modifyGoogleIcon = () => {
+  document.querySelectorAll("#social-google svg path").forEach(el => {
+    if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
+    else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
+    else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
+    else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
+  })
 }
 
 onMounted(() => {
   chosenTabIndex.value = location.hash.slice(1);
-  console.log(user.value.googleUser);
-  document.querySelectorAll("#social-google svg path").forEach(el => {
-    if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
-    else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
-    else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
-    else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
-  })
+  modifyGoogleIcon()
 })
 
 watch(user, () => {
-  console.log(user.value.googleUser);
-  document.querySelectorAll("#social-google svg path").forEach(el => {
-    if (el.getAttribute('data-class') == 'blue') el.style.fill = '#4284F3';
-    else if (el.getAttribute('data-class') == 'green') el.style.fill = '#34A853';
-    else if (el.getAttribute('data-class') == 'yellow') el.style.fill = '#FBBC05';
-    else if (el.getAttribute('data-class') == 'red') el.style.fill = '#EA4335';
-  })
+  modifyGoogleIcon()
 })
 </script>
 
@@ -317,15 +364,23 @@ watch(user, () => {
   &__nickname {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
+    border: 1px solid transparent;
+    transition: .3s;
     padding: 10px;
     font-family: 'Neue Plak';
     font-weight: 400;
     font-size: 22px;
     line-height: 30px;
     color: #FFFFFF;
+
+    &--edit {
+      border: 1px solid #fff;
+    }
   }
 
   &__edit {
+    padding: 12px;
+    box-sizing: content-box;
     cursor: pointer;
   }
 }
@@ -459,6 +514,44 @@ watch(user, () => {
 
     &--connected {
       border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+  }
+
+  &__connected {
+    margin-top: 14px;
+    grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .connectedWallet {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    font-family: 'Neue Plak';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 19px;
+    color: #fff;
+
+    &__delete {
+      margin-left: auto;
+      background: rgba(100, 102, 105, 0.1);
+      border-radius: 5px;
+      padding: 6px;
+      box-sizing: content-box;
+      cursor: pointer;
+
+      path {
+        transition: .3s;
+      }
+
+      &:hover {
+        path {
+          stroke: #fff;
+        }
+      }
     }
   }
 }

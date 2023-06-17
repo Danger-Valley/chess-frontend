@@ -121,7 +121,7 @@ class User {
 }
 class Wallet {
   constructor(path) {
-    this.localPath = `${path}/users/wallets`;
+    this.localPath = `${path}/users`;
   }
 
   async connect({
@@ -130,9 +130,10 @@ class Wallet {
     signatureId,
     signature,
     signatureType,
-    accessToken
+    accessToken,
+    userId
   }) {
-    return await fetch(`${this.localPath}`, {
+    return await fetch(`${this.localPath}/${userId}/wallets`, {
       method: "POST",
       body: JSON.stringify({
         blockchain,
@@ -150,9 +151,10 @@ class Wallet {
 
   async disconnect({
     walletAddress,
-    accessToken
+    accessToken,
+    userId
   }) {
-    return await fetch(`${this.localPath}/${walletAddress}`, {
+    return await fetch(`${this.localPath}/${userId}/wallets/${walletAddress}`, {
       method: "DELETE",
       headers: {
         'content-type': 'application/json',
@@ -161,8 +163,8 @@ class Wallet {
     });
   }
 
-  async get(accessToken) {
-    return await fetch(`${this.localPath}`, {
+  async get({ accessToken, userId }) {
+    return await fetch(`${this.localPath}/${userId}/wallets`, {
       method: "GET",
       headers: {
         'content-type': 'application/json',
@@ -176,7 +178,7 @@ class Chess {
     this.localPath = `${path}/games`;
   }
 
-  async find_create({mode, color, accessToken}){
+  async find_create({ mode, color, accessToken }) {
     return await fetch(`${this.localPath}/init`, {
       method: "POST",
       body: JSON.stringify({
@@ -189,7 +191,7 @@ class Chess {
     });
   }
 
-  async get({id, accessToken}){
+  async get({ id, accessToken }) {
     return await fetch(`${this.localPath}/${id}`, {
       method: "GET",
       headers: {
@@ -198,7 +200,7 @@ class Chess {
     });
   }
 
-  async join({id, accessToken}){
+  async join({ id, accessToken }) {
     return await fetch(`${this.localPath}/${id}/join`, {
       method: "POST",
       headers: {
@@ -207,16 +209,16 @@ class Chess {
     });
   }
 
-  async move({id, move, accessToken}){
+  async move({ id, move, accessToken }) {
     return await fetch(`${this.localPath}/${id}/move`, {
       method: "POST",
-      body: JSON.stringify({move}),
+      body: JSON.stringify({ move }),
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'content-type': 'application/json'
       }
     });
-  } 
+  }
 }
 
 export default defineNuxtPlugin(() => {

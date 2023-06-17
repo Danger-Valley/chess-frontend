@@ -9,6 +9,7 @@ import {
   WalletConnectWalletAdapter
 } from "@solana/wallet-adapter-wallets";
 import base58 from "bs58";
+import { useUserStore } from "~/stores/user";
 
 const walletOptions = {
   wallets: [
@@ -54,7 +55,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           signatureId: body.id,
           signature: signedMessage,
           signatureType: 'LOGIN',
-          accessToken: localStorage.getItem('accessToken')
+          accessToken: localStorage.getItem('accessToken'),
+          userId: localStorage.getItem('userId')
         })
         body = await resp.json();
 
@@ -65,6 +67,29 @@ export default defineNuxtPlugin((nuxtApp) => {
         }
 
         return true;
+      },
+      async disconnectWallet(walletAddress){
+        let resp = await nuxtApp.$API().Wallet.disconnect({
+          walletAddress,
+          accessToken: localStorage.getItem('accessToken'),
+          userId: localStorage.getItem('userId')
+        })
+        let body = await resp.json();
+        console.log(body);
+        await nuxtApp.$getWallets();
+      },
+      async getWallets(){
+        let resp = await nuxtApp.$API().Wallet.get({
+          accessToken: localStorage.getItem('accessToken'),
+          userId: localStorage.getItem('userId')
+        });
+        let body = await resp.json();
+        console.log(body);
+        useUserStore().saveWallets(body.wallets);
+      },
+      formatWallet(walletAddress){
+        if(!walletAddress) return;
+        return `${walletAddress?.slice(0,4)}...${walletAddress?.slice(-4)}`
       }
     }
   }
