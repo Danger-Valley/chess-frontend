@@ -136,12 +136,11 @@
                   walletType.toUpperCase())?.length || 0 }} Wallets Connected</div>
                 <div
                   class="wallet__connect"
-                  :class="{ 'wallet__connect--soon': walletType != 'Solana', 'wallet__connect--connected': wallet && walletType == 'Solana' }"
+                  :class="{ 'wallet__connect--soon': walletType != 'Solana' }"
                   @click="openWalletModalProvider(walletType)"
                 >
                   <template v-if="walletType == 'Solana'">
-                    <template v-if="connected">{{ $formatWallet(publicKey?.toString()) }}</template>
-                    <template v-else>Connect Wallet</template>
+                    Connect Wallet
                   </template>
                   <template v-else>Soon!</template>
                 </div>
@@ -192,6 +191,7 @@
     <WalletModalProvider
       dark
       ref="walletModalProviderRef"
+      
     ></WalletModalProvider>
   </div>
 </template>
@@ -203,18 +203,13 @@ import IconGoogle from "@/assets/imgs/google-logo.svg"
 import IconEdit from "@/assets/imgs/edit.svg"
 import { useUserStore } from "~/stores/user"
 import { WalletModalProvider, useWallet } from "solana-wallets-vue";
+import { storeToRefs } from "pinia"
 
 let chosenTabIndex = ref(0),
   isNameEditorToggled = ref(false),
   walletModalProviderRef = ref()
 
-const { publicKey, wallet, disconnect, connect, connected } = useWallet();
-
-watch([connected, wallet], async () => {
-  console.log(connected.value, wallet.value)
-  if (wallet?.value?.readyState == "Installed") connect();
-  if (connected.value) await $connectWallet()
-})
+const { publicKey, wallet, disconnect, connect, connecting, connected, ready, readyState } = useWallet();
 
 const store = useUserStore()
 
@@ -222,6 +217,12 @@ const user = computed(() => store.getUser.value),
   userWallets = computed(() => store.getWallets.value)
 
 let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $formatWallet, $connectWallet, $disconnectWallet } = useNuxtApp();
+
+watch([connected, wallet, readyState], async () => {
+  console.log(readyState.value, wallet.value)
+  if (readyState.value == "Installed") connect();
+  if (connected.value) await $connectWallet()
+}, {immediate: true})
 
 const { isReady, login } = useTokenClient({
   onSuccess: async (e) => {
@@ -238,12 +239,7 @@ const { isReady, login } = useTokenClient({
 
 const openWalletModalProvider = (walletType) => {
   console.log(wallet.value, walletType)
-  if (!wallet.value) {
-    if (walletType == 'Solana') walletModalProviderRef.value.openModal();
-  }
-  else {
-    if (walletType == 'Solana') disconnect();
-  }
+  if (walletType == 'Solana') walletModalProviderRef.value.openModal();
 }
 
 const chooseTabIndex = (index) => {
@@ -277,6 +273,7 @@ const modifyGoogleIcon = () => {
 onMounted(() => {
   chosenTabIndex.value = location.hash.slice(1);
   modifyGoogleIcon()
+  console.log(publicKey.value)
 })
 
 watch(user, () => {
@@ -500,6 +497,7 @@ watch(user, () => {
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
     padding: 10px;
+    transition: .3s;
 
     font-size: 12px;
     line-height: 1.2;
@@ -508,11 +506,11 @@ watch(user, () => {
     cursor: pointer;
 
     &--soon {
-      border: unset;
+      border: unset !important;
       cursor: not-allowed;
     }
 
-    &--connected {
+    &:hover {
       border: 1px solid rgba(255, 255, 255, 0.7);
     }
   }

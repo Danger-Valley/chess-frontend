@@ -307,7 +307,7 @@ const openGameSearchPopup = async () => {
 @media screen and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
   .main {
     grid-template-columns: repeat(2, 1fr);
-    margin: 8px 147px;
+    margin: 8px 147px 150px 147px;
   }
 
   .heading {
@@ -326,7 +326,7 @@ const openGameSearchPopup = async () => {
     }
 
     &--half {
-      position: absolute;
+      position: fixed;
       left: 0;
       bottom: 0;
       width: 100%;

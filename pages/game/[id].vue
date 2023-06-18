@@ -112,7 +112,6 @@ const afterMove = async (e) => {
     from: e.from,
     to: e.to
   })
-  boardConfig.movable.color = null;
 }
 
 const join = async () => {
@@ -155,10 +154,8 @@ onMounted(async () => {
 
   store.listen('game_event', async (resp) => {
     console.log(resp)
-    if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
-      // it will throw an error but also MAKE move - to investigate later 
-      boardAPI.value.move(resp.payload.move)
-      boardConfig.movable.color = playerMe.value?.color == 'w' ? 'white' : 'black';
+    if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id && resp.payload?.color !== playerMe.value?.color) {
+      boardAPI.value.move(resp.payload.move);
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
