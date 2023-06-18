@@ -84,6 +84,7 @@
 <script setup>
 import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
 import { TheChessboard } from 'vue3-chessboard';
+import 'vue3-chessboard/style.css';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
 
