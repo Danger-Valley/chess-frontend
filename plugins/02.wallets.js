@@ -68,9 +68,9 @@ export default defineNuxtPlugin((nuxtApp) => {
 
         return true;
       },
-      async disconnectWallet(walletAddress){
+      async disconnectWallet(id){
         let resp = await nuxtApp.$API().Wallet.disconnect({
-          walletAddress,
+          id,
           accessToken: localStorage.getItem('accessToken'),
           userId: localStorage.getItem('userId')
         })

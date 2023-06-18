@@ -150,11 +150,11 @@ class Wallet {
   }
 
   async disconnect({
-    walletAddress,
+    id,
     accessToken,
     userId
   }) {
-    return await fetch(`${this.localPath}/${userId}/wallets/${walletAddress}`, {
+    return await fetch(`${this.localPath}/${userId}/wallets/${id}`, {
       method: "DELETE",
       headers: {
         'content-type': 'application/json',
@@ -179,6 +179,7 @@ class Chess {
   }
 
   async find_create({ mode, color, accessToken }) {
+    console.log(mode, color)
     return await fetch(`${this.localPath}/init`, {
       method: "POST",
       body: JSON.stringify({

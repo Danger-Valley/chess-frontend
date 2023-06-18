@@ -5,7 +5,7 @@
       :src="props.player.user?.avatar"
     />
     <div class="player__nickname">{{ props.player.user.username || props.player.user.email }}</div>
-    <div class="player__rating">({{ props.player.user.rating }})</div>
+    <div class="player__rating">({{ props.player.user.rating.toFixed(0) }})</div>
     <img
       v-if="props.player?.user?.country"
       class="player__country"

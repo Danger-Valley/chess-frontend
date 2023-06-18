@@ -153,7 +153,7 @@
                   <div class="connectedWallet">
                     {{ $formatWallet(connectedWallet?.walletAddress) }}
                     <svg
-                      @click="$disconnectWallet(connectedWallet?.walletAddress)"
+                      @click="$disconnectWallet(connectedWallet?.id)"
                       class="connectedWallet__delete"
                       width="14"
                       height="14"

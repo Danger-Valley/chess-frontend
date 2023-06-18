@@ -26,6 +26,6 @@
     "socket.io-client": "^4.6.1",
     "solana-wallets-vue": "^0.6.0",
     "vite-svg-loader": "^4.0.0",
-    "vue3-chessboard": "^1.1.5"
+    "vue3-chessboard": "^1.1.8"
   }
 }

@@ -3,26 +3,26 @@
     class="popup__wrapper popup__wrapper--active"
     id="GameBeginsPopup"
     @click="$togglePopup('GameBeginsPopup')"
-    v-if="game"
+    v-if="props.me"
   >
     <div
       class="popup"
       @click.stop
     >
-      <div
-        class="player"
-        v-if="props.game.playerOne?.joined"
-      >
+      <div class="player">
         <img
           class="player__avatar"
-          :src="props.game.playerOne.user.avatar"
+          :src="props.me.user.avatar"
         />
-        <div class="player__name">{{ props.game.playerOne.user.username || props.game.playerOne.user.email }}</div>
-        <div class="player__rating">({{ props.game.playerOne.user.rating }})</div>
+        <div class="player__name">{{ props.me.user.username || props.me.user.email }}</div>
+        <div
+          class="player__rating"
+          v-if="props.me.user.rating > 0"
+        >({{ props.me.user.rating }})</div>
         <img
           v-if="false"
           class="player__country"
-          :src="player.country"
+          :src="props.me.user.country"
         />
         <IconsWifi
           class="player__connection-status"
@@ -30,33 +30,38 @@
         ></IconsWifi>
         <div class="player__ms">{{ ms }}ms</div>
       </div>
-      <div class="connecting" v-else>Opponent is connecting...</div>
 
-      <div class="center">VS</div>
-      <div class="start">game will start in {{ timeout }} sec</div>
+      <template v-if="props.opponent?.joined">
+        <div class="center">VS</div>
+        <div class="start">game will start in {{ timeout }} sec</div>
 
+        <div class="player">
+          <img
+            class="player__avatar"
+            :src="props.opponent.user.avatar"
+          />
+          <div class="player__name">{{ props.opponent.user.username || props.opponent.user.email }}</div>
+          <div
+            class="player__rating"
+            v-if="props.opponent.user.rating > 0"
+          >({{ props.opponent.user.rating }})</div>
+          <img
+            v-if="false"
+            class="player__country"
+            :src="props.opponent.user.country"
+          />
+          <IconsWifi
+            class="player__connection-status"
+            :ms="ms"
+          ></IconsWifi>
+          <div class="player__ms">{{ ms }}ms</div>
+        </div>
+      </template>
+      
       <div
-        class="player"
-        v-if="props.game.playerTwo?.joined"
-      >
-        <img
-          class="player__avatar"
-          :src="props.game.playerTwo.user.avatar"
-        />
-        <div class="player__name">{{ props.game.playerTwo.user.username || props.game.playerTwo.user.email }}</div>
-        <div class="player__rating">({{ props.game.playerTwo.user.rating }})</div>
-        <img
-          v-if="false"
-          class="player__country"
-          :src="player.country"
-        />
-        <IconsWifi
-          class="player__connection-status"
-          :ms="ms"
-        ></IconsWifi>
-        <div class="player__ms">{{ ms }}ms</div>
-      </div>
-      <div class="connecting" v-else>Opponent is connecting...</div>
+        class="connecting"
+        v-else
+      >Opponent is connecting...</div>
     </div>
   </div>
 </template>
@@ -70,15 +75,13 @@ let timeout = ref(5)
 
 const ms = computed(() => useSocketStore().pingGetter)
 
-let props = defineProps(['game'])
+let props = defineProps(['me', 'opponent'])
 
-watch(() => props.game, () => {
-  console.log(props.game.playerOne, props.game.playerTwo);
-
-  if(props.game.playerOne.joined && props.game.playerTwo.joined){
+watch(() => props.opponent, () => {
+  if (props.opponent.joined) {
     let closeInterval = setInterval(() => {
       timeout.value--;
-      if(timeout.value == 0){
+      if (timeout.value == 0) {
         $togglePopup('GameBeginsPopup');
         clearInterval(closeInterval);
       }
@@ -143,7 +146,7 @@ watch(() => props.game, () => {
     border-radius: 100%;
   }
 
-  &__connection-status{
+  &__connection-status {
     margin-left: auto;
   }
 
@@ -161,7 +164,7 @@ watch(() => props.game, () => {
   }
 }
 
-.connecting{
+.connecting {
   width: 100%;
   text-align: center;
   font-family: 'Neue Plak';
@@ -169,5 +172,4 @@ watch(() => props.game, () => {
   font-size: 16px;
   line-height: 22px;
   color: #FFFFFF4d;
-}
-</style>
+}</style>
