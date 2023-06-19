@@ -42,7 +42,7 @@
           <div class="slide__text">
             Step into the competitive arena and challenge NFT communities to epic chess tournaments. Compete against
             players from around the world and showcase your skills on the grand stage.<br /><br />
-            Rise up the ranks, claim victory, and earn prestigious rewards. 
+            Rise up the ranks, claim victory, and earn prestigious rewards.
             It's time to prove your mettle and become a chess champion.
           </div>
           <div
@@ -122,7 +122,7 @@
             We are the team that always delivers. We build games, tools, top- notch art, community, and utility for
             all our
             holders and the Solana ecosystem.<br /><br />
-            We love chess, and it’s time to reimagine how people play it. 
+            We love chess, and it’s time to reimagine how people play it.
             Join the waitlist to be one of the first “Chess 3.0” players with us!
           </div>
           <div
@@ -154,14 +154,14 @@
   <footer class="footer">
     <a
       class="footer__link"
-      href=""
+      href="https://discord.com/invite/dangervalley"
     ><img
         class="footer__img"
         src="@/assets/disc.png"
       /></a>
     <a
       class="footer__link"
-      href=""
+      href="https://twitter.com/danger_valley"
     ><img
         class="footer__img"
         src="@/assets/twi.png"
@@ -199,7 +199,7 @@
         <div class="popup__text">
           Your email address has been successfully registered.<br /><br />You will be notified when the platform is
           available!
-          /</div>
+        </div>
       </template>
     </div>
   </div>
@@ -209,9 +209,38 @@
 import { onMounted, ref } from 'vue';
 
 let chosenSlideNumber = ref(1),
-  sent = ref(false)
+  sent = ref(false),
+  isScrolling = false,
+  touchStartPosition = null;
+
+const wheelHandler = (e) => {
+  //console.log(e);
+  if (!isScrolling) {
+    isScrolling = true;
+    goToSlide(chosenSlideNumber.value + Math.sign(e.deltaY));
+    setTimeout(() => isScrolling = false, 1000)
+  }
+}
+
+const touchStartHandler = (e) => {
+  console.log(e.touches[0].pageY);
+  touchStartPosition = e.touches[0].pageY;
+}
+
+const touchStopHandler = (e) => {
+  console.log(e.changedTouches[0].pageY);
+  if (!isScrolling && Math.abs(touchStartPosition - e.changedTouches[0].pageY) > 60){
+    isScrolling = true
+    goToSlide(chosenSlideNumber.value + Math.sign(touchStartPosition - e.changedTouches[0].pageY))
+    setTimeout(() => isScrolling = false, 1000)
+  }
+  touchStartPosition = null;
+}
 
 const goToSlide = (num) => {
+  console.log(num)
+  if (num > 5) num = 1;
+  else if (num < 1) num = 5;
   chosenSlideNumber.value = num;
   document.querySelector('.main').style.translate = `0 ${-100 * (num - 1)}vh`;
 }
@@ -228,9 +257,9 @@ const joinByMail = async () => {
   let resp = await fetch('https://api-dev.thechess.io/auth/api/v1/waitlist', {
     method: "POST",
     headers: { 'content-type': 'application/json' },
-    body: {
+    body: JSON.stringify({
       email: mail.value
-    }
+    })
   })
   let body = await resp.json();
   console.log(body);
@@ -238,6 +267,9 @@ const joinByMail = async () => {
 }
 
 onMounted(() => {
+  document.addEventListener('wheel', wheelHandler)
+  document.addEventListener('touchstart', touchStartHandler)
+  document.addEventListener('touchend', touchStopHandler)
   setTimeout(() => {
     document.querySelector("#app").style.opacity = 1;
   }, 500);
@@ -586,12 +618,12 @@ body {
     }
   }
 
-  .popup{
+  .popup {
     width: 80vw;
-    &__func{
+
+    &__func {
       flex-direction: column;
     }
   }
 }
-
 </style>
