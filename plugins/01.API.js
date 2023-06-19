@@ -77,7 +77,18 @@ class User {
   async get(accessToken) {
     return await fetch(`${this.localPath}`, {
       headers: {
-        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  /**
+   * to get public user data without accessToken
+   * @param {Array} ids - array of ids of wanted users 
+   */
+  async getByIds(ids) {
+    return await fetch(`${this.localPath}/${ids.join(',')}`, {
+      headers: {
         'Authorization': `Bearer ${accessToken}`
       }
     });
@@ -167,7 +178,15 @@ class Wallet {
     return await fetch(`${this.localPath}/${userId}/wallets`, {
       method: "GET",
       headers: {
-        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async getNFTs({ accessToken, userId, id }) {
+    return await fetch(`${this.localPath}/${userId}/wallets/${id}/nfts`, {
+      method: "GET",
+      headers: {
         'Authorization': `Bearer ${accessToken}`
       }
     });

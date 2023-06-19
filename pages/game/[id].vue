@@ -78,6 +78,11 @@
       :opponent="playerOpponent"
     ></PopupsGameBeginsPopup>
     <PopupsGameChooseFigurePromotionPopup></PopupsGameChooseFigurePromotionPopup>
+    <PopupsGameEndsPopup
+      :me="playerMe"
+      :opponent="playerOpponent"
+      :whoWon="whoWon"
+    ></PopupsGameEndsPopup>
   </div>
 </template>
 
@@ -87,6 +92,7 @@ import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
+import PopupsGameEndsPopup from "~/components/Popups/GameEndsPopup.vue";
 
 let { $API } = useNuxtApp();
 
@@ -98,11 +104,12 @@ let boardConfig = reactive({}),
   game = ref(),
   playerMe = ref(),
   playerOpponent = ref(),
-  boardAPI = ref()
+  boardAPI = ref(),
+  whoWon = ref()
 
 const afterMove = async (e) => {
   console.log(e)
-  if(e.color !== playerMe.value?.color) return;
+  if (e.color !== playerMe.value?.color) return;
   await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
@@ -171,6 +178,14 @@ onMounted(async () => {
         playerMe.value = body.game.playerTwo;
         if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
       }
+    }
+    else if (resp.type == 'GAME_END') {
+      //TODO test
+      if(resp.payload.isDraw) return whoWon.value = 'draw';
+      else {
+        if(playerMe.value.id == resp.payload.winnerUserId) whoWon.value = 'me';
+        else if(playerOpponent.value.id == resp.payload.winnerUserId) whoWon.value = 'opponent';
+      } 
     }
   })
 

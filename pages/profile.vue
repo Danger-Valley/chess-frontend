@@ -191,7 +191,6 @@
     <WalletModalProvider
       dark
       ref="walletModalProviderRef"
-      
     ></WalletModalProvider>
   </div>
 </template>
@@ -203,7 +202,6 @@ import IconGoogle from "@/assets/imgs/google-logo.svg"
 import IconEdit from "@/assets/imgs/edit.svg"
 import { useUserStore } from "~/stores/user"
 import { WalletModalProvider, useWallet } from "solana-wallets-vue";
-import { storeToRefs } from "pinia"
 
 let chosenTabIndex = ref(0),
   isNameEditorToggled = ref(false),
@@ -220,9 +218,10 @@ let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, 
 
 watch([connected, wallet, readyState], async () => {
   console.log(readyState.value, wallet.value)
+  if (userWallets?.value?.wallets?.length > 0 && userWallets?.value?.wallets?.find(el => el.walletAddress == publicKey)) return;
   if (readyState.value == "Installed") connect();
   if (connected.value) await $connectWallet()
-}, {immediate: true})
+})
 
 const { isReady, login } = useTokenClient({
   onSuccess: async (e) => {

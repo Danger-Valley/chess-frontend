@@ -5,11 +5,11 @@
     </div>
 
     <div class="socials">
-      <NuxtLink to="" target="_blank" class="socials__item">
+      <NuxtLink to="https://discord.com/invite/dangervalley" target="_blank" class="socials__item">
         <IconDiscord alt="discord"/>
       </NuxtLink>
 
-      <NuxtLink to="" target="_blank" class="socials__item">
+      <NuxtLink to="https://twitter.com/danger_valley" target="_blank" class="socials__item">
         <IconTwitter alt="twitter"/>
       </NuxtLink>
     </div>
