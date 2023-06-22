@@ -24,11 +24,6 @@
           class="player__country"
           :src="props.me.user.country"
         />
-        <IconsWifi
-          class="player__connection-status"
-          :ms="ms"
-        ></IconsWifi>
-        <div class="player__ms">{{ ms }}ms</div>
       </div>
 
       <template v-if="props.opponent?.joined">
@@ -50,11 +45,6 @@
             class="player__country"
             :src="props.opponent.user.country"
           />
-          <IconsWifi
-            class="player__connection-status"
-            :ms="ms"
-          ></IconsWifi>
-          <div class="player__ms">{{ ms }}ms</div>
         </div>
       </template>
       
@@ -67,13 +57,9 @@
 </template>
 
 <script setup>
-import { useSocketStore } from '~/stores/socket';
-
 let { $togglePopup } = useNuxtApp();
 
 let timeout = ref(5)
-
-const ms = computed(() => useSocketStore().pingGetter)
 
 let props = defineProps(['me', 'opponent'])
 

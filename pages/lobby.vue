@@ -62,7 +62,7 @@
     </main>
     
     <PopupsGameSearchPopup ref="GameSearchPopupRef"></PopupsGameSearchPopup>
-    <PopupsGameSettingsPopup ref="GameSettingsPopupRef"></PopupsGameSettingsPopup>
+    <PopupsGameSettingsPopup ref="GameSettingsPopupRef" @play-now="openGameSearchPopup"></PopupsGameSettingsPopup>
   </div>
 </template>
 

@@ -2,11 +2,9 @@ import { defineStore } from 'pinia'
 import { io } from 'socket.io-client';
 
 export const useSocketStore = defineStore('socket', () => {
-  const socket = ref(),
-    ping = ref()
+  const socket = ref()
 
   const socketGetter = computed(() => socket.value)
-  const pingGetter = computed(() => ping.value)
 
   function init(url='https://socket-dev.thechess.io'){
     if(socket.value) return;
@@ -34,9 +32,6 @@ export const useSocketStore = defineStore('socket', () => {
     socket.value.on('info_message', (resp) => {
       //console.log(resp)
     })
-
-    getPing();
-    setInterval(getPing, 10000);
   }
 
   function disconnect(){
@@ -52,14 +47,5 @@ export const useSocketStore = defineStore('socket', () => {
     socket.value.on(name, callback)
   }
 
-  function getPing(){
-    const start = Date.now();
-
-    emit("ping", () => {
-      const dur = Date.now() - start;
-      ping.value = dur;
-    });
-  }
-
-  return {socketGetter, pingGetter, init, emit, listen}
+  return {socketGetter, init, emit, listen}
 })

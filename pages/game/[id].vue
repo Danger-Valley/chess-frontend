@@ -140,6 +140,8 @@ onMounted(async () => {
   console.log(resp, body)
   game.value = body.game;
 
+  if(body.game.playerOne.joined && body.game.playerTwo.joined) return console.error('Two players have already joined the game');
+  
   body = await join();
 
   let meResp = await $API().User.get(localStorage.getItem('accessToken'))

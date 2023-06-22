@@ -11,8 +11,6 @@
       class="player__country"
       :src="props.player.user.country"
     />
-    <IconsWifi class="player__connection-status" :ms="ms"></IconsWifi>
-    <div class="player__ms">{{ ms }}ms</div>
     <div class="timer">
       {{ timer.m }}:{{ timer.s }}:<span class="timer__ms">{{ timer.ms }}</span>
     </div>
@@ -20,10 +18,6 @@
 </template>
 
 <script setup>
-import { useSocketStore } from "~/stores/socket";
-
-const ms = computed(() => useSocketStore().pingGetter)
-
 let props = defineProps(['player']) //'me' or 'opponent'
 
 let timer = ref({

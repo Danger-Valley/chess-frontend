@@ -4,30 +4,30 @@
     id="GameSearchPopup"
     @click="closePopup"
   >
-    <div class="popup" @click.stop>
-      <div class="game-search">
-        <div class="game-search__heading">Game search</div>
-        <div class="game-search__time">{{ formatTime }}</div>
-      </div>
-      <div
-        class="player"
-        v-if="user"
-      >
-        <img
-          class="player__avatar"
-          :src="user.avatar"
-        />
-        <div class="player__name">{{ user.username || user.email }}</div>
-        <div class="player__rating">({{ player.rating }})</div>
-        <img
-          class="player__country"
-          :src="player.country"
-        />
-        <IconsWifi
-          class="player__connection-status"
-          :ms="ms"
-        ></IconsWifi>
-        <div class="player__ms">{{ ms }}ms</div>
+    <div
+      class="popup"
+      @click.stop
+    >
+      <div class="content">
+        <div class="game-search">
+          <div class="game-search__heading">Looking for a game</div>
+          <div class="game-search__time">{{ formatTime }}</div>
+        </div>
+        <div
+          class="player"
+          v-if="user"
+        >
+          <img
+            class="player__avatar"
+            :src="user.avatar"
+          />
+          <div class="player__name">{{ user.username || user.email }}</div>
+          <div class="player__rating">({{ player.rating }})</div>
+          <img
+            class="player__country"
+            :src="player.country"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -48,8 +48,7 @@ let startTime = ref(),
   player = ref({
     rating: '1423',
     country: ''
-  }),
-  ms = ref(150)
+  })
 
 const formatTime = computed(() => `${Math.floor(searchTime.value / 60)}:${Math.floor(searchTime.value % 60).toString().padStart(2, '0')}`)
 
@@ -61,8 +60,8 @@ const startTimeTracking = () => {
 }
 
 const closePopup = () => {
-  $togglePopup('GameSearchPopup'); 
-  clearInterval(searchTimeInterval.value); 
+  $togglePopup('GameSearchPopup');
+  clearInterval(searchTimeInterval.value);
   searchTime.value = 0
 }
 
@@ -71,16 +70,62 @@ defineExpose({ startTimeTracking })
 
 <style lang="scss" scoped>
 .popup {
-  min-width: 400px;
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  min-width: 402px;
+  min-height: 122px;
   color: #fff;
+  padding: 1px;
+
+  @keyframes rotate {
+    0% {
+      rotate: 0deg;
+    }
+
+    100% {
+      rotate: 360deg;
+    }
+  }
+
+  overflow: hidden;
+
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    display: flex;
+    align-self: center;
+    left: calc(-300px + 200px);
+    top: calc(-300px + 50px);
+    width: 600px;
+    aspect-ratio: 1;
+    background-repeat: no-repeat;
+    background-image: conic-gradient(#2B2B2B, #fff);
+    animation: rotate 4s linear infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 6px;
+    top: 6px;
+    width: calc(100% - 12px);
+    height: calc(100% - 12px);
+    background: white;
+  }
 
   &__heading {
     margin-bottom: 10px;
   }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 400px;
+  min-height: 120px;
+  background-color: #121314;
+  padding: 20px;
 }
 
 .game-search {
@@ -130,5 +175,4 @@ defineExpose({ startTimeTracking })
     margin-left: 5px;
     color: #ffffff4d;
   }
-}
-</style>
+}</style>

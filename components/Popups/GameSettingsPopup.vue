@@ -31,7 +31,17 @@
         </div>
       </div>
 
-      <div class="popup__heading popup__heading--small">Game type</div>
+      <div class="options options--hor">
+        <div class="popup__heading popup__heading--small">
+          Everyone can join
+          <div class="popup__underheading">
+            Turn off if you want to play with friend and share the link to the game
+          </div>
+        </div>
+        <Toggle v-model="everyoneCanJoin" />
+      </div>
+
+      <div class="popup__heading popup__heading--small">I play as</div>
 
       <div class="figures">
         <div
@@ -62,6 +72,10 @@
           </div>
         </div>
       </div>
+
+      <div class="play" @click="$togglePopup('GameSettingsPopup'); emit('playNow')">
+        Play now
+      </div>
     </div>
   </div>
 </template>
@@ -73,14 +87,20 @@ import BlackFigure from "@/assets/imgs/blackFigure.svg"
 import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
+import Toggle from '@vueform/toggle'
+
 console.log(gameModes)
 
 let option = ref(gameModes?.[0]?.items?.[0].id),
-  color = ref(null)
+  color = ref(null),
+  everyoneCanJoin = ref(true)
 
-defineExpose({option, color})
+const emit = defineEmits(['playNow'])
+
+defineExpose({ option, color, everyoneCanJoin })
 </script>
 
+<style src="@vueform/toggle/themes/default.css"></style>
 <style lang="scss" scoped>
 .popup {
   min-width: 448px;
@@ -90,6 +110,14 @@ defineExpose({option, color})
   gap: 10px;
   color: #fff;
 
+  &__underheading {
+    max-width: 155px;
+    color: #ffffff4d;
+    font-size: 8px;
+    line-height: 7px;
+    text-transform: initial;
+  }
+
   &__heading {
     margin-bottom: 10px;
     font-size: 16px;
@@ -98,10 +126,10 @@ defineExpose({option, color})
     &--small {
       text-transform: initial;
       margin-bottom: unset;
+    }
 
-      &:nth-last-of-type(2) {
-        margin-top: 60px;
-      }
+    &--mt {
+      margin-top: 60px;
     }
   }
 }
@@ -117,6 +145,11 @@ defineExpose({option, color})
     font-size: 16px;
     line-height: 22px;
     color: #FFFFFF80;
+
+    &--hor {
+      flex-direction: row;
+      justify-content: space-between;
+    }
 
     &__heading {
       color: #ffffff4d;
@@ -170,5 +203,28 @@ defineExpose({option, color})
     flex-direction: row;
     justify-content: space-between;
   }
+}
+
+.toggle-container:focus {
+  box-shadow: none !important;
+  outline: none;
+}
+
+.play {
+  width: 261px;
+  height: 77px;
+  margin: auto;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #27F4BA;
+  font-size: 16px;
+  font-family: Montserrat;
+  font-weight: 500;
+  line-height: 100%;
+  text-transform: uppercase;
+  border: 1px solid #27F4BA;
+  cursor: pointer;
 }
 </style>
