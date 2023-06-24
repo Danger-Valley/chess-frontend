@@ -27,6 +27,9 @@
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
+import { useUserStore } from "~/stores/user";
+
+if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
 </script>
 
 <style lang="scss" scoped>

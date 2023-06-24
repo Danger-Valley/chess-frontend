@@ -197,12 +197,13 @@ class Chess {
     this.localPath = `${path}/games`;
   }
 
-  async find_create({ mode, color, accessToken }) {
+  async find_create({ mode, color, everyoneCanJoin, accessToken }) {
     console.log(mode, color)
     return await fetch(`${this.localPath}/init`, {
       method: "POST",
       body: JSON.stringify({
-        mode, color
+        mode, color,
+        everyoneCanJoin
       }),
       headers: {
         'content-type': 'application/json',
@@ -240,6 +241,20 @@ class Chess {
     });
   }
 }
+class Lobby {
+  constructor(path) {
+    this.localPath = `${path}/lobby`;
+  }
+
+  async get(accessToken) {
+    return await fetch(`${this.localPath}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -257,7 +272,8 @@ export default defineNuxtPlugin(() => {
           User: new User(`${path}/auth/api/v1`),
           Wallet: new Wallet(`${path}/auth/api/v1`),
           Signatures: new Signatures(`${path}/auth/api/v1`),
-          Chess: new Chess(`${path}/game/api/v1`)
+          Chess: new Chess(`${path}/game/api/v1`),
+          Lobby: new Lobby(`${path}/game/api/v1`)
         }
       }
     }

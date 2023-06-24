@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', () => {
     await obtainUser();
     console.log(`User saved!`, user.value)
     document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
-    socket.error('auth', JSON.stringify({accessToken}))
+    socket.emit('auth', JSON.stringify({accessToken}))
   }
 
   async function updateUser(objToPass) {

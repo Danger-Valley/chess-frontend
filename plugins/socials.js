@@ -95,7 +95,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         else if (connectType == 'update') {
           await userStore.updateUser({ google: { token: response.access_token } })
         }
-        close()
       },
       handleOnError(errorResponse) {
         console.error("Error: ", errorResponse);

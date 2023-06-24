@@ -74,8 +74,8 @@ import SettingsIcon from "@/assets/imgs/settings.svg"
 let { $togglePopup, $API } = useNuxtApp();
 
 let rating = ref({
-  points: 1488,
-  position: [23, 100]
+  points: null,
+  position: [null, null]
 }),
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref()
@@ -85,7 +85,8 @@ const openGameSearchPopup = async () => {
   GameSearchPopupRef.value.startTimeTracking()
   let body = {
     mode: GameSettingsPopupRef.value.option,
-    accessToken: localStorage.getItem('accessToken')
+    accessToken: localStorage.getItem('accessToken'),
+    everyoneCanJoin: GameSettingsPopupRef.value.everyoneCanJoin
   }
   if(GameSettingsPopupRef.value.color) body = {
     ...body,
@@ -96,6 +97,18 @@ const openGameSearchPopup = async () => {
   console.log(body);
   await navigateTo(`game/${body.game.id}`)
 }
+
+onMounted(async () => {
+  let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
+  let body = await resp.json();
+  console.log(body);
+
+  if(body.errors) return console.error(body.errors);
+
+  rating.value.position = [body.user.leaderboard.position, body.user.leaderboard.total];
+  if(body.user.rank) rating.value.points = body.user.rank.rank;
+  // TODO add wait for Zheka to design for active games & other
+})
 </script>
 
 <style lang="scss" scoped>

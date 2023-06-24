@@ -142,6 +142,10 @@ const store = useUserStore()
 
 const user = computed(() => store.getUser.value)
 
+watch(user, async () => {
+  if(user.value?.id) await navigateTo('/lobby')
+})
+
 const toggleMenu = () => {
   // TODO get var from scss?
   isToggled.value = !isToggled.value;
