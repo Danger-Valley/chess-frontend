@@ -3,6 +3,7 @@
     <GamePlayer
       class="player"
       :player="playerOpponent"
+      :timer="timer.opponent"
     ></GamePlayer>
 
     <main class="main">
@@ -71,6 +72,7 @@
     <GamePlayer
       class="player"
       :player="playerMe"
+      :timer="timer.me"
     ></GamePlayer>
 
     <PopupsGameBeginsPopup
@@ -105,7 +107,15 @@ let boardConfig = reactive({}),
   playerMe = ref(),
   playerOpponent = ref(),
   boardAPI = ref(),
-  whoWon = ref()
+  whoWon = ref(),
+  timer = ref({
+    me: null,
+    opponent: null
+  }),
+  timeAddedPerMove = 0,
+  beginTime = null,
+  timerMeInterval = null,
+  timerOpponentInterval = null
 
 const afterMove = async (e) => {
   console.log(e)
@@ -132,6 +142,74 @@ const join = async () => {
 }
 
 onMounted(async () => {
+  store.listen('game_event', async (resp) => {
+    console.log(resp)
+    if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
+      if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
+      if (resp.payload.playerId == playerMe.value.id) {
+        timer.value.me = game.value.config.timeForGame - (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) / 1000 + timeAddedPerMove - 1 + (game.value.config.timeForGame - timer.value.opponent);
+        clearInterval(timerMeInterval)
+        timerOpponentInterval = setInterval(() => {
+          timer.value.opponent--;
+        }, 1000)
+      }
+      else if (resp.payload.playerId == playerOpponent.value.id) {
+        timer.value.opponent = game.value.config.timeForGame - (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) / 1000 + timeAddedPerMove - 1 + (game.value.config.timeForGame - timer.value.me);
+        clearInterval(timerOpponentInterval)
+        timerMeInterval = setInterval(() => {
+          timer.value.me--;
+        }, 1000)
+      }
+    }
+    else if (resp.type == 'GAME_START') {
+      resp = await $API().Chess.get({
+        id: resp.gameId,
+        accessToken: localStorage.getItem('accessToken')
+      })
+      body = await resp.json();
+      game.value = body.game;
+      if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
+        playerMe.value = body.game.playerOne;
+        if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
+      }
+      else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
+        playerMe.value = body.game.playerTwo;
+        if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
+      }
+
+      beginTime = body.game.startedAt;
+
+      console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
+
+      if (body.game.state.turn == playerMe.value.color) {
+        setTimeout(() => {
+          timerMeInterval = setInterval(() => {
+            timer.value.me--;
+            console.log(timer.value)
+          }, 1000)
+        }, 5000)
+      }
+      else if (body.game.state.turn == playerOpponent.value.color) {
+        setTimeout(() => {
+          timerOpponentInterval = setInterval(() => {
+            timer.value.opponent--;
+            console.log(timer.value)
+          }, 1000)
+        }, 5000)
+      }
+    }
+    else if (resp.type == 'GAME_END') {
+      //TODO test
+      if (resp.payload.isDraw) return whoWon.value = 'draw';
+      else {
+        if (playerMe.value.id == resp.payload.winnerUserId) whoWon.value = 'me';
+        else if (playerOpponent.value.id == resp.payload.winnerUserId) whoWon.value = 'opponent';
+      }
+    }
+  })
+
+  store.emit('room', JSON.stringify({ gameId: useRoute().params.id }))
+
   let resp = await $API().Chess.get({
     id: useRoute().params.id,
     accessToken: localStorage.getItem('accessToken')
@@ -140,8 +218,20 @@ onMounted(async () => {
   console.log(resp, body)
   game.value = body.game;
 
-  if(body.game.playerOne.joined && body.game.playerTwo.joined) return console.error('Two players have already joined the game');
-  
+  timer.value = {
+    me: game.value.config.timeForGame,
+    opponent: game.value.config.timeForGame
+  }
+  timeAddedPerMove = game.value.config.timeAddedPerMove;
+
+  if (
+    body.game.playerOne.joined &&
+    body.game.playerTwo.joined &&
+    !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
+  ) return console.error('Two players have already joined the game');
+
+  beginTime = body.game.startedAt;
+
   body = await join();
 
   let meResp = await $API().User.get(localStorage.getItem('accessToken'))
@@ -159,38 +249,6 @@ onMounted(async () => {
 
   console.log(playerMe.value, playerOpponent.value);
 
-  store.emit('room', JSON.stringify({ gameId: body.game.id }))
-
-  store.listen('game_event', async (resp) => {
-    console.log(resp)
-    if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id && resp.payload?.color !== playerMe.value?.color) {
-      boardAPI.value.move(resp.payload.move);
-    }
-    else if (resp.type == 'GAME_START') {
-      resp = await $API().Chess.get({
-        id: resp.gameId,
-        accessToken: localStorage.getItem('accessToken')
-      })
-      body = await resp.json();
-      if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
-        playerMe.value = body.game.playerOne;
-        if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
-      }
-      else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
-        playerMe.value = body.game.playerTwo;
-        if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
-      }
-    }
-    else if (resp.type == 'GAME_END') {
-      //TODO test
-      if(resp.payload.isDraw) return whoWon.value = 'draw';
-      else {
-        if(playerMe.value.id == resp.payload.winnerUserId) whoWon.value = 'me';
-        else if(playerOpponent.value.id == resp.payload.winnerUserId) whoWon.value = 'opponent';
-      } 
-    }
-  })
-
   boardConfig = {
     fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
@@ -207,6 +265,29 @@ onMounted(async () => {
   }
 
   canInit.value = true;
+
+  if (body.game.playerOne.joined && body.game.playerTwo.joined) {
+    beginTime = body.game.startedAt;
+
+    console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
+
+    if (body.game.state.turn == playerMe.value.color) {
+      setTimeout(() => {
+        timerMeInterval = setInterval(() => {
+          timer.value.me--;
+          console.log(timer.value)
+        }, 1000)
+      }, 5000)
+    }
+    else if (body.game.state.turn == playerOpponent.value.color) {
+      setTimeout(() => {
+        timerOpponentInterval = setInterval(() => {
+          timer.value.opponent--;
+          console.log(timer.value)
+        }, 1000)
+      }, 5000)
+    }
+  }
 })
 </script>
 

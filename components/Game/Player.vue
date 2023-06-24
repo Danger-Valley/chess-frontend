@@ -5,29 +5,27 @@
       :src="props.player.user?.avatar"
     />
     <div class="player__nickname">{{ props.player.user.username || props.player.user.email }}</div>
-    <div class="player__rating">({{ props.player.user.rating.toFixed(0) }})</div>
+    <div class="player__rating" v-if="props.player.user.rank?.rank">({{ props.player.user.rank.rank.toFixed(0) }})</div>
     <img
       v-if="props.player?.user?.country"
       class="player__country"
       :src="props.player.user.country"
     />
-    <div class="timer">
-      {{ timer.m }}:{{ timer.s }}:<span class="timer__ms">{{ timer.ms }}</span>
+    <div class="timer" v-if="props.timer">
+      {{ Math.floor(props.timer / 60)?.toFixed(0).padStart(2, 0) }}:{{ Math.floor(props.timer % 60)?.toFixed(0).padStart(2, 0) }}:<span class="timer__ms">ms</span>
     </div>
   </div>
 </template>
 
 <script setup>
-let props = defineProps(['player']) //'me' or 'opponent'
-
-let timer = ref({
-      m: '00',
-      s: '00',
-      ms: 0
-    })
+let props = defineProps(['player', 'timer']) //'me' or 'opponent'
 
 watch(() => props.player, () => {
   console.log(props.player)
+})
+
+watch(() => props.timer, () => {
+  console.error(props.timer)
 })
 </script>
 
