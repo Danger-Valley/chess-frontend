@@ -12,9 +12,9 @@ cg-container {
 */
 
 cg-board piece{
-  width: 101px;
-  height: 101px;
-  background-size: 72px 72px !important;
+  width: 12.5%;
+  height: 12.5%;
+  background-size: 85% 85% !important;
   background-repeat: no-repeat !important;
   background-position: center center !important;
 }
@@ -110,6 +110,9 @@ cg-board .king.black {
 .promotion-dialog button {
   width: 95px;
   height: 95px;
+  background-size: 85% 85% !important;
+  background-repeat: no-repeat !important;
+  background-position: center center !important;
 }
 
 .promotion-dialog::before {

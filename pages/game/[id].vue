@@ -79,7 +79,6 @@
       :me="playerMe"
       :opponent="playerOpponent"
     ></PopupsGameBeginsPopup>
-    <PopupsGameChooseFigurePromotionPopup></PopupsGameChooseFigurePromotionPopup>
     <PopupsGameEndsPopup
       :me="playerMe"
       :opponent="playerOpponent"
@@ -94,7 +93,6 @@ import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
-import PopupsGameEndsPopup from "~/components/Popups/GameEndsPopup.vue";
 
 let { $API } = useNuxtApp();
 
@@ -141,24 +139,61 @@ const join = async () => {
   return body;
 }
 
+const timerMeFunc = () => {
+  if(timer.value.me > 100) timer.value.me -= 100;
+  else {
+    timer.value.me = 0;
+    boardConfig.viewOnly = true;
+  }
+}
+
+const timerOpponentFunc = () => {
+  if(timer.value.opponent > 100) timer.value.opponent -= 100;
+  else {
+    timer.value.opponent = 0;
+    boardConfig.viewOnly = true;
+  }
+}
+
 onMounted(async () => {
   store.listen('game_event', async (resp) => {
     console.log(resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
       if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
+
+      console.error(
+        timer.value.me,
+        (game.value.config.timeForGame * 1000),
+        +new Date(resp.payload.createdAt),
+        +new Date(game.value.startedAt),
+        (timeAddedPerMove * 1000),
+        timer.value.opponent);
+
       if (resp.payload.playerId == playerMe.value.id) {
-        timer.value.me = game.value.config.timeForGame - (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) / 1000 + timeAddedPerMove - 1 + (game.value.config.timeForGame - timer.value.opponent);
+        timer.value.me =
+          // 3600 * 1000
+          (game.value.config.timeForGame * 1000) -
+          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+          (timeAddedPerMove * 1000) -
+          // minus 100 - because interval is not immediate
+          100 +
+          // 'restore' from opponent's time
+          (game.value.config.timeForGame * 1000 - timer.value.opponent);
         clearInterval(timerMeInterval)
-        timerOpponentInterval = setInterval(() => {
-          timer.value.opponent--;
-        }, 1000)
+        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
-        timer.value.opponent = game.value.config.timeForGame - (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) / 1000 + timeAddedPerMove - 1 + (game.value.config.timeForGame - timer.value.me);
+        timer.value.opponent =
+          // 3600 * 1000
+          (game.value.config.timeForGame * 1000) -
+          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+          (timeAddedPerMove * 1000) -
+          // minus 100 - because interval is not immediate
+          100 +
+          // 'restore' from opponent's time
+          (game.value.config.timeForGame * 1000 - timer.value.me);
         clearInterval(timerOpponentInterval)
-        timerMeInterval = setInterval(() => {
-          timer.value.me--;
-        }, 1000)
+        timerMeInterval = setInterval(timerMeFunc, 100)
       }
     }
     else if (resp.type == 'GAME_START') {
@@ -183,18 +218,12 @@ onMounted(async () => {
 
       if (body.game.state.turn == playerMe.value.color) {
         setTimeout(() => {
-          timerMeInterval = setInterval(() => {
-            timer.value.me--;
-            console.log(timer.value)
-          }, 1000)
+          timerMeInterval = setInterval(timerMeFunc, 100)
         }, 5000)
       }
       else if (body.game.state.turn == playerOpponent.value.color) {
         setTimeout(() => {
-          timerOpponentInterval = setInterval(() => {
-            timer.value.opponent--;
-            console.log(timer.value)
-          }, 1000)
+          timerOpponentInterval = setInterval(timerOpponentFunc, 100)
         }, 5000)
       }
     }
@@ -205,6 +234,27 @@ onMounted(async () => {
         if (playerMe.value.id == resp.payload.winnerUserId) whoWon.value = 'me';
         else if (playerOpponent.value.id == resp.payload.winnerUserId) whoWon.value = 'opponent';
       }
+
+      clearInterval(timerMeInterval)
+      clearInterval(timerOpponentInterval)
+      timer.value.me =
+        // 3600 * 1000
+        (game.value.config.timeForGame * 1000) -
+        (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+        (timeAddedPerMove * 1000) -
+        // minus 100 - because interval is not immediate
+        100 +
+        // 'restore' from opponent's time
+        (game.value.config.timeForGame * 1000 - timer.value.opponent);
+      timer.value.opponent =
+        // 3600 * 1000
+        (game.value.config.timeForGame * 1000) -
+        (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+        (timeAddedPerMove * 1000) -
+        // minus 100 - because interval is not immediate
+        100 +
+        // 'restore' from opponent's time
+        (game.value.config.timeForGame * 1000 - timer.value.me);
     }
   })
 
@@ -219,8 +269,8 @@ onMounted(async () => {
   game.value = body.game;
 
   timer.value = {
-    me: game.value.config.timeForGame,
-    opponent: game.value.config.timeForGame
+    me: game.value.config.timeForGame * 1000,
+    opponent: game.value.config.timeForGame * 1000
   }
   timeAddedPerMove = game.value.config.timeAddedPerMove;
 
@@ -273,18 +323,12 @@ onMounted(async () => {
 
     if (body.game.state.turn == playerMe.value.color) {
       setTimeout(() => {
-        timerMeInterval = setInterval(() => {
-          timer.value.me--;
-          console.log(timer.value)
-        }, 1000)
+        timerMeInterval = setInterval(timerMeFunc, 100)
       }, 5000)
     }
     else if (body.game.state.turn == playerOpponent.value.color) {
       setTimeout(() => {
-        timerOpponentInterval = setInterval(() => {
-          timer.value.opponent--;
-          console.log(timer.value)
-        }, 1000)
+        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
       }, 5000)
     }
   }

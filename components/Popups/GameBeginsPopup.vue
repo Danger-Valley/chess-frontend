@@ -2,7 +2,6 @@
   <div
     class="popup__wrapper popup__wrapper--active"
     id="GameBeginsPopup"
-    @click="$togglePopup('GameBeginsPopup')"
     v-if="props.me"
   >
     <div

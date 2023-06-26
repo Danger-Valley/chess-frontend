@@ -2,13 +2,15 @@
   <div
     class="popup__wrapper"
     id="GameEndsPopup"
-    @click="$togglePopup('GameEndsPopup')"
   >
     <div
       class="popup"
       @click.stop
     >
-      <div class="player" v-if="props.me">
+      <div
+        class="player"
+        v-if="props.me"
+      >
         <img
           class="player__avatar"
           :src="props.me.user.avatar"
@@ -31,7 +33,10 @@
         </div>
       </div>
 
-      <div class="player" v-if="props.opponent">
+      <div
+        class="player"
+        v-if="props.opponent"
+      >
         <img
           class="player__avatar"
           :src="props.opponent.user.avatar"
@@ -57,7 +62,10 @@
       <div class="actions">
         <div class="button">Find a new game</div>
         <div class="button">Offer revenge</div>
-        <div class="button">Analyze</div>
+        <div
+          class="button"
+          @click="$togglePopup('GameEndsPopup')"
+        >Analyze</div>
       </div>
     </div>
   </div>
@@ -151,5 +159,4 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-</style>
+}</style>

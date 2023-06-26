@@ -2,7 +2,6 @@
   <div
     class="popup__wrapper"
     id="GameChooseFigurePromotionPopup"
-    @click="$togglePopup('GameChooseFigurePromotionPopup')"
   >
     <div
       class="popup"
