@@ -358,6 +358,7 @@ watch(user, () => {
   }
 
   &__nickname {
+    max-width: 10ch;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
     border: 1px solid transparent;

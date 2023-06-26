@@ -1,10 +1,5 @@
 <template>
   <div class="page">
-    <GamePlayer
-      class="player"
-      :player="playerOpponent"
-      :timer="timer.opponent"
-    ></GamePlayer>
 
     <main class="main">
       <aside class="aside chat">
@@ -12,14 +7,30 @@
         <div class="aside__divider"></div>
       </aside>
 
-      <TheChessboard
-        @move="afterMove"
-        v-if="canInit"
-        :board-config="boardConfig"
-        reactive-config
-        @board-created="(api) => (boardAPI = api)"
-        :player-color="playerMe?.color == 'w' ? 'white' : 'black'"
-      />
+      <div class="playboard">
+        <GamePlayer
+          class="player"
+          :player="playerOpponent"
+          :timer="timer.opponent"
+          :active="activeTimer == 'opponent'"
+        ></GamePlayer>
+
+        <TheChessboard
+          @move="afterMove"
+          v-if="canInit"
+          :board-config="boardConfig"
+          reactive-config
+          @board-created="(api) => (boardAPI = api)"
+          :player-color="playerMe?.color == 'w' ? 'white' : 'black'"
+        />
+
+        <GamePlayer
+          class="player"
+          :player="playerMe"
+          :timer="timer.me"
+          :active="activeTimer == 'me'"
+        ></GamePlayer>
+      </div>
 
       <aside class="aside info">
         <div class="aside__heading">
@@ -69,12 +80,6 @@
       </aside>
     </main>
 
-    <GamePlayer
-      class="player"
-      :player="playerMe"
-      :timer="timer.me"
-    ></GamePlayer>
-
     <PopupsGameBeginsPopup
       :me="playerMe"
       :opponent="playerOpponent"
@@ -113,7 +118,8 @@ let boardConfig = reactive({}),
   timeAddedPerMove = 0,
   beginTime = null,
   timerMeInterval = null,
-  timerOpponentInterval = null
+  timerOpponentInterval = null,
+  activeTimer = ref()
 
 const afterMove = async (e) => {
   console.log(e)
@@ -140,7 +146,8 @@ const join = async () => {
 }
 
 const timerMeFunc = () => {
-  if(timer.value.me > 100) timer.value.me -= 100;
+  // TODO not self-decrement, but attach stable date evaluation
+  if (timer.value.me > 100) timer.value.me -= 100;
   else {
     clearInterval(timerMeInterval)
     timer.value.me = 0;
@@ -149,7 +156,8 @@ const timerMeFunc = () => {
 }
 
 const timerOpponentFunc = () => {
-  if(timer.value.opponent > 100) timer.value.opponent -= 100;
+  // TODO not self-decrement, but attach stable date evaluation
+  if (timer.value.opponent > 100) timer.value.opponent -= 100;
   else {
     clearInterval(timerOpponentInterval)
     timer.value.opponent = 0;
@@ -163,14 +171,6 @@ onMounted(async () => {
     if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
       if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
 
-      console.error(
-        timer.value.me,
-        (game.value.config.timeForGame * 1000),
-        +new Date(resp.payload.createdAt),
-        +new Date(game.value.startedAt),
-        (timeAddedPerMove * 1000),
-        timer.value.opponent);
-
       if (resp.payload.playerId == playerMe.value.id) {
         timer.value.me =
           // 3600 * 1000
@@ -183,6 +183,7 @@ onMounted(async () => {
           (game.value.config.timeForGame * 1000 - timer.value.opponent);
         clearInterval(timerMeInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+        activeTimer.value = 'opponent'
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
         timer.value.opponent =
@@ -196,6 +197,7 @@ onMounted(async () => {
           (game.value.config.timeForGame * 1000 - timer.value.me);
         clearInterval(timerOpponentInterval)
         timerMeInterval = setInterval(timerMeFunc, 100)
+        activeTimer.value = 'me'
       }
     }
     else if (resp.type == 'GAME_START') {
@@ -221,11 +223,13 @@ onMounted(async () => {
       if (body.game.state.turn == playerMe.value.color) {
         setTimeout(() => {
           timerMeInterval = setInterval(timerMeFunc, 100)
+          activeTimer.value = 'me'
         }, 5000)
       }
       else if (body.game.state.turn == playerOpponent.value.color) {
         setTimeout(() => {
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+          activeTimer.value = 'opponent'
         }, 5000)
       }
     }
@@ -239,6 +243,7 @@ onMounted(async () => {
 
       clearInterval(timerMeInterval)
       clearInterval(timerOpponentInterval)
+      activeTimer.value = null
       timer.value.me =
         // 3600 * 1000
         (game.value.config.timeForGame * 1000) -
@@ -269,7 +274,9 @@ onMounted(async () => {
   let body = await resp.json();
   console.log(resp, body)
   game.value = body.game;
+  beginTime = body.game.startedAt;
 
+  // TODO if reconnected - it shows wrong info. Think do I need additional info from API to calculate
   timer.value = {
     me: game.value.config.timeForGame * 1000,
     opponent: game.value.config.timeForGame * 1000
@@ -282,7 +289,6 @@ onMounted(async () => {
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
   ) return console.error('Two players have already joined the game');
 
-  beginTime = body.game.startedAt;
 
   body = await join();
 
@@ -297,6 +303,19 @@ onMounted(async () => {
   else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
     playerMe.value = body.game.playerTwo;
     if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
+  }
+
+  if (game.value.moves.length > 0) {
+    let lastTime = beginTime;
+    // TODO - map thru array to calculate time for each timer
+    game.value.moves.map(el => {
+      if (el.playerId == playerMe.value.id) timer.value.me -= (new Date(el.createdAt) - new Date(lastTime))
+      if (el.playerId == playerOpponent.value.id) timer.value.opponent -= (new Date(el.createdAt) - new Date(lastTime))
+      lastTime = el.createdAt;
+    })
+    // (new Date() - new Date(lastTime))
+    if (game.value.moves.at(-1).playerId == playerMe.value.id) timer.value.opponent = timer.value.me - 5000
+    else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) timer.value.me = timer.value.me - 5000
   }
 
   console.log(playerMe.value, playerOpponent.value);
@@ -324,12 +343,16 @@ onMounted(async () => {
     console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
 
     if (body.game.state.turn == playerMe.value.color) {
+      if (game.value.moves.length == 0) timer.value.me -= (new Date() - new Date(body.game.startedAt)) - 5000;
       setTimeout(() => {
+        activeTimer.value = 'me'
         timerMeInterval = setInterval(timerMeFunc, 100)
       }, 5000)
     }
     else if (body.game.state.turn == playerOpponent.value.color) {
+      if (game.value.moves.length == 0) timer.value.opponent -= (new Date() - new Date(body.game.startedAt));
       setTimeout(() => {
+        activeTimer.value = 'opponent'
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
       }, 5000)
     }
@@ -342,15 +365,13 @@ onMounted(async () => {
   display: grid;
   width: 100vw;
   height: 100vh;
-  grid-template-columns: 283px auto 283px;
-  grid-template-rows: 35px auto 35px;
+  grid-template-columns: max(230px, 18%) auto max(230px, 18%);
   gap: 25px 20px;
   padding: 20px 33px;
   background-color: #181B20;
 }
 
 .main {
-  grid-row: 2;
   grid-column: span 3;
   display: grid;
   grid-template-columns: inherit;
@@ -360,7 +381,6 @@ onMounted(async () => {
 .aside {
   display: flex;
   flex-direction: column;
-  grid-column: span 1;
   width: 100%;
   padding: 10px;
   background: rgba(255, 255, 255, 0.05);
@@ -393,6 +413,14 @@ onMounted(async () => {
       margin-top: auto;
     }
   }
+}
+
+.chat {
+  grid-column: 1;
+}
+
+.info {
+  grid-column: 3;
 }
 
 .turn {
@@ -429,6 +457,12 @@ onMounted(async () => {
     background: #181B20;
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
+}
+
+.playboard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .rotated {

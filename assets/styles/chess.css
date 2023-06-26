@@ -1,7 +1,7 @@
 .main-wrap {
   width: 100%;
-  max-width: 814px;
-  margin-inline: auto;
+  max-width: min(75%, 80vh);
+  margin: auto;
 }
 
 /*

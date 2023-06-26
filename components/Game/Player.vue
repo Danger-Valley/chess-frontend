@@ -20,29 +20,18 @@
     <div
       class="timer"
       v-if="props.timer"
+      :class="{'timer--active': props.active}"
     >
-      <!--
-        timer = 3600
-        m = timer / 60
-        s = timer % 60
-        ms = timer 
-      -->
-      {{ Math.floor(props.timer / (60 * 1000))?.toFixed(0).padStart(2, 0) }}:
-      {{ Math.floor((props.timer / 1000) %60)?.toFixed(0).padStart(2, 0) }}:
-      <span class="timer__ms">{{ (props.timer % 1000).toString()[0] }}</span>
+      {{ Math.floor(props.timer / (60 * 1000))?.toFixed(0).padStart(2, 0) }}:{{ Math.floor((props.timer / 1000) %60)?.toFixed(0).padStart(2, 0) }}:<span class="timer__ms">{{ (props.timer % 1000).toString()[0] }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-let props = defineProps(['player', 'timer']) //'me' or 'opponent'
+let props = defineProps(['player', 'timer', 'active']) //player: 'me' or 'opponent'
 
 watch(() => props.player, () => {
   console.log(props.player)
-})
-
-watch(() => props.timer, () => {
-  console.error(props.timer)
 })
 </script>
 
@@ -90,6 +79,12 @@ watch(() => props.timer, () => {
   font-size: 20px;
   line-height: 27px;
   color: #FFFFFF4d;
+  transition: .3s;
+
+  &--active{
+    color: #ACFF00;
+    background: rgba(172, 255, 0, 0.10);
+  }
 
   &__ms {
     display: inline-block;
