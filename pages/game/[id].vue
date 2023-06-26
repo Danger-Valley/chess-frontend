@@ -142,6 +142,7 @@ const join = async () => {
 const timerMeFunc = () => {
   if(timer.value.me > 100) timer.value.me -= 100;
   else {
+    clearInterval(timerMeInterval)
     timer.value.me = 0;
     boardConfig.viewOnly = true;
   }
@@ -150,6 +151,7 @@ const timerMeFunc = () => {
 const timerOpponentFunc = () => {
   if(timer.value.opponent > 100) timer.value.opponent -= 100;
   else {
+    clearInterval(timerOpponentInterval)
     timer.value.opponent = 0;
     boardConfig.viewOnly = true;
   }
