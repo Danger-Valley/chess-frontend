@@ -178,7 +178,7 @@ onMounted(async () => {
     font-weight: 400;
     font-size: 62px;
     line-height: 85px;
-    color: #27F4BA;
+    color: $color1;
   }
 
   &__text {
@@ -273,8 +273,8 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #27F4BA;
-  border: 1px solid #27F4BA;
+  color: $color1;
+  border: 1px solid $color1;
 }
 
 .settings {
@@ -286,7 +286,7 @@ onMounted(async () => {
   align-items: center;
   width: 28px;
   aspect-ratio: 1;
-  background: rgba(39, 244, 186, 0.1);
+  background: #{$color1}1a;
   border-radius: 5px;
   padding: 6px;
   cursor: pointer;

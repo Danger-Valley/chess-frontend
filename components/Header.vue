@@ -272,7 +272,7 @@ onMounted(() => {
   flex-direction: column;
   width: 213px;
   padding: 16px 20px;
-  background: radial-gradient(136px 60.5px at 24px 255px, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
+  background: radial-gradient(136px 60.5px at 24px 255px, #{$color1}1a 0%, #{$color1}00 100%), rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(50px);
   border-radius: 20px;
@@ -287,7 +287,7 @@ onMounted(() => {
 
   &--logged {
     align-self: flex-start;
-    background: radial-gradient(136px 60.5px at 24px 255px, rgba(39, 244, 186, 0.105) 0%, rgba(39, 244, 186, 0) 100%), rgba(255, 255, 255, 0.05);
+    background: radial-gradient(136px 60.5px at 24px 255px, #{$color1}1a 0%, #{$color1}00 100%), rgba(255, 255, 255, 0.05);
   }
 
   &__list {

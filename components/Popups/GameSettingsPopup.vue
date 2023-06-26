@@ -218,13 +218,13 @@ defineExpose({ option, color, everyoneCanJoin })
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #27F4BA;
+  color: $color1;
   font-size: 16px;
   font-family: Montserrat;
   font-weight: 500;
   line-height: 100%;
   text-transform: uppercase;
-  border: 1px solid #27F4BA;
+  border: 1px solid $color1;
   cursor: pointer;
 }
 </style>
