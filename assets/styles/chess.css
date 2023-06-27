@@ -1,15 +1,13 @@
 .main-wrap {
   width: 100%;
-  max-width: min(75%, 80vh);
-  margin: auto;
+  max-width: inherit;
+  margin: 0 auto;
 }
 
-/*
 cg-container {
   width: 100% !important;
   height: 100% !important;
 }
-*/
 
 cg-board piece{
   width: 12.5%;

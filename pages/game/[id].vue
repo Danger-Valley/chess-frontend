@@ -3,8 +3,22 @@
 
     <main class="main">
       <aside class="aside chat">
-        <div class="aside__heading aside__heading--uppercase">Chat (in dev)</div>
+        <div class="aside__heading aside__heading--uppercase">Chat</div>
         <div class="aside__divider"></div>
+        <div class="chat__messages">
+          <div v-for="message in messages" class="message">
+            <div class="message__author"></div>
+            <div class="message__text"></div>
+          </div>
+        </div>
+        <div class="chat__inputField">
+          <input
+            class="chat__input"
+            type="text"
+            placeholder="Your message"
+          />
+          <ChatSend class="chat__send" />
+        </div>
       </aside>
 
       <div class="playboard">
@@ -42,39 +56,47 @@
           History
           <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
         </div>
-        <div
-          class="turn"
-          v-for="(turn, counter) in turns"
-        >
-          <div class="turn__counter">{{ counter }}.</div>
-          <div class="turn__item">{{ turn.from }}</div>
-          <div class="turn__item">{{ turn.to }}</div>
+        <div class="turns">
+          <div
+            class="turn"
+            v-for="(turn, counter) in turns"
+          >
+            <div
+              class="turn__counter"
+              v-if="counter % 2 == 0"
+            >{{ counter / 2 + 1 }}.</div>
+            <div
+              class="turn__item"
+              :class="{ 'turn__item--active': counter + 1 == turns.length }"
+            >{{ turn }}</div>
+          </div>
         </div>
 
         <div class="aside__divider aside__divider--bottom"></div>
         <div class="panel">
-          <div class="panel__container">
-            <img class="panel__icon" />
+          <div class="panel__container panel__container--hint">
+            <Lightbulb class="panel__icon" />
+            <span>0</span>
+          </div>
+
+          <div class="panel__container panel__container--inactive">
+            <OneSlashTwo class="panel__icon" />
           </div>
 
           <div class="panel__container">
-            <img class="panel__icon" />
+            <BackAll class="panel__icon" />
           </div>
 
           <div class="panel__container">
-            <img class="panel__icon" />
+            <BackOne class="panel__icon" />
           </div>
 
-          <div class="panel__container">
-            <img class="panel__icon" />
+          <div class="panel__container panel__container--inactive">
+            <ForwardOne class="panel__icon" />
           </div>
 
-          <div class="panel__container">
-            <img class="panel__icon" />
-          </div>
-
-          <div class="panel__container">
-            <img class="panel__icon" />
+          <div class="panel__container panel__container--inactive">
+            <ForwardAll class="panel__icon" />
           </div>
         </div>
       </aside>
@@ -93,11 +115,19 @@
 </template>
 
 <script setup>
-import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
 import { TheChessboard } from 'vue3-chessboard';
 import 'vue3-chessboard/style.css';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
+
+import ChatSend from "@/assets/imgs/chatSend.svg"
+import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
+import Lightbulb from "@/assets/imgs/lightbulb.svg"
+import OneSlashTwo from "@/assets/imgs/1slash2.svg"
+import BackAll from "@/assets/imgs/backAll.svg"
+import BackOne from "@/assets/imgs/backOne.svg"
+import ForwardAll from "@/assets/imgs/forwardAll.svg"
+import ForwardOne from "@/assets/imgs/forwardOne.svg"
 
 let { $API } = useNuxtApp();
 
@@ -119,19 +149,17 @@ let boardConfig = reactive({}),
   beginTime = null,
   timerMeInterval = null,
   timerOpponentInterval = null,
-  activeTimer = ref()
+  activeTimer = ref(),
+  messages = ref([])
 
 const afterMove = async (e) => {
   console.log(e)
+  turns.value.push(e.san);
   if (e.color !== playerMe.value?.color) return;
   await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
     accessToken: localStorage.getItem('accessToken')
-  })
-  turns.value.push({
-    from: e.from,
-    to: e.to
   })
 }
 
@@ -289,7 +317,6 @@ onMounted(async () => {
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
   ) return console.error('Two players have already joined the game');
 
-
   body = await join();
 
   let meResp = await $API().User.get(localStorage.getItem('accessToken'))
@@ -305,10 +332,11 @@ onMounted(async () => {
     if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
   }
 
+  console.warn(game.value.moves.length)
   if (game.value.moves.length > 0) {
     let lastTime = beginTime;
-    // TODO - map thru array to calculate time for each timer
     game.value.moves.map(el => {
+      turns.value.push(el.move);
       if (el.playerId == playerMe.value.id) timer.value.me -= (new Date(el.createdAt) - new Date(lastTime))
       if (el.playerId == playerOpponent.value.id) timer.value.opponent -= (new Date(el.createdAt) - new Date(lastTime))
       lastTime = el.createdAt;
@@ -337,13 +365,15 @@ onMounted(async () => {
 
   canInit.value = true;
 
+  console.log(new Date())
+
   if (body.game.playerOne.joined && body.game.playerTwo.joined) {
     beginTime = body.game.startedAt;
 
     console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
 
     if (body.game.state.turn == playerMe.value.color) {
-      if (game.value.moves.length == 0) timer.value.me -= (new Date() - new Date(body.game.startedAt)) - 5000;
+      if (game.value.moves.length == 0) timer.value.me -= (new Date() - new Date(body.game.startedAt));
       setTimeout(() => {
         activeTimer.value = 'me'
         timerMeInterval = setInterval(timerMeFunc, 100)
@@ -417,6 +447,55 @@ onMounted(async () => {
 
 .chat {
   grid-column: 1;
+
+  &__messages{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__input {
+    width: calc(100% - 20px);
+    background: transparent;
+    border: unset;
+    outline: unset;
+    font-family: 'Neue Plak';
+    font-size: 12px;
+    color: #fff;
+
+    &::placeholder {
+      opacity: .3;
+    }
+
+    &Field {
+      margin-top: auto;
+      padding: 10px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      background: #181B20;
+      padding: 13px;
+    }
+  }
+
+  &__send {
+    width: 19px;
+    margin-left: auto;
+    cursor: pointer;
+  }
+}
+
+.message{
+  font-family: "Neue Plak";
+  &__author{
+    font-size: 12px;
+    color: #FFFFFF4d;
+  }
+  &__text{
+    font-size: 14px;
+    color: #FFF;
+  }
 }
 
 .info {
@@ -424,8 +503,17 @@ onMounted(async () => {
 }
 
 .turn {
+  &s {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
+  }
+
   display: flex;
-  gap: 30px;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
 
   font-family: 'Neue Plak';
   font-weight: 400;
@@ -437,8 +525,16 @@ onMounted(async () => {
   }
 
   &__item {
-    width: 40%;
+    width: 86px;
     color: #FFFFFF;
+    border-radius: 10px;
+    background: transparent;
+    transition: .3s;
+    padding: 5px 10px;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.05);
+    }
   }
 }
 
@@ -452,20 +548,56 @@ onMounted(async () => {
   justify-content: space-between;
 
   &__container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 39px;
     aspect-ratio: 1;
     background: #181B20;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+
+    &--inactive {
+      >svg {
+        opacity: 0.3;
+      }
+
+      border-color: transparent;
+    }
+
+    &--hint {
+      position: relative;
+      display: block;
+      background: #27F4BA;
+
+      >svg {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+      }
+
+      >span {
+        position: absolute;
+        left: 6px;
+        bottom: 1px;
+        color: #181B20;
+        font-size: 12px;
+        font-family: "Neue Plak";
+      }
+    }
   }
 }
 
 .playboard {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 20px;
+  margin: auto;
+  width: min(100%, calc(100vh - 40px - (2 * (35px + 20px))));
+  max-height: calc(100vh - 40px);
 }
 
 .rotated {
   rotate: 90deg;
-}
-</style>
+}</style>
