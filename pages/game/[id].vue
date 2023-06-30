@@ -6,19 +6,33 @@
         <div class="aside__heading aside__heading--uppercase">Chat</div>
         <div class="aside__divider"></div>
         <div class="chat__messages">
-          <div v-for="message in messages" class="message">
-            <div class="message__author"></div>
-            <div class="message__text"></div>
+          <div
+            v-for="message in messages"
+            class="message"
+          >
+            <div class="message__author">
+              {{ message.userId == playerMe.id ? playerMe.user.username : playerOpponent.user.username }}
+            </div>
+            <div class="message__text">{{ message.text }}</div>
           </div>
         </div>
-        <div class="chat__inputField">
-          <input
-            class="chat__input"
-            type="text"
-            placeholder="Your message"
-          />
-          <ChatSend class="chat__send" />
-        </div>
+        <ClientOnly>
+          <div
+            class="chat__inputField"
+            v-if="userId && playerMe"
+          >
+            <input
+              class="chat__input"
+              type="text"
+              placeholder="Your message"
+              :disabled="userId !== playerMe.id"
+            />
+            <ChatSend
+              class="chat__send"
+              @click="sendMessage"
+            />
+          </div>
+        </ClientOnly>
       </aside>
 
       <div class="playboard">
@@ -74,7 +88,10 @@
 
         <div class="aside__divider aside__divider--bottom"></div>
         <div class="panel">
-          <div class="panel__container panel__container--hint">
+          <div
+            class="panel__container panel__container--hint"
+            @click="$togglePopup('GameHintPopup')"
+          >
             <Lightbulb class="panel__icon" />
             <span>0</span>
           </div>
@@ -128,10 +145,12 @@ import BackAll from "@/assets/imgs/backAll.svg"
 import BackOne from "@/assets/imgs/backOne.svg"
 import ForwardAll from "@/assets/imgs/forwardAll.svg"
 import ForwardOne from "@/assets/imgs/forwardOne.svg"
+import { useUserStore } from '~/stores/user';
 
 let { $API } = useNuxtApp();
 
-const store = useSocketStore()
+const store = useSocketStore(),
+  user = useUserStore()
 
 let boardConfig = reactive({}),
   turns = ref([]),
@@ -150,10 +169,42 @@ let boardConfig = reactive({}),
   timerMeInterval = null,
   timerOpponentInterval = null,
   activeTimer = ref(),
-  messages = ref([])
+  messages = ref([]),
+  userId = computed(() => user.getUser.value.id),
+  lastTimeForInterval = null,
+  lastTimerValue = null
+
+const getMessages = async () => {
+  let resp = await $API().Chat.get({
+    gameId: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(body);
+
+  if (body.errors) return console.error(body.errors);
+
+  messages.value = body.messages;
+}
+
+const sendMessage = async () => {
+  let text = document.querySelector('chat__input').value;
+
+  if (!text) return console.error("Enter your message first!");
+
+  let resp = await $API().Chat.send({
+    text,
+    gameId: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(body);
+
+  if (body.errors) return console.error(body.errors);
+}
 
 const afterMove = async (e) => {
-  console.log(e)
+  console.log("After move:", e)
   turns.value.push(e.san);
   if (e.color !== playerMe.value?.color) return;
   await $API().Chess.move({
@@ -169,13 +220,12 @@ const join = async () => {
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
-  console.log(body);
+  console.log("Join: ", body);
   return body;
 }
 
 const timerMeFunc = () => {
-  // TODO not self-decrement, but attach stable date evaluation
-  if (timer.value.me > 100) timer.value.me -= 100;
+  if (timer.value.me > 100) timer.value.me = lastTimerValue - (new Date() - lastTimeForInterval);
   else {
     clearInterval(timerMeInterval)
     timer.value.me = 0;
@@ -184,8 +234,7 @@ const timerMeFunc = () => {
 }
 
 const timerOpponentFunc = () => {
-  // TODO not self-decrement, but attach stable date evaluation
-  if (timer.value.opponent > 100) timer.value.opponent -= 100;
+  if (timer.value.opponent > 100) timer.value.opponent = lastTimerValue - (new Date() - lastTimeForInterval);
   else {
     clearInterval(timerOpponentInterval)
     timer.value.opponent = 0;
@@ -194,8 +243,14 @@ const timerOpponentFunc = () => {
 }
 
 onMounted(async () => {
+  // get my user
+  let meResp = await $API().User.get(localStorage.getItem('accessToken'))
+  let meBody = await meResp.json();
+
+  // socket func
+
   store.listen('game_event', async (resp) => {
-    console.log(resp)
+    console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
       if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
 
@@ -212,6 +267,7 @@ onMounted(async () => {
         clearInterval(timerMeInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
         activeTimer.value = 'opponent'
+        lastTimerValue = timer.value.opponent
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
         timer.value.opponent =
@@ -226,7 +282,9 @@ onMounted(async () => {
         clearInterval(timerOpponentInterval)
         timerMeInterval = setInterval(timerMeFunc, 100)
         activeTimer.value = 'me'
+        lastTimerValue = timer.value.me
       }
+      lastTimeForInterval = new Date(resp.payload.createdAt)
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
@@ -245,16 +303,19 @@ onMounted(async () => {
       }
 
       beginTime = body.game.startedAt;
+      lastTimeForInterval = new Date(beginTime);
 
-      console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
+      console.log("Turn, mine color, opponent's color:", body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
 
       if (body.game.state.turn == playerMe.value.color) {
+        lastTimerValue = timer.value.me
         setTimeout(() => {
           timerMeInterval = setInterval(timerMeFunc, 100)
           activeTimer.value = 'me'
         }, 5000)
       }
       else if (body.game.state.turn == playerOpponent.value.color) {
+        lastTimerValue = timer.value.opponent
         setTimeout(() => {
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)
           activeTimer.value = 'opponent'
@@ -295,34 +356,41 @@ onMounted(async () => {
 
   store.emit('room', JSON.stringify({ gameId: useRoute().params.id }))
 
+  // get game. If connected by find_create - it autojoins (on server)
+
   let resp = await $API().Chess.get({
     id: useRoute().params.id,
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
-  console.log(resp, body)
+  console.log("Get game:", JSON.parse(JSON.stringify(body)))
   game.value = body.game;
   beginTime = body.game.startedAt;
+  lastTimeForInterval = new Date(beginTime);
 
-  // TODO if reconnected - it shows wrong info. Think do I need additional info from API to calculate
+  // basic timer values
   timer.value = {
     me: game.value.config.timeForGame * 1000,
     opponent: game.value.config.timeForGame * 1000
   }
   timeAddedPerMove = game.value.config.timeAddedPerMove;
 
+  // TODO change to allow joining games not by find_create
+  /*
+  if(localStorage.getItem('autoJoin')){
+    localStorage.removeItem('autoJoin')
+  }
   if (
     body.game.playerOne.joined &&
     body.game.playerTwo.joined &&
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
-  ) return console.error('Two players have already joined the game');
-
+  ) {
+    console.error('Two players have already joined the game');
+  }
   body = await join();
+  */
 
-  let meResp = await $API().User.get(localStorage.getItem('accessToken'))
-  let meBody = await meResp.json();
-  console.log(meBody, body.game.playerOne, body.game.playerTwo)
-
+  // connected players to local vars
   if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
     playerMe.value = body.game.playerOne;
     if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
@@ -331,23 +399,44 @@ onMounted(async () => {
     playerMe.value = body.game.playerTwo;
     if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
   }
+  // TODO if connected as viewer
+  else {
+    if (Math.random() > .5) {
+      playerMe.value = body.game.playerTwo;
+      if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
+    }
+    else {
+      playerMe.value = body.game.playerOne;
+      if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
+    }
+  }
 
-  console.warn(game.value.moves.length)
+  // calculate timer by counting moves and their timestamps - TODO fix
+  console.warn("Moves:", game.value.moves.length)
   if (game.value.moves.length > 0) {
     let lastTime = beginTime;
     game.value.moves.map(el => {
+      console.log(timer.value.me, timer.value.opponent, el.createdAt, lastTime)
       turns.value.push(el.move);
-      if (el.playerId == playerMe.value.id) timer.value.me -= (new Date(el.createdAt) - new Date(lastTime))
-      if (el.playerId == playerOpponent.value.id) timer.value.opponent -= (new Date(el.createdAt) - new Date(lastTime))
+      if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
+      else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
       lastTime = el.createdAt;
     })
-    // (new Date() - new Date(lastTime))
-    if (game.value.moves.at(-1).playerId == playerMe.value.id) timer.value.opponent = timer.value.me - 5000
-    else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) timer.value.me = timer.value.me - 5000
+
+    if (game.value.moves.at(-1).playerId == playerMe.value.id) {
+      //timer.value.opponent = timer.value.opponent - (new Date() - new Date(lastTime)) - 5000
+      lastTimerValue = timer.value.opponent
+    }
+    else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) {
+      //timer.value.me = timer.value.me - (new Date() - new Date(lastTime)) - 5000
+      lastTimerValue = timer.value.me
+    }
+
+    lastTimeForInterval = new Date(lastTime);
+    console.log(timer.value.me, timer.value.opponent, new Date(lastTime))
   }
 
-  console.log(playerMe.value, playerOpponent.value);
-
+  // set board config
   boardConfig = {
     fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
@@ -365,28 +454,40 @@ onMounted(async () => {
 
   canInit.value = true;
 
-  console.log(new Date())
+  console.log("Start timestamp", new Date())
 
   if (body.game.playerOne.joined && body.game.playerTwo.joined) {
     beginTime = body.game.startedAt;
 
-    console.log(body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
+    console.log("turn, mine color, opponent's color:", body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
 
     if (body.game.state.turn == playerMe.value.color) {
-      if (game.value.moves.length == 0) timer.value.me -= (new Date() - new Date(body.game.startedAt));
+      lastTimerValue = timer.value.me
+      console.log(timer.value.me, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
+      if (game.value.moves.length == 0) {
+        timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt)) - 5000;
+        lastTimeForInterval = timer.value.me;
+      }
       setTimeout(() => {
         activeTimer.value = 'me'
         timerMeInterval = setInterval(timerMeFunc, 100)
       }, 5000)
     }
     else if (body.game.state.turn == playerOpponent.value.color) {
-      if (game.value.moves.length == 0) timer.value.opponent -= (new Date() - new Date(body.game.startedAt));
+      lastTimerValue = timer.value.opponent
+      console.log(timer.value.opponent, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
+      if (game.value.moves.length == 0) {
+        timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt)) - 5000;
+        lastTimeForInterval = timer.value.opponent;
+      }
       setTimeout(() => {
         activeTimer.value = 'opponent'
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
       }, 5000)
     }
   }
+  
+  console.error(timer.value.me, timer.value.opponent)
 })
 </script>
 
@@ -398,7 +499,7 @@ onMounted(async () => {
   grid-template-columns: max(230px, 18%) auto max(230px, 18%);
   gap: 25px 20px;
   padding: 20px 33px;
-  background-color: #181B20;
+  background-color: $color-font;
 }
 
 .main {
@@ -448,7 +549,7 @@ onMounted(async () => {
 .chat {
   grid-column: 1;
 
-  &__messages{
+  &__messages {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -474,7 +575,7 @@ onMounted(async () => {
       display: flex;
       flex-direction: row;
       align-items: center;
-      background: #181B20;
+      background: $color-font;
       padding: 13px;
     }
   }
@@ -486,13 +587,15 @@ onMounted(async () => {
   }
 }
 
-.message{
+.message {
   font-family: "Neue Plak";
-  &__author{
+
+  &__author {
     font-size: 12px;
     color: #FFFFFF4d;
   }
-  &__text{
+
+  &__text {
     font-size: 14px;
     color: #FFF;
   }
@@ -553,7 +656,7 @@ onMounted(async () => {
     align-items: center;
     width: 39px;
     aspect-ratio: 1;
-    background: #181B20;
+    background: $color-font;
     border: 1px solid rgba(255, 255, 255, 0.2);
     cursor: pointer;
 
@@ -568,7 +671,7 @@ onMounted(async () => {
     &--hint {
       position: relative;
       display: block;
-      background: #27F4BA;
+      background: $color1;
 
       >svg {
         position: absolute;
@@ -580,7 +683,7 @@ onMounted(async () => {
         position: absolute;
         left: 6px;
         bottom: 1px;
-        color: #181B20;
+        color: $color-font;
         font-size: 12px;
         font-family: "Neue Plak";
       }
@@ -600,4 +703,5 @@ onMounted(async () => {
 
 .rotated {
   rotate: 90deg;
-}</style>
+}
+</style>

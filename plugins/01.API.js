@@ -87,11 +87,7 @@ class User {
    * @param {Array} ids - array of ids of wanted users 
    */
   async getByIds(ids) {
-    return await fetch(`${this.localPath}/${ids.join(',')}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
+    return await fetch(`${this.localPath}/${ids.join(',')}`);
   }
 
   async update(accessToken, body) {
@@ -255,6 +251,31 @@ class Lobby {
     });
   }
 }
+class Chat {
+  constructor(path) {
+    this.localPath = `${path}/chat`;
+  }
+
+  async get({gameId, accessToken}) {
+    return await fetch(`${this.localPath}/${gameId}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async send({text, gameId, accessToken}) {
+    return await fetch(`${this.localPath}/${gameId}`, {
+      method: "POST",
+      body: JSON.stringify({text}),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -273,7 +294,8 @@ export default defineNuxtPlugin(() => {
           Wallet: new Wallet(`${path}/auth/api/v1`),
           Signatures: new Signatures(`${path}/auth/api/v1`),
           Chess: new Chess(`${path}/game/api/v1`),
-          Lobby: new Lobby(`${path}/game/api/v1`)
+          Lobby: new Lobby(`${path}/game/api/v1`),
+          Chat: new Chat(`${path}/game/api/v1`)
         }
       }
     }

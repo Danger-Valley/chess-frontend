@@ -9,17 +9,41 @@
       <div class="heading heading--double">Daily mission</div>
 
       <div class="block rating">
-        <div class="rating__points">{{ rating.points }}</div>
-        <div class="rating__text">Leaderboard position</div>
+        <template v-if="lobby?.user.rank.points">
+          <div class="rating__points">{{ lobby.user.rank.points }}</div>
+          <div class="rating__text">Leaderboard position</div>
+        </template>
+        <template v-else>
+          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more games to get your rank
+          </div>
+        </template>
         <div class="rating__position">
-          #{{ rating.position[0] }}
-          <span class="rating__max"> / {{ rating.position[1] }}</span>
+          #{{ lobby?.user.leaderboard.position }}
+          <span class="rating__max"> / {{ lobby?.user.leaderboard.total }}</span>
         </div>
       </div>
 
       <div class="block active-games">
-        <NoGamesIcon></NoGamesIcon>
-        No active games
+        <template v-if="lobby?.activeGames?.length">
+          <div
+            class="game"
+            v-for="(game, counter) in lobby.activeGames"
+          >
+            <div
+              v-if="counter != 0"
+              class="game__hr"
+            ></div>
+            <div class="game__name">{{ game.title }}</div>
+            <div class="game__btn" @click="navigateTo(`game/${game.gameId}`)">Open</div>
+          </div>
+        </template>
+        <div
+          class="active-games__empty"
+          v-else
+        >
+          <NoGamesIcon></NoGamesIcon>
+          No active games
+        </div>
       </div>
 
       <div class="block block--double">
@@ -28,13 +52,9 @@
       </div>
 
       <div class="block event-1">
-        <div class="event-1__heading">Soon</div>
-        <div class="event-1__underheading">Only on The Chess</div>
-        <div class="event-1__text">Solana-based on-chain mode</div>
-        <img
-          src=""
-          class="event-1__bg-image"
-        />
+        <div class="event-1__heading">AI</div>
+        <div class="event-1__underheading">Want to improve your Chess skills and play with the most powerful AI?</div>
+        <div class="event-1__text">Play Now</div>
       </div>
 
       <div class="block block--double event-2">
@@ -48,9 +68,15 @@
       </div>
 
       <div class="block block--half">
-        <div class="block__half play" @click="openGameSearchPopup">
+        <div
+          class="block__half play"
+          @click="openGameSearchPopup"
+        >
           Play now
-          <div class="settings" @click.stop="$togglePopup('GameSettingsPopup')">
+          <div
+            class="settings"
+            @click.stop="$togglePopup('GameSettingsPopup')"
+          >
             <SettingsIcon></SettingsIcon>
           </div>
         </div>
@@ -60,9 +86,12 @@
         </div>
       </div>
     </main>
-    
+
     <PopupsGameSearchPopup ref="GameSearchPopupRef"></PopupsGameSearchPopup>
-    <PopupsGameSettingsPopup ref="GameSettingsPopupRef" @play-now="openGameSearchPopup"></PopupsGameSettingsPopup>
+    <PopupsGameSettingsPopup
+      ref="GameSettingsPopupRef"
+      @play-now="openGameSearchPopup"
+    ></PopupsGameSettingsPopup>
   </div>
 </template>
 
@@ -73,14 +102,18 @@ import SettingsIcon from "@/assets/imgs/settings.svg"
 
 let { $togglePopup, $API } = useNuxtApp();
 
-let rating = ref({
-  points: null,
-  position: [null, null]
-}),
+let lobby = ref(),
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref()
 
+const getUserById = async (id) => {
+  let resp = await $API().User.getByIds([id])
+  let body = await resp.json();
+  return body.users.username;
+}
+
 const openGameSearchPopup = async () => {
+  //localStorage.setItem('autoJoin', true);
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
   let body = {
@@ -88,7 +121,7 @@ const openGameSearchPopup = async () => {
     accessToken: localStorage.getItem('accessToken'),
     everyoneCanJoin: GameSettingsPopupRef.value.everyoneCanJoin
   }
-  if(GameSettingsPopupRef.value.color) body = {
+  if (GameSettingsPopupRef.value.color) body = {
     ...body,
     color: GameSettingsPopupRef.value.color
   }
@@ -103,11 +136,9 @@ onMounted(async () => {
   let body = await resp.json();
   console.log(body);
 
-  if(body.errors) return console.error(body.errors);
+  if (body.errors) return console.error(body.errors);
 
-  rating.value.position = [body.user.leaderboard.position, body.user.leaderboard.total];
-  if(body.user.rank) rating.value.points = body.user.rank.rank;
-  // TODO add wait for Zheka to design for active games & other
+  lobby.value = body;
 })
 </script>
 
@@ -203,12 +234,58 @@ onMounted(async () => {
 .active-games {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
+  gap: 12px;
   color: #FFFFFF4d;
   font-size: 16px;
   line-height: 22px;
+
+  &__empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.game {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  &__hr {
+    width: 100%;
+    height: 1px;
+    margin-bottom: 17px;
+    background: #2C2E32;
+  }
+
+  &__name {
+    color: #FFF;
+    font-size: 16px;
+    font-family: "Neue Plak";
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  &__btn {
+    padding: 6px 10px;
+    border-radius: 10px;
+    background-color: $color1;
+    color: $color-font;
+    font-size: 12px;
+    font-family: "Neue Plak";
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+  }
 }
 
 // TODO add mixins?
@@ -218,10 +295,9 @@ onMounted(async () => {
   gap: 10px;
 
   &__heading {
-    font-weight: 600;
-    font-size: 26px;
-    line-height: 36px;
-    color: #FFFFFF;
+    font-weight: 400;
+    font-size: 62px;
+    color: $color1;
   }
 
   &__underheading {
@@ -350,7 +426,7 @@ onMounted(async () => {
       justify-content: center;
       align-items: center;
       gap: 20px;
-      background: #181B20;
+      background: $color-font;
       box-shadow: 0px -12px 50px rgba(0, 0, 0, 0.25);
     }
 
@@ -397,16 +473,19 @@ onMounted(async () => {
     line-height: 16px;
   }
 
-  .event-1, .event-2{
-    &__heading{
+  .event-1,
+  .event-2 {
+    &__heading {
       font-size: 16px;
       line-height: 22px;
     }
-    &__underheading{
+
+    &__underheading {
       font-size: 12px;
       line-height: 16px;
     }
-    &__text{
+
+    &__text {
       font-size: 16px;
       line-height: 22px;
     }
@@ -414,24 +493,27 @@ onMounted(async () => {
 }
 
 @media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {
-  .main{
+  .main {
     display: flex;
     flex-direction: column;
     gap: 25px;
   }
-  .block{
+
+  .block {
     height: 141px;
   }
-  .rating{
+
+  .rating {
     order: -1;
   }
-  .heading{
-    &:nth-of-type(1){
+
+  .heading {
+    &:nth-of-type(1) {
       order: -2;
     }
-    &:nth-of-type(2){
+
+    &:nth-of-type(2) {
       order: 0;
     }
   }
-}
-</style>
+}</style>

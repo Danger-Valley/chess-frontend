@@ -2,7 +2,6 @@
   <div
     class="popup__wrapper"
     id="GameSearchPopup"
-    @click="closePopup"
   >
     <div
       class="popup"

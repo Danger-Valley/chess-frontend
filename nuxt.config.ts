@@ -30,10 +30,27 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'The Chess'
+      title: 'The Chess',
+      link: [
+        {
+          rel: 'icon',
+          type: 'image/png',
+          href: '/favicon/favicon.png',
+          sizes: 'any'
+        },
+        {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/favicon/favicon.svg'
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/favicon/favicon-retina-ipad.png'
+        }
+      ]
     }
   },
-  runtimeConfig:{
+  runtimeConfig: {
     public: {
       API_URL: process.env.API_URL,
       Discord: {

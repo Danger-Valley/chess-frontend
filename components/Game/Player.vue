@@ -10,8 +10,8 @@
     <div class="player__nickname">{{ props.player.user.username || props.player.user.email }}</div>
     <div
       class="player__rating"
-      v-if="props.player.user.rank?.rank"
-    >({{ props.player.user.rank.rank.toFixed(0) }})</div>
+      v-if="props.player.user.rating"
+    >({{ props.player.user.rating.toFixed(0) }})</div>
     <img
       v-if="props.player?.user?.country"
       class="player__country"
