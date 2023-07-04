@@ -236,6 +236,69 @@ class Chess {
       }
     });
   }
+
+  async resign({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/resign`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async offerDraw({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/draw`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async rejectDraw({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/draw/reject`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async acceptDraw({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/draw/accept`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async offerRevenge({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/revenge`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async rejectRevenge({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/revenge/reject`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async acceptRevenge({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/offer/revenge/accept`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
 }
 class Lobby {
   constructor(path) {

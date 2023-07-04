@@ -1,6 +1,14 @@
 <template>
   <div class="page">
 
+    <NuxtLink
+      class="back-to-lobby"
+      to="/lobby"
+    >
+      <ArrowIcon />
+      Back to lobby
+    </NuxtLink>
+
     <main class="main">
       <aside class="aside chat">
         <div class="aside__heading aside__heading--uppercase">Chat</div>
@@ -11,7 +19,10 @@
             class="message"
           >
             <div class="message__author">
-              {{ message.userId == playerMe.id ? playerMe.user.username : playerOpponent.user.username }}
+              <template v-if="message.userId == 'system'">System message</template>
+              <template v-else>
+                {{ message.userId == playerMe.id ? playerMe.user.username : playerOpponent.user.username }}
+              </template>
             </div>
             <div class="message__text">{{ message.text }}</div>
           </div>
@@ -96,8 +107,19 @@
             <span>0</span>
           </div>
 
-          <div class="panel__container panel__container--inactive">
-            <OneSlashTwo class="panel__icon" />
+          <div class="panel__container">
+            <OneSlashTwo
+              class="panel__icon"
+              @click="$togglePopup('GameConfirmDrawPopup')"
+            />
+          </div>
+
+          <div class="panel__container">
+            <Flag
+              class="panel__icon"
+              style="height: 100%; padding: 11px;"
+              @click="$togglePopup('GameResignPopup')"
+            />
           </div>
 
           <div class="panel__container">
@@ -119,15 +141,21 @@
       </aside>
     </main>
 
-    <PopupsGameBeginsPopup
+    <PopupsGameBegins
       :me="playerMe"
       :opponent="playerOpponent"
-    ></PopupsGameBeginsPopup>
-    <PopupsGameEndsPopup
+      :show="(timer?.me == game?.config?.timeForGame * 1000 && timer?.opponent == game?.config?.timeForGame * 1000) || false"
+    />
+    <PopupsGameEnds
       :me="playerMe"
       :opponent="playerOpponent"
       :whoWon="whoWon"
-    ></PopupsGameEndsPopup>
+    />
+    <PopupsGameConfirmDraw />
+    <PopupsGameIncomeDraw :opponent="playerOpponent" />
+    <PopupsGameHintsShop />
+    <PopupsGameHint />
+    <PopupsGameResign />
   </div>
 </template>
 
@@ -137,17 +165,19 @@ import 'vue3-chessboard/style.css';
 import '@/assets/styles/chess.css';
 import { useSocketStore } from "~/stores/socket";
 
+import ArrowIcon from "@/assets/imgs/Arrow.svg"
 import ChatSend from "@/assets/imgs/chatSend.svg"
 import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
 import Lightbulb from "@/assets/imgs/lightbulb.svg"
 import OneSlashTwo from "@/assets/imgs/1slash2.svg"
+import Flag from "@/assets/imgs/flag.svg"
 import BackAll from "@/assets/imgs/backAll.svg"
 import BackOne from "@/assets/imgs/backOne.svg"
 import ForwardAll from "@/assets/imgs/forwardAll.svg"
 import ForwardOne from "@/assets/imgs/forwardOne.svg"
 import { useUserStore } from '~/stores/user';
 
-let { $API } = useNuxtApp();
+let { $togglePopup, $API } = useNuxtApp();
 
 const store = useSocketStore(),
   user = useUserStore()
@@ -188,7 +218,7 @@ const getMessages = async () => {
 }
 
 const sendMessage = async () => {
-  let text = document.querySelector('chat__input').value;
+  let text = document.querySelector('.chat__input').value;
 
   if (!text) return console.error("Enter your message first!");
 
@@ -201,6 +231,8 @@ const sendMessage = async () => {
   console.log(body);
 
   if (body.errors) return console.error(body.errors);
+
+  text = "";
 }
 
 const afterMove = async (e) => {
@@ -309,17 +341,29 @@ onMounted(async () => {
 
       if (body.game.state.turn == playerMe.value.color) {
         lastTimerValue = timer.value.me
-        setTimeout(() => {
+        if (timer.value.me == game.value.config.timeForGame * 1000) {
+          setTimeout(() => {
+            timerMeInterval = setInterval(timerMeFunc, 100)
+            activeTimer.value = 'me'
+          }, 5000)
+        }
+        else {
           timerMeInterval = setInterval(timerMeFunc, 100)
           activeTimer.value = 'me'
-        }, 5000)
+        }
       }
       else if (body.game.state.turn == playerOpponent.value.color) {
         lastTimerValue = timer.value.opponent
-        setTimeout(() => {
+        if (timer.value.opponent == game.value.config.timeForGame * 1000) {
+          setTimeout(() => {
+            timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+            activeTimer.value = 'opponent'
+          }, 5000)
+        }
+        else {
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)
           activeTimer.value = 'opponent'
-        }, 5000)
+        }
       }
     }
     else if (resp.type == 'GAME_END') {
@@ -352,6 +396,16 @@ onMounted(async () => {
         // 'restore' from opponent's time
         (game.value.config.timeForGame * 1000 - timer.value.me);
     }
+    else if (resp.type == 'OFFER_DRAW') {
+      $togglePopup("GameIncomeDrawPopup")
+    }
+    else if (resp.type == 'OFFER_REVENGE') {
+      // TODO add offer revenge popup
+    }
+  })
+
+  store.listen('chat_message', (resp) => {
+    messages.value.push(resp);
   })
 
   store.emit('room', JSON.stringify({ gameId: useRoute().params.id }))
@@ -466,28 +520,49 @@ onMounted(async () => {
       console.log(timer.value.me, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
       if (game.value.moves.length == 0) {
         timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt)) - 5000;
-        lastTimeForInterval = timer.value.me;
       }
-      setTimeout(() => {
+      if (timer.value.me >= game.value.config.timeForGame * 1000 - 5000) {
+        setTimeout(() => {
+          activeTimer.value = 'me'
+          timerMeInterval = setInterval(timerMeFunc, 100)
+        }, 5000)
+      }
+      else {
         activeTimer.value = 'me'
         timerMeInterval = setInterval(timerMeFunc, 100)
-      }, 5000)
+      }
     }
     else if (body.game.state.turn == playerOpponent.value.color) {
       lastTimerValue = timer.value.opponent
       console.log(timer.value.opponent, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
       if (game.value.moves.length == 0) {
         timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt)) - 5000;
-        lastTimeForInterval = timer.value.opponent;
       }
-      setTimeout(() => {
+      if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 5000) {
+        setTimeout(() => {
+          activeTimer.value = 'opponent'
+          timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+        }, 5000)
+      }
+      else {
         activeTimer.value = 'opponent'
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-      }, 5000)
+      }
     }
   }
-  
+
   console.error(timer.value.me, timer.value.opponent)
+
+  await getMessages();
+
+  window.addEventListener("keydown", async (e) => {
+    if (e.key == "Enter") await sendMessage();
+  })
+})
+
+onUnmounted(() => {
+  clearInterval(timerMeInterval)
+  clearInterval(timerOpponentInterval)
 })
 </script>
 
@@ -496,10 +571,31 @@ onMounted(async () => {
   display: grid;
   width: 100vw;
   height: 100vh;
-  grid-template-columns: max(230px, 18%) auto max(230px, 18%);
+  grid-template-rows: 14px auto;
+  grid-template-columns: max(230px, 18%) auto max(290px, 18%);
   gap: 25px 20px;
   padding: 20px 33px;
   background-color: $color-font;
+}
+
+.back-to-lobby {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  color: $color1;
+  font-size: 14px;
+  font-family: "Neue Plak";
+  font-style: normal;
+  font-weight: 400;
+  line-height: 100%;
+  text-transform: uppercase;
+
+  svg {
+    width: 8px;
+    height: 8px;
+    scale: -1 1;
+  }
 }
 
 .main {
@@ -552,6 +648,8 @@ onMounted(async () => {
   &__messages {
     display: flex;
     flex-direction: column;
+    overflow: auto;
+    max-height: calc(100vh - (2 * 20px) - (2 * 10px) - 22px - 15px - 45px - 5px);
     gap: 20px;
   }
 
@@ -570,7 +668,6 @@ onMounted(async () => {
 
     &Field {
       margin-top: auto;
-      padding: 10px;
       width: 100%;
       display: flex;
       flex-direction: row;
@@ -654,7 +751,8 @@ onMounted(async () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 39px;
+    gap: 5px;
+    width: 34px;
     aspect-ratio: 1;
     background: $color-font;
     border: 1px solid rgba(255, 255, 255, 0.2);

@@ -20,7 +20,10 @@
           v-if="props.whoWon == 'me'"
           class="player__won"
         >won!</div>
-        <div class="player__rating">
+        <div
+          class="player__rating"
+          v-if="false"
+        >
           <template v-if="props.whoWon == 'me'">
             +25 rating
           </template>
@@ -46,7 +49,10 @@
           v-if="props.whoWon == 'opponent'"
           class="player__won"
         >won!</div>
-        <div class="player__rating">
+        <div
+          class="player__rating"
+          v-if="false"
+        >
           <template v-if="props.whoWon == 'me'">
             -25 rating
           </template>
@@ -61,7 +67,7 @@
 
       <div class="actions">
         <div class="button">Find a new game</div>
-        <div class="button">Offer revenge</div>
+        <div class="button" @click="offerRevenge">Offer revenge</div>
         <div
           class="button"
           @click="$togglePopup('GameEndsPopup')"
@@ -72,7 +78,7 @@
 </template>
 
 <script setup>
-let { $togglePopup } = useNuxtApp();
+let { $togglePopup, $API } = useNuxtApp();
 
 let props = defineProps(['me', 'opponent', 'whoWon'])
 
@@ -80,6 +86,16 @@ watch(() => props.whoWon, () => {
   console.log(props.me, props.opponent, props.whoWon)
   $togglePopup('GameEndsPopup');
 })
+
+const offerRevenge = async () => {
+  let resp = await $API().Chess.offerRevenge({
+    id: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+
+  let body = await resp.json();
+  console.log(body);
+}
 
 onMounted(() => {
   console.log(props);

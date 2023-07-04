@@ -1,6 +1,7 @@
 <template>
   <div
-    class="popup__wrapper popup__wrapper--active"
+    class="popup__wrapper"
+    :class="{'popup__wrapper--active': props.show}"
     id="GameBeginsPopup"
     v-if="props.me"
   >
@@ -60,10 +61,10 @@ let { $togglePopup } = useNuxtApp();
 
 let timeout = ref(5)
 
-let props = defineProps(['me', 'opponent'])
+let props = defineProps(['me', 'opponent', 'show'])
 
 watch(() => props.opponent, () => {
-  if (props.opponent.joined) {
+  if (props.show && props.opponent.joined) {
     let closeInterval = setInterval(() => {
       timeout.value--;
       if (timeout.value == 0) {

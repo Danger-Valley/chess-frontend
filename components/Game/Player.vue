@@ -5,21 +5,20 @@
   >
     <img
       class="player__avatar"
-      :src="props.player.user?.avatar"
+      :src="props.player?.user?.avatar"
     />
-    <div class="player__nickname">{{ props.player.user.username || props.player.user.email }}</div>
+    <div class="player__nickname">{{ props.player?.user.username || props.player?.user.email }}</div>
     <div
       class="player__rating"
-      v-if="props.player.user.rating"
-    >({{ props.player.user.rating.toFixed(0) }})</div>
+      v-if="props.player?.user.rating"
+    >({{ props.player?.user.rating.toFixed(0) }})</div>
     <img
       v-if="props.player?.user?.country"
       class="player__country"
-      :src="props.player.user.country"
+      :src="props.player?.user.country"
     />
     <div
       class="timer"
-      v-if="props.timer"
       :class="{'timer--active': props.active}"
     >
       {{ Math.floor(props.timer / (60 * 1000))?.toFixed(0).padStart(2, 0) }}:{{ Math.floor((props.timer / 1000) %60)?.toFixed(0).padStart(2, 0) }}:<span class="timer__ms">{{ (props.timer % 1000).toString()[0] }}</span>
@@ -29,10 +28,6 @@
 
 <script setup>
 let props = defineProps(['player', 'timer', 'active']) //player: 'me' or 'opponent'
-
-watch(() => props.player, () => {
-  console.log(props.player)
-})
 </script>
 
 <style lang="scss" scoped>

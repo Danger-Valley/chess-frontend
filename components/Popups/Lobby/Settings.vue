@@ -8,72 +8,81 @@
       class="popup"
       @click.stop
     >
-      <div class="popup__heading">QUICK GAME PRESET SETTING</div>
+      <div class="popup__heading">CREATE GAME</div>
 
-      <div class="popup__heading popup__heading--small">Game type</div>
-
-      <div
-        class="options"
-        v-for="mode in gameModes"
-        :key="mode.type"
-      >
-        <div class="options__heading">{{ mode.name }}</div>
+      <div class="options">
+        <div class="options__heading">Play with</div>
         <div class="options__list">
           <div
             class="option"
-            v-for="item in mode.items"
-            :key="item.id"
-            :class="{ 'option--active': item.id == option }"
-            @click="option = item.id"
+            v-for="(option, counter) in ['Anyone', 'Friend', 'AI (ChatGPT)']"
+            :class="{ 'option--active': playWith == counter }"
+            @click="playWith = counter"
           >
-            <div class="option__front">{{ item.name }}</div>
+            <div class="option__front">{{ option }}</div>
+          </div>
+        </div>
+
+        <div class="options__heading">Game type</div>
+        <div class="options__list">
+          <div
+            class="option"
+            v-for="option in gameModes"
+            :class="{ 'option--active': gameType.type == option.type }"
+            @click="gameType = option; gameMode = gameType?.items?.[0].id"
+          >
+            <div class="option__front">{{ option.name }}</div>
+          </div>
+        </div>
+
+        <div class="options__heading">Mode</div>
+        <div class="options__list">
+          <div
+            class="option"
+            v-for="option in gameType?.items"
+            :class="{ 'option--active': gameMode == option.id }"
+            @click="gameMode = option.id"
+          >
+            <div class="option__front">{{ option.name }}</div>
+          </div>
+        </div>
+
+        <div class="options__heading">Figure color</div>
+        <div class="figures">
+          <div
+            class="figure"
+            :class="{ 'figure--active': color == 'b' }"
+            @click="color = 'b'"
+          >
+            <div class="figure__front">
+              <BlackFigure />
+            </div>
+          </div>
+          <div
+            class="figure"
+            :class="{ 'figure--active': color == null }"
+            @click="color = null"
+          >
+            <div class="figure__front">
+              <AnyFigure />
+            </div>
+          </div>
+          <div
+            class="figure"
+            :class="{ 'figure--active': color == 'w' }"
+            @click="color = 'w'"
+          >
+            <div class="figure__front">
+              <WhiteFigure />
+            </div>
           </div>
         </div>
       </div>
 
-      <div class="options options--hor">
-        <div class="popup__heading popup__heading--small">
-          Everyone can join
-          <div class="popup__underheading">
-            Turn off if you want to play with friend and share the link to the game
-          </div>
-        </div>
-        <Toggle v-model="everyoneCanJoin" />
-      </div>
-
-      <div class="popup__heading popup__heading--small">I play as</div>
-
-      <div class="figures">
-        <div
-          class="figure"
-          :class="{ 'figure--active': color == 'b' }"
-          @click="color = 'b'"
-        >
-          <div class="figure__front">
-            <BlackFigure />
-          </div>
-        </div>
-        <div
-          class="figure"
-          :class="{ 'figure--active': color == null }"
-          @click="color = null"
-        >
-          <div class="figure__front">
-            <AnyFigure />
-          </div>
-        </div>
-        <div
-          class="figure"
-          :class="{ 'figure--active': color == 'w' }"
-          @click="color = 'w'"
-        >
-          <div class="figure__front">
-            <WhiteFigure />
-          </div>
-        </div>
-      </div>
-
-      <div class="play" @click="$togglePopup('GameSettingsPopup'); emit('playNow')">
+      <div
+        class="play"
+        @click="$togglePopup('GameSettingsPopup'); emit('playNow')"
+      >
         Play now
       </div>
     </div>
@@ -87,17 +96,14 @@ import BlackFigure from "@/assets/imgs/blackFigure.svg"
 import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
-import Toggle from '@vueform/toggle'
-
-console.log(gameModes)
-
-let option = ref(gameModes?.[0]?.items?.[0].id),
-  color = ref(null),
-  everyoneCanJoin = ref(true)
+let playWith = ref(0),
+  gameType = ref(gameModes?.[0]),
+  gameMode = ref(gameType.value?.items?.[0].id),
+  color = ref(null)
 
 const emit = defineEmits(['playNow'])
 
-defineExpose({ option, color, everyoneCanJoin })
+defineExpose({ playWith, gameMode, color })
 </script>
 
 <style src="@vueform/toggle/themes/default.css"></style>
@@ -153,6 +159,7 @@ defineExpose({ option, color, everyoneCanJoin })
 
     &__heading {
       color: #ffffff4d;
+      margin-top: 12px;
     }
 
     &__list {
@@ -214,6 +221,7 @@ defineExpose({ option, color, everyoneCanJoin })
   width: 261px;
   height: 77px;
   margin: auto;
+  margin-top: 10px;
   position: relative;
   display: flex;
   justify-content: center;

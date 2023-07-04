@@ -12,15 +12,20 @@
         <template v-if="lobby?.user.rank.points">
           <div class="rating__points">{{ lobby.user.rank.points }}</div>
           <div class="rating__text">Leaderboard position</div>
-        </template>
-        <template v-else>
-          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more games to get your rank
+          <div class="rating__position">
+            #{{ lobby?.user.leaderboard.position }}
+            <span class="rating__max"> / {{ lobby?.user.leaderboard.total }}</span>
           </div>
         </template>
-        <div class="rating__position">
-          #{{ lobby?.user.leaderboard.position }}
-          <span class="rating__max"> / {{ lobby?.user.leaderboard.total }}</span>
-        </div>
+        <template v-else>
+          <div class="rating__points">{rank}</div>
+          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more games to get your rank
+          </div>
+          <div class="rating__position">
+            {{ 30 - lobby?.user.rank.gamesLeftTillRank }}
+            <span class="rating__max"> / 30</span>
+          </div>
+        </template>
       </div>
 
       <div class="block active-games">
@@ -34,7 +39,10 @@
               class="game__hr"
             ></div>
             <div class="game__name">{{ game.title }}</div>
-            <div class="game__btn" @click="navigateTo(`game/${game.gameId}`)">Open</div>
+            <div
+              class="game__btn"
+              @click="navigateTo(`game/${game.gameId}`)"
+            >Open</div>
           </div>
         </template>
         <div
@@ -47,8 +55,10 @@
       </div>
 
       <div class="block block--double">
-        <div class="block__double"></div>
-        <div class="block__double"></div>
+        <div class="block__double">Coming soon</div>
+        <div class="block__double">
+          <img src="@/assets/imgs/lobby_piece_2.png" />
+        </div>
       </div>
 
       <div class="block event-1">
@@ -58,47 +68,31 @@
       </div>
 
       <div class="block block--double event-2">
-        <div class="event-2__heading">5 days left</div>
-        <div class="event-2__underheading">before the</div>
-        <div class="event-2__text">BLITZ Community Championship</div>
+        <div class="event-2__heading">To be announced</div>
         <img
-          src=""
-          class="event-2__bg-image"
+          src="@/assets/imgs/lobby_piece_1.png"
+          class="event-2__image"
         />
       </div>
 
-      <div class="block block--half">
-        <div
-          class="block__half play"
-          @click="openGameSearchPopup"
-        >
-          Play now
-          <div
-            class="settings"
-            @click.stop="$togglePopup('GameSettingsPopup')"
-          >
-            <SettingsIcon></SettingsIcon>
-          </div>
-        </div>
-
-        <div class="block__half create">
-          Create game <ArrowIcon></ArrowIcon>
-        </div>
+      <div
+        class="block play"
+        @click="$togglePopup('GameSettingsPopup')"
+      >
+        Play now
       </div>
     </main>
 
-    <PopupsGameSearchPopup ref="GameSearchPopupRef"></PopupsGameSearchPopup>
-    <PopupsGameSettingsPopup
+    <PopupsLobbySearch ref="GameSearchPopupRef"></PopupsLobbySearch>
+    <PopupsLobbySettings
       ref="GameSettingsPopupRef"
       @play-now="openGameSearchPopup"
-    ></PopupsGameSettingsPopup>
+    ></PopupsLobbySettings>
   </div>
 </template>
 
 <script setup>
 import NoGamesIcon from "@/assets/imgs/no-icon.svg"
-import ArrowIcon from "@/assets/imgs/Arrow.svg"
-import SettingsIcon from "@/assets/imgs/settings.svg"
 
 let { $togglePopup, $API } = useNuxtApp();
 
@@ -106,20 +100,14 @@ let lobby = ref(),
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref()
 
-const getUserById = async (id) => {
-  let resp = await $API().User.getByIds([id])
-  let body = await resp.json();
-  return body.users.username;
-}
-
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
   let body = {
-    mode: GameSettingsPopupRef.value.option,
+    mode: GameSettingsPopupRef.value.gameMode,
     accessToken: localStorage.getItem('accessToken'),
-    everyoneCanJoin: GameSettingsPopupRef.value.everyoneCanJoin
+    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0
   }
   if (GameSettingsPopupRef.value.color) body = {
     ...body,
@@ -170,33 +158,33 @@ onMounted(async () => {
   font-family: 'Neue Plak';
 
   &--double {
+    display: grid;
+    grid-template-columns: repeat(2, 50%);
     width: 100%;
     height: 100%;
     grid-column: span 2;
     aspect-ratio: unset;
+    padding: 0;
   }
 
-  &--half {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    background-color: unset;
-    cursor: auto;
-    padding: unset;
-  }
-
-  &__double {}
-
-  &__half {
+  &__double {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: calc((100% - 20px) / 2);
-    background: rgba(255, 255, 255, 0.05);
-    font-family: "Montserrat";
-    text-transform: uppercase;
-    cursor: pointer;
+
+    color: #FFFFFF4d;
+    text-align: center;
+    font-size: 16px;
+    font-family: "Neue Plak";
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+    >img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 }
 
@@ -317,30 +305,26 @@ onMounted(async () => {
 }
 
 .event-2 {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 10px;
   background: #000008;
+  padding: 20px;
+  overflow: hidden;
 
   &__heading {
     font-weight: 600;
-    font-size: 26px;
-    line-height: 36px;
-    color: #FFFFFF;
-  }
-
-  &__underheading {
-    margin-top: auto;
-    color: #FFFFFF4d;
-    font-size: 16px;
-    line-height: 22px;
-  }
-
-  &__text {
-    font-weight: 600;
     font-size: 22px;
-    line-height: 31px;
     color: #FFFFFF;
+    margin: auto 0;
+  }
+
+  &__image {
+    position: absolute;
+    top: 16px;
+    right: 8%;
+    height: 104%;
   }
 }
 
@@ -351,6 +335,14 @@ onMounted(async () => {
   align-items: center;
   color: $color1;
   border: 1px solid $color1;
+  text-align: center;
+  font-size: 30px;
+  font-family: Montserrat;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 100%;
+  text-transform: uppercase;
+  cursor: pointer;
 }
 
 .settings {
@@ -413,8 +405,7 @@ onMounted(async () => {
         display: none;
       }
     }
-
-    &--half {
+    &.play {
       position: fixed;
       left: 0;
       bottom: 0;
@@ -429,10 +420,6 @@ onMounted(async () => {
       background: $color-font;
       box-shadow: 0px -12px 50px rgba(0, 0, 0, 0.25);
     }
-
-    &__half {
-      height: 77px;
-    }
   }
 }
 
@@ -446,7 +433,7 @@ onMounted(async () => {
     aspect-ratio: unset;
     padding: 10px;
 
-    &--half {
+    &.play {
       padding: 0 20px;
     }
   }

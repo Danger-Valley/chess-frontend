@@ -65,6 +65,10 @@ const closePopup = () => {
 }
 
 defineExpose({ startTimeTracking })
+
+onUnmounted(() => {
+  clearInterval(searchTimeInterval.value)
+})
 </script>
 
 <style lang="scss" scoped>

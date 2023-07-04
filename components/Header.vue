@@ -4,8 +4,8 @@
       class="logo"
       to="/"
     >
-      <div class="logo__heading">The Chess</div>
-      <div class="logo__underheading">Multichain crypto chess</div>
+      <div class="logo__heading">xChess</div>
+      <div class="logo__underheading">By players, for players.</div>
     </NuxtLink>
 
     <div class="header__mobile">
@@ -14,8 +14,8 @@
           <div class="animation__dot"></div>
           <div class="animation__bg"></div>
         </div>
-        <div>
-          {{ activeBoards }} active boadrs
+        <div v-if="activeBoards">
+          {{ activeBoards }} active board{{activeBoards > 1 ? 's' : ''}}
         </div>
       </div>
 
@@ -123,16 +123,16 @@
     </div>
   </header>
 
-  <PopupsSignInPopup></PopupsSignInPopup>
+  <PopupsSignIn></PopupsSignIn>
 </template>
 
 <script setup>
 import IconArrow from "@/assets/imgs/Arrow.svg"
 import IconCross from "@/assets/imgs/+.svg"
 import { useUserStore } from "~/stores/user";
-let { $togglePopup } = useNuxtApp();
+let { $togglePopup, $API } = useNuxtApp();
 
-let activeBoards = ref(584),
+let activeBoards = ref(),
   // for mobile
   isToggled = ref(false),
   // for desktop
@@ -161,8 +161,13 @@ function meme() {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (user.value) isClosed.value = true;
+
+  let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
+  let body = await resp.json();
+
+  activeBoards.value = body.activeBoardsCount;
 })
 </script>
 
@@ -214,7 +219,6 @@ onMounted(() => {
     font-weight: 600;
     line-height: 1;
     color: #FFFFFF;
-    text-transform: uppercase;
   }
 
   &__underheading {
