@@ -107,18 +107,15 @@
             <span>0</span>
           </div>
 
-          <div class="panel__container">
-            <OneSlashTwo
-              class="panel__icon"
-              @click="$togglePopup('GameConfirmDrawPopup')"
+          <div class="panel__container" @click="$togglePopup('GameConfirmDrawPopup')">
+            <OneSlashTwo class="panel__icon"
             />
           </div>
 
-          <div class="panel__container">
+          <div class="panel__container" @click="$togglePopup('GameResignPopup')">
             <Flag
               class="panel__icon"
               style="height: 100%; padding: 11px;"
-              @click="$togglePopup('GameResignPopup')"
             />
           </div>
 
@@ -851,11 +848,29 @@ onUnmounted(() => {
   justify-content: center;
   gap: 20px;
   margin: auto;
-  width: min(100%, calc(100vh - 40px - (2 * (35px + 20px))));
-  max-height: calc(100vh - 40px);
+  width: min(100%, calc(100vh - 40px - (2 * (35px + 20px))) - 40px);
+  height: calc(100vh - 40px - 40px);
 }
 
 .rotated {
   rotate: 90deg;
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
+  .page{
+    display: flex;
+    flex-direction: column;
+  }
+  .back-to-lobby{
+    display: none;
+  }
+  .main {
+    display: flex;
+    flex-direction: column;
+  }
+  .playboard{
+    order: -1;
+    height: auto;
+  }
 }
 </style>

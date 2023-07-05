@@ -222,6 +222,7 @@ onMounted(async () => {
 .active-games {
   display: flex;
   flex-direction: column;
+  overflow: auto;
   gap: 12px;
   color: #FFFFFF4d;
   font-size: 16px;
@@ -409,9 +410,10 @@ onMounted(async () => {
       position: fixed;
       left: 0;
       bottom: 0;
-      width: 100%;
+      width: calc(100% - 2 * 147px);
       height: 117px;
       padding: 0 147px;
+      margin: 0 147px;
       display: flex;
       flex-direction: row-reverse;
       justify-content: center;
@@ -435,6 +437,8 @@ onMounted(async () => {
 
     &.play {
       padding: 0 20px;
+      margin: 0 20px;
+      width: calc(100% - 2 * 20px);
     }
   }
 
