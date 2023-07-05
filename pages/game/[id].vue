@@ -150,12 +150,20 @@
       :me="playerMe"
       :opponent="playerOpponent"
       :whoWon="whoWon"
+      @find-game="$togglePopup('GameSettingsPopup')"
     />
     <PopupsGameConfirmDraw />
     <PopupsGameIncomeDraw :opponent="playerOpponent" />
     <PopupsGameHintsShop />
     <PopupsGameHint />
     <PopupsGameResign />
+    <PopupsGameConfirmRevenge :opponent="playerOpponent" />
+    <PopupsGameIncomeRevenge :opponent="playerOpponent" />
+    <PopupsLobbySearch ref="GameSearchPopupRef"></PopupsLobbySearch>
+    <PopupsLobbySettings
+      ref="GameSettingsPopupRef"
+      @play-now="openGameSearchPopup"
+    ></PopupsLobbySettings>
   </div>
 </template>
 
@@ -202,7 +210,32 @@ let boardConfig = reactive({}),
   messages = ref([]),
   userId = computed(() => user.getUser.value.id),
   lastTimeForInterval = null,
-  lastTimerValue = null
+  lastTimerValue = null,
+  GameSearchPopupRef = ref(),
+  GameSettingsPopupRef = ref()
+
+const openGameSearchPopup = async () => {
+  //localStorage.setItem('autoJoin', true);
+  $togglePopup('GameSearchPopup')
+  GameSearchPopupRef.value.startTimeTracking()
+  let body = {
+    mode: GameSettingsPopupRef.value.gameMode,
+    accessToken: localStorage.getItem('accessToken'),
+    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0
+  }
+  if (GameSettingsPopupRef.value.color) body = {
+    ...body,
+    color: GameSettingsPopupRef.value.color
+  }
+  let resp = await $API().Chess.find_create(body);
+  body = await resp.json();
+  console.log(body);
+  await navigateTo({
+    params: {
+      id: body.game.id
+    }
+  })
+}
 
 const getMessages = async () => {
   let resp = await $API().Chat.get({
@@ -400,7 +433,14 @@ onMounted(async () => {
       $togglePopup("GameIncomeDrawPopup")
     }
     else if (resp.type == 'OFFER_REVENGE') {
-      // TODO add offer revenge popup
+      $togglePopup('GameIncomeRevengePopup')
+    }
+    else if (resp.type == 'OPEN_GAME') {
+      navigateTo({
+        params: {
+          id: resp.payload.gameId
+        }
+      })
     }
   })
 
@@ -521,7 +561,15 @@ onMounted(async () => {
       if (game.value.moves.length == 0) {
         timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt)) - 5000;
       }
-      if (timer.value.me >= game.value.config.timeForGame * 1000 - 5000) {
+      console.log(game.value.status);
+      console.log(timer.value.me, game.value.config.timeForGame * 1000 - 10000)
+      if (game.value.status == 'FINISHED') {
+        clearInterval(timerMeInterval)
+        clearInterval(timerOpponentInterval)
+        activeTimer.value = null
+        $togglePopup('GameEndsPopup')
+      }
+      else if (timer.value.me >= game.value.config.timeForGame * 1000 - 10000) {
         setTimeout(() => {
           activeTimer.value = 'me'
           timerMeInterval = setInterval(timerMeFunc, 100)
@@ -538,7 +586,15 @@ onMounted(async () => {
       if (game.value.moves.length == 0) {
         timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt)) - 5000;
       }
-      if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 5000) {
+      console.log(game.value.status);
+      console.log(timer.value.opponent, game.value.config.timeForGame * 1000 - 10000)
+      if (game.value.status == 'FINISHED') {
+        clearInterval(timerMeInterval)
+        clearInterval(timerOpponentInterval)
+        activeTimer.value = null
+        $togglePopup('GameEndsPopup')
+      }
+      else if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 10000) {
         setTimeout(() => {
           activeTimer.value = 'opponent'
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)

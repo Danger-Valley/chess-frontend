@@ -66,7 +66,7 @@
       </div>
 
       <div class="actions">
-        <div class="button">Find a new game</div>
+        <div class="button" @click="emits('findGame')">Find a new game</div>
         <div class="button" @click="offerRevenge">Offer revenge</div>
         <div
           class="button"
@@ -81,6 +81,7 @@
 let { $togglePopup, $API } = useNuxtApp();
 
 let props = defineProps(['me', 'opponent', 'whoWon'])
+let emits = defineEmits(['findGame'])
 
 watch(() => props.whoWon, () => {
   console.log(props.me, props.opponent, props.whoWon)

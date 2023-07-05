@@ -116,6 +116,10 @@ defineExpose({ playWith, gameMode, color })
   gap: 10px;
   color: #fff;
 
+  &__wrapper--active{
+    z-index: 101;
+  }
+
   &__underheading {
     max-width: 155px;
     color: #ffffff4d;
