@@ -101,7 +101,7 @@
         <div class="panel">
           <div
             class="panel__container panel__container--hint"
-            @click="$togglePopup('GameHintPopup')"
+            @click="$togglePopup('GameHintsShopPopup')"
           >
             <Lightbulb class="panel__icon" />
             <span>0</span>

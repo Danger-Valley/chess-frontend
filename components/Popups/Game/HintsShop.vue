@@ -8,65 +8,217 @@
       class="popup"
       @click.stop
     >
-      <div class="popup__heading">Shop</div>
+      <div class="popup__heading">Buy hints</div>
+      <div class="popup__underheading">You can use AI hints in any Chess game.<br />1 hint = 1 recommendation</div>
 
-      <div class="hints">
-        <div
-          class="hint"
-          v-for="hint in hints"
-        >
-          <div class="hint__hr"></div>
-          <div class="hint__content">
-            <div class="hint__name">{{ hint.name }}</div>
-            <div class="hint__price">{{ hint.price }} SOL</div>
+      <div class="section">
+        <div class="section__heading">Pay with</div>
+        <div class="section__items">
+          <div
+            class="section__item"
+            v-for="token in tokens"
+            :title="token.name"
+            :class="{ 'section__item--active': selectedToken == token }"
+            @click="selectedToken = token; selectedPrice = prices?.filter(el => el.tokenId == selectedToken?.id)[0]"
+          >
+            <div class="section__front">{{ token.ticker }}</div>
           </div>
         </div>
       </div>
+
+      <div class="section">
+        <div class="section__heading">Amount</div>
+        <div
+          class="section__items"
+          v-if="prices"
+        >
+          <div
+            class="section__item"
+            v-for="price in prices?.filter(el => el.tokenId == selectedToken?.id)"
+            :class="{ 'section__item--active': selectedPrice == price }"
+            @click="selectedPrice = price"
+          >
+            <div class="section__front">{{ price.title }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="btn"
+        @click="purchase"
+      >Purchase</div>
     </div>
   </div>
+
+  <WalletModalProvider
+    dark
+    ref="walletModalProviderRef"
+  ></WalletModalProvider>
 </template>
 
 <script setup>
-let { $togglePopup } = useNuxtApp();
+import { useWallet, WalletModalProvider } from "solana-wallets-vue";
+import { Transaction } from "@solana/web3.js"
+let { $togglePopup, $API } = useNuxtApp();
+let { publicKey, readyState, connected, signTransaction, connect } = useWallet();
 
-let hints = ref([
-  {
-    name: "5 hints",
-    price: 0.5
-  },
-  {
-    name: "15 hints",
-    price: 1
-  },
-  {
-    name: "30 hints",
-    price: 1.5
-  },
-  {
-    name: "60 hints",
-    price: 2.3
-  },
-  {
-    name: "100 hints",
-    price: 5
+let tokens = ref([]),
+  selectedToken = ref(),
+  prices = ref([]),
+  selectedPrice = ref(),
+  walletModalProviderRef = ref()
+
+watch([connected, readyState], async () => {
+  console.log(readyState.value)
+  if (readyState.value == "Installed") connect();
+}, { immediate: true })
+
+const purchase = async () => {
+  console.log(publicKey.value?.toString())
+
+  if (!publicKey.value) {
+    return walletModalProviderRef.value.openModal();
   }
-])
+
+  let resp = await $API().Payments.Hints.buy({
+    accessToken: localStorage.getItem('accessToken'),
+    walletAddress: publicKey.value.toString(),
+    amount: selectedPrice.value.amount,
+    splTokenId: selectedToken.value.id
+  })
+  let body = await resp.json();
+
+  console.log(body)
+  let depositId = body.depositId
+  let sign = await signTransaction.value(Transaction.from(JSON.parse(body.transaction).data));
+  console.log(sign, sign.serialize({
+    requireAllSignatures: false,
+    verifySignatures: false,
+  }));
+
+  if (!sign) return;
+  resp = await $API().Payments.Deposit.claim({
+    accessToken: localStorage.getItem('accessToken'),
+    id: depositId,
+    transaction: sign.serialize({
+      requireAllSignatures: false,
+      verifySignatures: false,
+    }).toJSON()
+  })
+  body = await resp.json();
+  console.log(body);
+
+  let int = setInterval(async () => {
+    resp = await $API().Payments.Deposit.getStatus({
+      accessToken: localStorage.getItem('accessToken'),
+      id: depositId
+    })
+    body = await resp.json();
+    console.log(body);
+
+    if(body.status == 'COMPLETED' || body.status == 'ERROR') clearInterval(int)
+  }, 10000)
+}
+
+onMounted(async () => {
+  let resp = await $API().Payments.Hints.getPrices(localStorage.getItem('accessToken'));
+  let body = await resp.json();
+
+  console.log(body);
+  body.tokens.map(el => {
+    tokens.value.push(el.splToken);
+    el.prices.map(price => {
+      prices.value.push({ ...price, tokenId: el.splToken.id })
+    })
+  })
+  console.log(tokens.value, prices.value);
+  selectedToken.value = tokens.value?.[0]
+  selectedPrice.value = prices.value?.[0]
+})
 </script>
 
 <style lang="scss" scoped>
 .popup {
-  width: 340px;
-  min-height: 300px;
+  width: 470px;
+  min-height: 400px;
   top: 74px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(24, 27, 32, 0.55);
+  backdrop-filter: blur(50px);
 
   &__heading {
     text-transform: uppercase;
   }
+
+  &__underheading {
+    color: #67696B;
+    font-family: "Neue Plak";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    margin-bottom: 20px;
+  }
 }
 
-.hint{
-  &s{
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
 
+  &__heading {
+    color: #FFFFFF4d;
+    font-family: "Neue Plak";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
   }
+
+  &__item {
+    color: #FFFFFF80;
+    font-family: "Neue Plak";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+
+    &s {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    &--active {
+      color: #FFFFFF;
+      background: linear-gradient(65.1deg, rgba(252, 248, 213, 1) 0%, rgba(252, 248, 213, 0) 100%);
+    }
+  }
+
+  &__front {
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    margin: 2px;
+    padding: 5px 10px;
+    background: #282A2C;
+  }
+}
+
+.btn {
+  width: fit-content;
+  margin-top: 20px;
+  padding: 15px 13px;
+  background: #1FA2F3;
+  color: #181B20;
+  text-align: center;
+  font-family: "Montserrat";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 100%;
+  cursor: pointer;
 }
 </style>

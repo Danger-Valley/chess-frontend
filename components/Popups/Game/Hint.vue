@@ -11,13 +11,13 @@
       <div class="popup__heading">You have 3 hints left, would you like to use one?</div>
       <div class="popup__actions">
         <div
-          class="button"
-          @click="$togglePopup('GameHintPopup')"
-        >No, not yet</div>
-        <div
           class="button button--active"
           @click="useHint"
         >Yes, let's go</div>
+        <div
+          class="button"
+          @click="$togglePopup('GameHintPopup')"
+        >No, not yet</div>
       </div>
     </div>
   </div>
@@ -29,16 +29,23 @@ let { $togglePopup } = useNuxtApp();
 
 <style lang="scss" scoped>
 .popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 428px;
   height: 173px;
+  margin: calc((100vh - 173px) / 2) auto;
   &__heading{
     text-align: center;
-    max-width: 240px;
+    max-width: 220px;
+    text-transform: initial;
+    font-size: 16px;
+    line-height: normal;
   }
   &__actions{
     margin-top: auto;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 10px;
   }
 }

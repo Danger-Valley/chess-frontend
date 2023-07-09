@@ -339,6 +339,60 @@ class Chat {
     });
   }
 }
+class Hints {
+  constructor(path) {
+    this.localPath = `${path}/store/hints`;
+  }
+
+  async getPrices(accessToken) {
+    return await fetch(`${this.localPath}/prices`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async buy({accessToken, walletAddress, amount, splTokenId}) {
+    return await fetch(`${this.localPath}/purchase`, {
+      method: "POST",
+      body: JSON.stringify({
+        walletAddress,
+        amount,
+        splTokenId
+      }),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+  }
+}
+class Deposit {
+  constructor(path) {
+    this.localPath = `${path}/deposits`;
+  }
+
+  async getStatus({accessToken, id}) {
+    return await fetch(`${this.localPath}/${id}/status`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async claim({accessToken, id, transaction}) {
+    return await fetch(`${this.localPath}/${id}/claim`, {
+      method: "POST",
+      body: JSON.stringify({transaction}),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`,
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -358,7 +412,11 @@ export default defineNuxtPlugin(() => {
           Signatures: new Signatures(`${path}/auth/api/v1`),
           Chess: new Chess(`${path}/game/api/v1`),
           Lobby: new Lobby(`${path}/game/api/v1`),
-          Chat: new Chat(`${path}/game/api/v1`)
+          Chat: new Chat(`${path}/game/api/v1`),
+          Payments: {
+            Hints: new Hints(`${path}/payments/api/v1`),
+            Deposit: new Deposit(`${path}/payments/api/v1`)
+          }
         }
       }
     }
