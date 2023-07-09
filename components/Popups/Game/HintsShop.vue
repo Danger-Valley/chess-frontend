@@ -66,17 +66,23 @@ let tokens = ref([]),
   selectedToken = ref(),
   prices = ref([]),
   selectedPrice = ref(),
-  walletModalProviderRef = ref()
+  walletModalProviderRef = ref(),
+  purchaseAfterConnection = false
 
 watch([connected, readyState], async () => {
   console.log(readyState.value)
-  if (readyState.value == "Installed") connect();
+  if (readyState.value == "Installed") await connect();
+  if (purchaseAfterConnection) {
+    purchaseAfterConnection = false;
+    purchase();
+  }
 }, { immediate: true })
 
 const purchase = async () => {
   console.log(publicKey.value?.toString())
 
   if (!publicKey.value) {
+    purchaseAfterConnection = true;
     return walletModalProviderRef.value.openModal();
   }
 
@@ -91,19 +97,15 @@ const purchase = async () => {
   console.log(body)
   let depositId = body.depositId
   let sign = await signTransaction.value(Transaction.from(JSON.parse(body.transaction).data));
-  console.log(sign, sign.serialize({
-    requireAllSignatures: false,
-    verifySignatures: false,
-  }));
 
   if (!sign) return;
   resp = await $API().Payments.Deposit.claim({
     accessToken: localStorage.getItem('accessToken'),
     id: depositId,
-    transaction: sign.serialize({
+    transaction: JSON.stringify(sign.serialize({
       requireAllSignatures: false,
       verifySignatures: false,
-    }).toJSON()
+    }).toJSON())
   })
   body = await resp.json();
   console.log(body);
@@ -116,7 +118,7 @@ const purchase = async () => {
     body = await resp.json();
     console.log(body);
 
-    if(body.status == 'COMPLETED' || body.status == 'ERROR') clearInterval(int)
+    if (body.status == 'COMPLETED' || body.status == 'ERROR') clearInterval(int)
   }, 10000)
 }
 
