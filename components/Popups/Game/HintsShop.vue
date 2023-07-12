@@ -45,8 +45,20 @@
 
       <div
         class="btn"
+        :class="{ 'btn--success': success, 'btn--waiting': waiting }"
         @click="purchase"
-      >Purchase</div>
+      >
+        <div class="btn__content">
+          <template v-if="waiting">
+            <SpinnerDiamond />
+          </template>
+          <template v-else>
+            <template v-if="success">Complete!</template>
+            <template v-else>Purchase</template>
+          </template>
+        </div>
+        <div class="btn__success"></div>
+      </div>
     </div>
   </div>
 
@@ -59,6 +71,7 @@
 <script setup>
 import { useWallet, WalletModalProvider } from "solana-wallets-vue";
 import { Transaction } from "@solana/web3.js"
+
 let { $togglePopup, $API } = useNuxtApp();
 let { publicKey, readyState, connected, signTransaction, connect } = useWallet();
 
@@ -67,7 +80,9 @@ let tokens = ref([]),
   prices = ref([]),
   selectedPrice = ref(),
   walletModalProviderRef = ref(),
-  purchaseAfterConnection = false
+  purchaseAfterConnection = false,
+  waiting = ref(false),
+  success = ref(false)
 
 watch([connected, readyState], async () => {
   console.log(readyState.value)
@@ -93,12 +108,18 @@ const purchase = async () => {
     splTokenId: selectedToken.value.id
   })
   let body = await resp.json();
+  success.value = false;
+  waiting.value = true;
 
   console.log(body)
   let depositId = body.depositId
-  let sign = await signTransaction.value(Transaction.from(JSON.parse(body.transaction).data));
+  let sign;
+  try {
+    sign = await signTransaction.value(Transaction.from(JSON.parse(body.transaction).data));
+  } catch (e) {
+    return waiting.value = false;
+  }
 
-  if (!sign) return;
   resp = await $API().Payments.Deposit.claim({
     accessToken: localStorage.getItem('accessToken'),
     id: depositId,
@@ -118,8 +139,12 @@ const purchase = async () => {
     body = await resp.json();
     console.log(body);
 
-    if (body.status == 'COMPLETED' || body.status == 'ERROR') clearInterval(int)
-  }, 10000)
+    if (body.status == 'COMPLETED' || body.status == 'ERROR') {
+      clearInterval(int)
+      waiting.value = false;
+      success.value = true;
+    }
+  }, 5000)
 }
 
 onMounted(async () => {
@@ -210,9 +235,13 @@ onMounted(async () => {
 }
 
 .btn {
-  width: fit-content;
-  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 120px;
   padding: 15px 13px;
+  margin-top: 20px;
   background: #1FA2F3;
   color: #181B20;
   text-align: center;
@@ -222,5 +251,46 @@ onMounted(async () => {
   font-weight: 500;
   line-height: 100%;
   cursor: pointer;
+
+  &__content {
+    position: relative;
+    z-index: 1;
+  }
+
+  &--waiting::after {
+    text-align: start;
+    width: 180px;
+    content: 'Verifying your transaction. \2028\2028\2028\2028 This could take up to 30 seconds.';
+    position: absolute;
+    left: calc(100% + 5px);
+    color: #FFFFFF4d;
+    font-family: "Neue Plak";
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+  }
+
+  &--success &__success {
+    left: 0;
+    width: 100%;
+    background: #27F4BA;
+  }
+
+  &__success {
+    z-index: 0;
+    position: absolute;
+    width: 20%;
+    height: 100%;
+    left: 40%;
+    top: 0;
+    transition: .3s ease;
+  }
+}
+
+@keyframes expand {
+  100% {
+    width: 100%;
+  }
 }
 </style>

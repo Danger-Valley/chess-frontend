@@ -70,8 +70,9 @@ class Signatures {
   }
 }
 class User {
-  constructor(path) {
+  constructor(path, globalPath) {
     this.localPath = `${path}/users`;
+    this.path = globalPath;
   }
 
   async get(accessToken) {
@@ -82,50 +83,78 @@ class User {
     });
   }
 
+  async getPaymentProfile(accessToken) {
+    return await fetch(`${this.path}/payments/api/v1/users`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async chargeHint({ accessToken, id }) {
+    return await fetch(`${this.path}/payments/api/v1/users/${id}/chargeHint`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async checkUsername({accessToken, username}) {
+    return await fetch(`${this.localPath}/checkUsername`, {
+      method: "POST",
+      body: JSON.stringify({username}),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
   /**
    * to get public user data without accessToken
    * @param {Array} ids - array of ids of wanted users 
    */
   async getByIds(ids) {
-    return await fetch(`${this.localPath}/${ids.join(',')}`);
-  }
+      return await fetch(`${this.localPath}/${ids.join(',')}`);
+    }
 
   async update(accessToken, body) {
-    return await fetch(`${this.localPath}`, {
-      method: "POST",
-      /**
-       * body: {
-          username,
-          avatar,
-          twitter: {
-            twitterAuthCode, codeChallenge
+      return await fetch(`${this.localPath}`, {
+        method: "POST",
+        /**
+         * body: {
+            username,
+            avatar,
+            twitter: {
+              twitterAuthCode, codeChallenge
+            },
+            discord: {
+              discordAuthCode
+            },
+            google: {
+              token
+            }
           },
-          discord: {
-            discordAuthCode
-          },
-          google: {
-            token
-          }
-        },
-       */
-      body: JSON.stringify(body),
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-  }
+         */
+        body: JSON.stringify(body),
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+    }
 
-  async delete(accessToken) {
-    return await fetch(`${this.localPath}`, {
-      method: "DELETE",
-      headers: {
-        'content-type': 'application/json',
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
+  async delete (accessToken) {
+      return await fetch(`${this.localPath}`, {
+        method: "DELETE",
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+    }
   }
-}
 class Wallet {
   constructor(path) {
     this.localPath = `${path}/users`;
@@ -319,7 +348,7 @@ class Chat {
     this.localPath = `${path}/chat`;
   }
 
-  async get({gameId, accessToken}) {
+  async get({ gameId, accessToken }) {
     return await fetch(`${this.localPath}/${gameId}`, {
       method: "GET",
       headers: {
@@ -328,10 +357,10 @@ class Chat {
     });
   }
 
-  async send({text, gameId, accessToken}) {
+  async send({ text, gameId, accessToken }) {
     return await fetch(`${this.localPath}/${gameId}`, {
       method: "POST",
-      body: JSON.stringify({text}),
+      body: JSON.stringify({ text }),
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
@@ -353,7 +382,7 @@ class Hints {
     });
   }
 
-  async buy({accessToken, walletAddress, amount, splTokenId}) {
+  async buy({ accessToken, walletAddress, amount, splTokenId }) {
     return await fetch(`${this.localPath}/purchase`, {
       method: "POST",
       body: JSON.stringify({
@@ -373,7 +402,7 @@ class Deposit {
     this.localPath = `${path}/deposits`;
   }
 
-  async getStatus({accessToken, id}) {
+  async getStatus({ accessToken, id }) {
     return await fetch(`${this.localPath}/${id}/status`, {
       method: "GET",
       headers: {
@@ -382,10 +411,10 @@ class Deposit {
     });
   }
 
-  async claim({accessToken, id, transaction}) {
+  async claim({ accessToken, id, transaction }) {
     return await fetch(`${this.localPath}/${id}/claim`, {
       method: "POST",
-      body: JSON.stringify({transaction}),
+      body: JSON.stringify({ transaction }),
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`,
@@ -407,7 +436,7 @@ export default defineNuxtPlugin(() => {
             Twitter: new Twitter(`${path}/auth/api/v1/auth`),
             Google: new Google(`${path}/auth/api/v1/auth`)
           },
-          User: new User(`${path}/auth/api/v1`),
+          User: new User(`${path}/auth/api/v1`, path),
           Wallet: new Wallet(`${path}/auth/api/v1`),
           Signatures: new Signatures(`${path}/auth/api/v1`),
           Chess: new Chess(`${path}/game/api/v1`),

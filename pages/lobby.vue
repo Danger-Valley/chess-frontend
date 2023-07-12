@@ -9,8 +9,8 @@
       <div class="heading heading--double">Daily mission</div>
 
       <div class="block rating">
-        <template v-if="lobby?.user.rank.points">
-          <div class="rating__points">{{ lobby.user.rank.points }}</div>
+        <template v-if="lobby?.user.rating">
+          <div class="rating__points">{{ lobby.user.rating }}</div>
           <div class="rating__text">Leaderboard position</div>
           <div class="rating__position">
             #{{ lobby?.user.leaderboard.position }}
@@ -83,16 +83,18 @@
       </div>
     </main>
 
-    <PopupsLobbySearch ref="GameSearchPopupRef"></PopupsLobbySearch>
+    <PopupsLobbySearch ref="GameSearchPopupRef"/>
     <PopupsLobbySettings
       ref="GameSettingsPopupRef"
       @play-now="openGameSearchPopup"
-    ></PopupsLobbySettings>
+    />
+    <PopupsSetUsername/>
   </div>
 </template>
 
 <script setup>
 import NoGamesIcon from "@/assets/imgs/no-icon.svg"
+import { useUserStore } from "~/stores/user";
 
 let { $togglePopup, $API } = useNuxtApp();
 
@@ -120,6 +122,8 @@ const openGameSearchPopup = async () => {
 }
 
 onMounted(async () => {
+  if(!useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
+
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
   console.log(body);

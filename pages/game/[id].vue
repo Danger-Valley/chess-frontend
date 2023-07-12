@@ -141,7 +141,7 @@
     <PopupsGameBegins
       :me="playerMe"
       :opponent="playerOpponent"
-      :show="(timer?.me == game?.config?.timeForGame * 1000 && timer?.opponent == game?.config?.timeForGame * 1000) || false"
+      :show="showBegins"
     />
     <PopupsGameEnds
       :me="playerMe"
@@ -209,7 +209,8 @@ let boardConfig = reactive({}),
   lastTimeForInterval = null,
   lastTimerValue = null,
   GameSearchPopupRef = ref(),
-  GameSettingsPopupRef = ref()
+  GameSettingsPopupRef = ref(),
+  showBegins = ref(false)
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -262,7 +263,8 @@ const sendMessage = async () => {
 
   if (body.errors) return console.error(body.errors);
 
-  text = "";
+  document.querySelector('.chat__input').value = "";
+  document.querySelector('.chat__messages').scrollBy(0,100000)
 }
 
 const afterMove = async (e) => {
@@ -289,6 +291,7 @@ const join = async () => {
 const timerMeFunc = () => {
   if (timer.value.me > 100) timer.value.me = lastTimerValue - (new Date() - lastTimeForInterval);
   else {
+    clearInterval(timerOpponentInterval)
     clearInterval(timerMeInterval)
     timer.value.me = 0;
     boardConfig.viewOnly = true;
@@ -299,6 +302,7 @@ const timerOpponentFunc = () => {
   if (timer.value.opponent > 100) timer.value.opponent = lastTimerValue - (new Date() - lastTimeForInterval);
   else {
     clearInterval(timerOpponentInterval)
+    clearInterval(timerMeInterval)
     timer.value.opponent = 0;
     boardConfig.viewOnly = true;
   }
@@ -314,6 +318,7 @@ onMounted(async () => {
   store.listen('game_event', async (resp) => {
     console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == body.game.id) {
+      console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
       if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
 
       if (resp.payload.playerId == playerMe.value.id) {
@@ -327,6 +332,7 @@ onMounted(async () => {
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.opponent);
         clearInterval(timerMeInterval)
+        clearInterval(timerOpponentInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
         activeTimer.value = 'opponent'
         lastTimerValue = timer.value.opponent
@@ -341,12 +347,14 @@ onMounted(async () => {
           100 +
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.me);
+        clearInterval(timerMeInterval)
         clearInterval(timerOpponentInterval)
         timerMeInterval = setInterval(timerMeFunc, 100)
         activeTimer.value = 'me'
         lastTimerValue = timer.value.me
       }
       lastTimeForInterval = new Date(resp.payload.createdAt)
+      console.log(timerMeInterval, timerOpponentInterval)
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
@@ -371,7 +379,7 @@ onMounted(async () => {
 
       if (body.game.state.turn == playerMe.value.color) {
         lastTimerValue = timer.value.me
-        if (timer.value.me == game.value.config.timeForGame * 1000) {
+        if (timer.value.me >= game.value.config.timeForGame * 1000 - 2000) {
           setTimeout(() => {
             timerMeInterval = setInterval(timerMeFunc, 100)
             activeTimer.value = 'me'
@@ -384,7 +392,7 @@ onMounted(async () => {
       }
       else if (body.game.state.turn == playerOpponent.value.color) {
         lastTimerValue = timer.value.opponent
-        if (timer.value.opponent == game.value.config.timeForGame * 1000) {
+        if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000) {
           setTimeout(() => {
             timerOpponentInterval = setInterval(timerOpponentFunc, 100)
             activeTimer.value = 'opponent'
@@ -443,6 +451,9 @@ onMounted(async () => {
 
   store.listen('chat_message', (resp) => {
     messages.value.push(resp);
+    nextTick(() => {
+      document.querySelector('.chat__messages').scrollBy(0,100000)
+    })
   })
 
   store.emit('room', JSON.stringify({ gameId: useRoute().params.id }))
@@ -466,31 +477,26 @@ onMounted(async () => {
   }
   timeAddedPerMove = game.value.config.timeAddedPerMove;
 
-  // TODO change to allow joining games not by find_create
-  /*
-  if(localStorage.getItem('autoJoin')){
-    localStorage.removeItem('autoJoin')
-  }
   if (
     body.game.playerOne.joined &&
     body.game.playerTwo.joined &&
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
-  ) {
-    console.error('Two players have already joined the game');
-  }
-  body = await join();
-  */
+  ) console.error('Two players have already joined the game');
+  else if(!body.game.playerOne.joined || !body.game.playerTwo.joined) body = await join();
 
+  let isViewer = true;
   // connected players to local vars
   if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
     playerMe.value = body.game.playerOne;
     if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
+    isViewer = false;
   }
   else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
     playerMe.value = body.game.playerTwo;
     if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
+    isViewer = false;
   }
-  // TODO if connected as viewer
+  // if connected as viewer
   else {
     if (Math.random() > .5) {
       playerMe.value = body.game.playerTwo;
@@ -500,9 +506,10 @@ onMounted(async () => {
       playerMe.value = body.game.playerOne;
       if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
     }
+    isViewer = true;
   }
 
-  // calculate timer by counting moves and their timestamps - TODO fix
+  // calculate timer by counting moves and their timestamps
   console.warn("Moves:", game.value.moves.length)
   if (game.value.moves.length > 0) {
     let lastTime = beginTime;
@@ -531,7 +538,7 @@ onMounted(async () => {
   boardConfig = {
     fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
-    viewOnly: false,
+    viewOnly: isViewer,
     movable: {
       free: false,
       color: playerMe.value?.color == 'w' ? 'white' : 'black'
@@ -559,22 +566,23 @@ onMounted(async () => {
         timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt)) - 5000;
       }
       console.log(game.value.status);
-      console.log(timer.value.me, game.value.config.timeForGame * 1000 - 10000)
       if (game.value.status == 'FINISHED') {
         clearInterval(timerMeInterval)
         clearInterval(timerOpponentInterval)
         activeTimer.value = null
         $togglePopup('GameEndsPopup')
       }
-      else if (timer.value.me >= game.value.config.timeForGame * 1000 - 10000) {
+      else if (timer.value.me >= game.value.config.timeForGame * 1000 - 2000) {
         setTimeout(() => {
           activeTimer.value = 'me'
           timerMeInterval = setInterval(timerMeFunc, 100)
         }, 5000)
+        showBegins.value = true;
       }
       else {
         activeTimer.value = 'me'
         timerMeInterval = setInterval(timerMeFunc, 100)
+        showBegins.value = false;
       }
     }
     else if (body.game.state.turn == playerOpponent.value.color) {
@@ -584,25 +592,27 @@ onMounted(async () => {
         timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt)) - 5000;
       }
       console.log(game.value.status);
-      console.log(timer.value.opponent, game.value.config.timeForGame * 1000 - 10000)
       if (game.value.status == 'FINISHED') {
         clearInterval(timerMeInterval)
         clearInterval(timerOpponentInterval)
         activeTimer.value = null
         $togglePopup('GameEndsPopup')
       }
-      else if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 10000) {
+      else if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000) {
         setTimeout(() => {
           activeTimer.value = 'opponent'
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)
         }, 5000)
+        showBegins.value = true;
       }
       else {
         activeTimer.value = 'opponent'
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+        showBegins.value = false;
       }
     }
   }
+  else showBegins.value = true;
 
   console.error(timer.value.me, timer.value.opponent)
 
@@ -624,6 +634,7 @@ onUnmounted(() => {
   display: grid;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
   grid-template-rows: 14px auto;
   grid-template-columns: max(230px, 18%) auto max(290px, 18%);
   gap: 25px 20px;
@@ -702,7 +713,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     overflow: auto;
-    max-height: calc(100vh - (2 * 20px) - (2 * 10px) - 22px - 15px - 45px - 5px);
+    max-height: calc(100vh - (2 * 20px) - (2 * 10px) - 22px - 15px - 45px - 45px);
     gap: 20px;
   }
 
