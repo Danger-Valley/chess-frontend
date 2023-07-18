@@ -125,12 +125,11 @@
           </div>
 
           <div class="tab">
-            <div class="tab__text">Add multiple wallets to verify token ownership. All of these wallets can also access
-              your profile.</div>
+            <div class="tab__text">Add multiple wallets to verify token ownership.</div>
             <div class="tab__item">
               <div
                 class="wallet"
-                v-for="walletType in ['Solana', 'Ethereum', 'Polygon', 'Bitcoin', 'Stellar']"
+                v-for="walletType in ['Solana']"
               >
                 <div class="wallet__type">{{ walletType }} Wallets</div>
                 <div class="wallet__amount">{{ userWallets?.filter(el => el.blockchain.toUpperCase() ==
