@@ -1,7 +1,8 @@
 <template>
   <TheChessboard
     :board-config="{
-      fen: 'rn2kbnr/ppPppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1'
+      fen: 'rn2kbnr/ppPppppp/8/8/8/8/PPP1PPPP/RNBQKBNR w KQkq - 0 1',
+      coordinates: true
     }"
     reactive-config
     @move="onMove"

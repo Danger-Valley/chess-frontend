@@ -9,7 +9,7 @@ cg-container {
   height: 100% !important;
 }
 
-cg-board piece{
+cg-board piece {
   width: 12.5%;
   height: 12.5%;
   background-size: 85% 85% !important;
@@ -149,6 +149,53 @@ cg-board .king.black {
 
 .promotion-dialog .queen {
   order: 4;
+}
+
+coords {
+  font-family: "Roboto";
+  font-size: 14px !important;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-transform: uppercase;
+}
+
+coords.ranks {
+  right: unset;
+  top: 3px;
+  left: 3px;
+}
+
+coords.files {
+  height: auto;
+  text-align: end;
+  padding-right: 3px;
+}
+
+.orientation-white .files coord:nth-child(2n + 1),
+.orientation-white .ranks coord:nth-child(2n + 1),
+.orientation-black .files coord:nth-child(2n),
+.orientation-black .ranks coord:nth-child(2n) {
+  color: #E8EDF9;
+}
+
+.orientation-white .files coord:nth-child(2n),
+.orientation-white .ranks coord:nth-child(2n),
+.orientation-black .files coord:nth-child(2n + 1),
+.orientation-black .ranks coord:nth-child(2n + 1) {
+  color: #B7C0D8;
+}
+
+cg-board square.move-dest {
+  background: radial-gradient(#7B61FF80 22%, #7B61FF80 0, rgba(0, 0, 0, .3) 0, rgba(0, 0, 0, 0) 0)
+}
+
+cg-board square.oc.move-dest {
+  background: radial-gradient(transparent 0%, transparent 80%, #7B61FF80 80%)
+}
+
+cg-board square.selecte, cg-board square.last-move {
+  background-color: #7B61FF80;
 }
 
 @media (orientation: landscape) {

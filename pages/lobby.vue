@@ -9,7 +9,7 @@
       <div class="heading heading--double">Daily mission</div>
 
       <div class="block rating">
-        <template v-if="lobby?.user.rating">
+        <template v-if="lobby?.user.rating != null">
           <div class="rating__points">{{ lobby.user.rating }}</div>
           <div class="rating__text">Leaderboard position</div>
           <div class="rating__position">

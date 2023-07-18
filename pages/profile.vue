@@ -22,6 +22,7 @@
               <img
                 class="info__avatar"
                 :src="user?.avatar"
+                @click="PFPPopupref.open()"
               />
               <div
                 class="info__nickname"
@@ -192,6 +193,8 @@
       dark
       ref="walletModalProviderRef"
     ></WalletModalProvider>
+
+    <PopupsProfileSelectAvatar ref="PFPPopupref"/>
   </div>
 </template>
 
@@ -205,7 +208,8 @@ import { WalletModalProvider, useWallet } from "solana-wallets-vue";
 
 let chosenTabIndex = ref(0),
   isNameEditorToggled = ref(false),
-  walletModalProviderRef = ref()
+  walletModalProviderRef = ref(),
+  PFPPopupref = ref()
 
 const { publicKey, wallet, disconnect, connect, connecting, connected, ready, readyState } = useWallet();
 
@@ -355,6 +359,7 @@ watch(user, () => {
     width: 75px;
     aspect-ratio: 1;
     cursor: pointer;
+    clip-path: path("M72.4695 28.264C69.7326 22.5089 66.5413 16.9813 62.9255 11.7337L61.7592 10.0574C60.3233 7.97422 58.4415 6.237 56.2504 4.9721C54.0592 3.70718 51.6134 2.94632 49.0915 2.74479L47.0439 2.57979C40.6913 2.06976 34.3084 2.06976 27.956 2.57979L25.9085 2.74479C23.3864 2.94632 20.9409 3.70718 18.7497 4.9721C16.5585 6.237 14.6766 7.97422 13.2407 10.0574L12.0745 11.7487C8.45871 16.9963 5.26728 22.5239 2.53051 28.279L1.64924 30.1316C0.563385 32.4165 0 34.9145 0 37.4442C0 39.974 0.563385 42.4719 1.64924 44.7569L2.53051 46.6094C5.26728 52.3646 8.45871 57.8922 12.0745 63.1397L13.2407 64.831C14.6766 66.9142 16.5585 68.6516 18.7497 69.9165C20.9409 71.1814 23.3864 71.9423 25.9085 72.1437L27.956 72.3087C34.3084 72.8187 40.6913 72.8187 47.0439 72.3087L49.0915 72.1437C51.6153 71.9397 54.0622 71.1754 56.2534 69.9064C58.4449 68.6373 60.3256 66.8958 61.7592 64.8085L62.9255 63.1172C66.5413 57.8697 69.7326 52.3421 72.4695 46.5869L73.3507 44.7344C74.4364 42.4494 75 39.9515 75 37.4217C75 34.892 74.4364 32.394 73.3507 30.1091L72.4695 28.264Z");
   }
 
   &__nickname {

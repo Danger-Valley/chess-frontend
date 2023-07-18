@@ -1,7 +1,7 @@
 <template>
   <div
     class="popup__wrapper"
-    :class="{'popup__wrapper--active': props.show}"
+    :class="{ 'popup__wrapper--active': props.show }"
     id="GameBeginsPopup"
     v-if="props.me"
   >
@@ -47,7 +47,7 @@
           />
         </div>
       </template>
-      
+
       <div
         class="connecting"
         v-else
@@ -65,11 +65,14 @@ let props = defineProps(['me', 'opponent', 'show'])
 
 watch(() => props.opponent, () => {
   if (props.show && props.opponent.joined) {
+    console.time();
     let closeInterval = setInterval(() => {
-      timeout.value--;
+      timeout.value -= 1;
+      console.timeLog();
       if (timeout.value == 0) {
         $togglePopup('GameBeginsPopup');
         clearInterval(closeInterval);
+        console.timeEnd();
       }
     }, 1000)
   }
@@ -158,4 +161,5 @@ watch(() => props.opponent, () => {
   font-size: 16px;
   line-height: 22px;
   color: #FFFFFF4d;
-}</style>
+}
+</style>

@@ -260,7 +260,7 @@ onMounted(async () => {
   &--waiting::after {
     text-align: start;
     width: 180px;
-    content: 'Verifying your transaction. \2028\2028\2028\2028 This could take up to 30 seconds.';
+    content: 'Verifying your transaction. This could take up to 30 seconds.';
     position: absolute;
     left: calc(100% + 5px);
     color: #FFFFFF4d;
