@@ -109,7 +109,8 @@ const openGameSearchPopup = async () => {
   let body = {
     mode: GameSettingsPopupRef.value.gameMode,
     accessToken: localStorage.getItem('accessToken'),
-    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0
+    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0,
+    isAI: GameSettingsPopupRef.value.playWith == 2
   }
   if (GameSettingsPopupRef.value.color) body = {
     ...body,

@@ -14,8 +14,8 @@
           <div class="animation__dot"></div>
           <div class="animation__bg"></div>
         </div>
-        <div v-if="activeBoards">
-          {{ activeBoards }} active board{{activeBoards > 1 ? 's' : ''}}
+        <div>
+          {{ activeBoards || 0 }} active board{{activeBoards != 1 ? 's' : ''}}
         </div>
       </div>
 
