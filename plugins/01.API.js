@@ -222,13 +222,14 @@ class Chess {
     this.localPath = `${path}/games`;
   }
 
-  async find_create({ mode, color, everyoneCanJoin, accessToken }) {
+  async find_create({ mode, color, everyoneCanJoin, isAI, accessToken }) {
     console.log(mode, color)
     return await fetch(`${this.localPath}/init`, {
       method: "POST",
       body: JSON.stringify({
         mode, color,
-        everyoneCanJoin
+        everyoneCanJoin,
+        isAI
       }),
       headers: {
         'content-type': 'application/json',
