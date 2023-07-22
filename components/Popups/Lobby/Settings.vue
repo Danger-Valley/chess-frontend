@@ -15,7 +15,7 @@
         <div class="options__list">
           <div
             class="option"
-            v-for="(option, counter) in ['Anyone', 'Friend', 'AI (ChatGPT)']"
+            v-for="(option, counter) in ['Anyone', 'Friend', 'AI']"
             :class="{ 'option--active': playWith == counter }"
             @click="playWith = counter"
           >
