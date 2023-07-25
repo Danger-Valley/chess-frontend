@@ -6,7 +6,7 @@
 
       <div class="heading">Rating</div>
       <div class="heading">Active games</div>
-      <div class="heading">Daily mission</div>
+      <div class="heading">Daily missions</div>
       <div class="heading">Arena</div>
 
       <div class="block rating">
@@ -20,7 +20,7 @@
         </template>
         <template v-else>
           <div class="rating__points">{rank}</div>
-          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more games to get your rank
+          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more ranked {{ lobby?.user.rank.gamesLeftTillRank==1 ? 'game' : 'games' }} to get your rank
           </div>
           <div class="rating__position">
             {{ 30 - lobby?.user.rank.gamesLeftTillRank }}
