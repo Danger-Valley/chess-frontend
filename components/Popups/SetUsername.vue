@@ -2,6 +2,7 @@
   <div
     class="popup__wrapper"
     id="SetUsernamePopup"
+    @click="props.canClose ? $togglePopup('SetUsernamePopup') : null"
   >
     <div
       class="popup"
@@ -32,6 +33,13 @@
 
 <script setup>
 import { useUserStore } from '~/stores/user';
+
+let props = defineProps({
+  canClose: {
+    type: Boolean,
+    default: false
+  }
+})
 
 let { $API, $togglePopup } = useNuxtApp();
 let status = ref(),

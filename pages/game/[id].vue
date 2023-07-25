@@ -154,18 +154,19 @@
       :whoWon="whoWon"
       @find-game="$togglePopup('GameSettingsPopup')"
     />
-    <PopupsGameConfirmDraw />
-    <PopupsGameIncomeDraw :opponent="playerOpponent" />
-    <PopupsGameHintsShop />
-    <PopupsGameHint />
-    <PopupsGameResign />
-    <PopupsGameConfirmRevenge :opponent="playerOpponent" />
-    <PopupsGameIncomeRevenge :opponent="playerOpponent" />
-    <PopupsLobbySearch ref="GameSearchPopupRef"></PopupsLobbySearch>
+    <PopupsGameConfirmDraw v-if="!isViewer"/>
+    <PopupsGameIncomeDraw v-if="!isViewer" :opponent="playerOpponent" />
+    <PopupsGameHintsShop v-if="!isViewer"/>
+    <PopupsGameHint v-if="!isViewer"/>
+    <PopupsGameResign v-if="!isViewer"/>
+    <PopupsGameConfirmRevenge :opponent="playerOpponent" v-if="!isViewer"/>
+    <PopupsGameIncomeRevenge :opponent="playerOpponent" v-if="!isViewer"/>
+    <PopupsLobbySearch ref="GameSearchPopupRef" v-if="!isViewer"/>
     <PopupsLobbySettings
       ref="GameSettingsPopupRef"
       @play-now="openGameSearchPopup"
-    ></PopupsLobbySettings>
+      v-if="!isViewer"
+    />
   </div>
 </template>
 
@@ -210,12 +211,13 @@ let boardConfig = reactive({}),
   timerOpponentInterval = null,
   activeTimer = ref(),
   messages = ref([]),
-  userId = computed(() => user.getUser.value.id),
+  userId = computed(() => user.getUser.value?.id),
   lastTimeForInterval = null,
   lastTimerValue = null,
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref(),
-  showBegins = ref(false)
+  showBegins = ref(false),
+  isViewer = ref(true)
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -317,8 +319,11 @@ const timerOpponentFunc = () => {
 
 onMounted(async () => {
   // get my user
-  let meResp = await $API().User.get(localStorage.getItem('accessToken'))
-  let meBody = await meResp.json();
+  let meResp, meBody;
+  if (localStorage.getItem('accessToken')) {
+    meResp = await $API().User.get(localStorage.getItem('accessToken'))
+    meBody = await meResp.json();
+  }
 
   // socket func
   store.listen('game_event', async (resp) => {
@@ -438,13 +443,13 @@ onMounted(async () => {
         // 'restore' from opponent's time
         (game.value.config.timeForGame * 1000 - timer.value.me);
     }
-    else if (resp.type == 'OFFER_DRAW') {
+    else if (!isViewer.value && resp.type == 'OFFER_DRAW') {
       $togglePopup("GameIncomeDrawPopup")
     }
-    else if (resp.type == 'OFFER_REVENGE') {
+    else if (!isViewer.value && resp.type == 'OFFER_REVENGE') {
       $togglePopup('GameIncomeRevengePopup')
     }
-    else if (resp.type == 'OPEN_GAME') {
+    else if (!isViewer.value && resp.type == 'OPEN_GAME') {
       navigateTo({
         params: {
           id: resp.payload.gameId
@@ -476,7 +481,7 @@ onMounted(async () => {
     body.game.playerTwo.joined &&
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
   ) console.error('Two players have already joined the game');
-  else if (!body.game.playerOne.joined || !body.game.playerTwo.joined) {
+  else if (localStorage.getItem('accessToken') && (!body.game.playerOne.joined || !body.game.playerTwo.joined)) {
     body = await join();
     game.value = body.game;
   }
@@ -491,17 +496,17 @@ onMounted(async () => {
   }
   timeAddedPerMove = game.value.config.timeAddedPerMove;
 
-  let isViewer = true;
+  isViewer.value = true;
   // connected players to local vars
-  if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
+  if (meBody && body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
     playerMe.value = body.game.playerOne;
     if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
-    isViewer = false;
+    isViewer.value = false;
   }
-  else if (body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
+  else if (meBody && body.game.playerTwo.joined && body.game.playerTwo.user.id == meBody.user.id) {
     playerMe.value = body.game.playerTwo;
     if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
-    isViewer = false;
+    isViewer.value = false;
   }
   // if connected as viewer
   else {
@@ -514,7 +519,7 @@ onMounted(async () => {
       playerMe.value = body.game.playerOne;
       if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
     }
-    isViewer = true;
+    isViewer.value;
   }
 
   // calculate timer by counting moves and their timestamps
@@ -547,7 +552,7 @@ onMounted(async () => {
     fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
     coordinates: true,
-    viewOnly: isViewer,
+    viewOnly: isViewer.value,
     movable: {
       free: false,
       color: playerMe.value?.color == 'w' ? 'white' : 'black'

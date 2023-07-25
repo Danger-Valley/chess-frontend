@@ -26,13 +26,11 @@
               />
               <div
                 class="info__nickname"
-                :class="{ 'info__nickname--edit': isNameEditorToggled }"
                 id="nickname"
-                :contenteditable="isNameEditorToggled"
               >{{ user.username || 'Your username' }}</div>
               <IconEdit
                 class="info__edit"
-                @click="toggleEditName"
+                @click="$togglePopup('SetUsernamePopup')"
                 title="Click to edit/save"
               ></IconEdit>
             </div>
@@ -106,7 +104,7 @@
                 class="social"
                 :class="{ 'social--connected': user?.googleUser }"
                 id="social-google"
-                @click="login()"
+                @click="user?.googleUser ? null : login()"
               >
                 <IconGoogle
                   class="social__icon"
@@ -194,6 +192,7 @@
     ></WalletModalProvider>
 
     <PopupsProfileSelectAvatar ref="PFPPopupref"/>
+    <PopupsSetUsername :canClose="true"/>
   </div>
 </template>
 
@@ -206,7 +205,6 @@ import { useUserStore } from "~/stores/user"
 import { WalletModalProvider, useWallet } from "solana-wallets-vue";
 
 let chosenTabIndex = ref(0),
-  isNameEditorToggled = ref(false),
   walletModalProviderRef = ref(),
   PFPPopupref = ref()
 
@@ -247,20 +245,6 @@ const openWalletModalProvider = (walletType) => {
 const chooseTabIndex = (index) => {
   chosenTabIndex.value = index;
   location.hash = index;
-}
-
-const uploadAvatar = async () => {
-
-}
-
-const toggleEditName = async () => {
-  isNameEditorToggled.value = !isNameEditorToggled.value;
-  if (!isNameEditorToggled.value) {
-    let body = {
-      username: document.querySelector('.info__nickname').innerText
-    }
-    await store.updateUser(body)
-  }
 }
 
 const modifyGoogleIcon = () => {

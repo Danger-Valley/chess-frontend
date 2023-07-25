@@ -96,12 +96,20 @@ import BlackFigure from "@/assets/imgs/blackFigure.svg"
 import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
+let props = defineProps(['isAI'])
+
 let playWith = ref(0),
   gameType = ref(gameModes?.[0]),
   gameMode = ref(gameType.value?.items?.[0].id),
   color = ref(null)
 
 const emit = defineEmits(['playNow'])
+
+watch(() => props.isAI, () => {
+  // hardcode for AI
+  if(props.isAI) playWith.value = 2;
+  else playWith.value = 0;
+})
 
 defineExpose({ playWith, gameMode, color })
 </script>

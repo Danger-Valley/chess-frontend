@@ -6,7 +6,8 @@
 
       <div class="heading">Rating</div>
       <div class="heading">Active games</div>
-      <div class="heading heading--double">Daily mission</div>
+      <div class="heading">Daily mission</div>
+      <div class="heading">Arena</div>
 
       <div class="block rating">
         <template v-if="lobby?.user.rating != null">
@@ -54,17 +55,20 @@
         </div>
       </div>
 
-      <div class="block block--double">
+      <div class="block">
         <div class="block__double">Coming soon</div>
-        <div class="block__double">
-          <img src="@/assets/imgs/lobby_piece_2.png" />
-        </div>
+      </div>
+
+      <div class="block event-1">
+        <div class="event-1__heading">24/7</div>
+        <div class="event-1__underheading">Play ranked games 24/7, complete with high-skilled players, and earn your rank.</div>
+        <div class="event-1__text">Compete Now</div>
       </div>
 
       <div class="block event-1">
         <div class="event-1__heading">AI</div>
         <div class="event-1__underheading">Want to improve your Chess skills and play with the most powerful AI?</div>
-        <div class="event-1__text">Play Now</div>
+        <div class="event-1__text" @click="isAI = true; $togglePopup('GameSettingsPopup')">Play Now</div>
       </div>
 
       <div class="block block--double event-2">
@@ -77,7 +81,7 @@
 
       <div
         class="block play"
-        @click="$togglePopup('GameSettingsPopup')"
+        @click="isAI = false; $togglePopup('GameSettingsPopup')"
       >
         Play now
       </div>
@@ -86,6 +90,7 @@
     <PopupsLobbySearch ref="GameSearchPopupRef"/>
     <PopupsLobbySettings
       ref="GameSettingsPopupRef"
+      :isAI="isAI"
       @play-now="openGameSearchPopup"
     />
     <PopupsSetUsername/>
@@ -100,7 +105,8 @@ let { $togglePopup, $API } = useNuxtApp();
 
 let lobby = ref(),
   GameSearchPopupRef = ref(),
-  GameSettingsPopupRef = ref()
+  GameSettingsPopupRef = ref(),
+  isAI = ref(false)
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -176,6 +182,7 @@ onMounted(async () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100%;
 
     color: #FFFFFF4d;
     text-align: center;
@@ -307,6 +314,7 @@ onMounted(async () => {
     font-size: 22px;
     line-height: 31px;
     color: #FFFFFF;
+    cursor: pointer;
   }
 }
 
@@ -398,7 +406,7 @@ onMounted(async () => {
   }
 
   .heading {
-    &--double {
+    &:nth-of-type(3), &:nth-of-type(4){
       display: none;
     }
   }
