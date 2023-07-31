@@ -67,6 +67,8 @@ watch(() => props.opponent, () => {
   if (props.show && props.opponent.joined) {
     console.time();
     let closeInterval = setInterval(() => {
+
+      console.log(props.show)
       timeout.value -= 1;
       console.timeLog();
       if (timeout.value == 0) {

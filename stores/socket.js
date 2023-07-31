@@ -13,7 +13,12 @@ export const useSocketStore = defineStore('socket', () => {
 
     socket.value.on('disconnect', () => {
       console.warn("DISCONNECT")
-      socket.value.connect()
+      setTimeout(() => socket.value.connect(), 500)
+    })
+
+    socket.value.on('connect_error', () => {
+      console.warn("CONNECT ERROR")
+      setTimeout(() => socket.value.connect(), 500)
     })
 
     socket.value.on("reconnection_attempt", () => {
@@ -22,11 +27,18 @@ export const useSocketStore = defineStore('socket', () => {
 
     socket.value.on("reconnect", () => {
       console.warn("RECONNECTED")
-      if(process.client && localStorage.getItem('accessToken')) {
-        emit("auth", JSON.stringify({accessToken: localStorage.getItem('accessToken')}))
+      if(!process.client) return;
+      if(localStorage.getItem('accessToken')) {
+        let accessToken = JSON.stringify({accessToken: localStorage.getItem('accessToken')})
+        console.log(`sending auth upon reconnect: ${accessToken}`)
+        emit('auth', accessToken)
+
+        if(route.params.id) {
+          let route = useRoute();
+          console.log(`sending emit upon reconnect: ${JSON.stringify({ gameId: route.params.id })}`)
+          emit('room', JSON.stringify({ gameId: route.params.id }))
+        }
       }
-      let route = useRoute();
-      if(process.client && route.params.id) emit('room', JSON.stringify({ gameId: route.params.id }))
     })
 
     socket.value.on('info_message', (resp) => {
@@ -39,7 +51,7 @@ export const useSocketStore = defineStore('socket', () => {
   }
 
   function emit(name, body){
-    //console.log(name, body)
+    console.log(name, body)
     socket.value.emit(name, body)
   }
 

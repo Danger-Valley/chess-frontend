@@ -154,14 +154,26 @@
       :whoWon="whoWon"
       @find-game="$togglePopup('GameSettingsPopup')"
     />
-    <PopupsGameConfirmDraw v-if="!isViewer"/>
-    <PopupsGameIncomeDraw v-if="!isViewer" :opponent="playerOpponent" />
-    <PopupsGameHintsShop v-if="!isViewer"/>
-    <PopupsGameHint v-if="!isViewer"/>
-    <PopupsGameResign v-if="!isViewer"/>
-    <PopupsGameConfirmRevenge :opponent="playerOpponent" v-if="!isViewer"/>
-    <PopupsGameIncomeRevenge :opponent="playerOpponent" v-if="!isViewer"/>
-    <PopupsLobbySearch ref="GameSearchPopupRef" v-if="!isViewer"/>
+    <PopupsGameConfirmDraw v-if="!isViewer" />
+    <PopupsGameIncomeDraw
+      v-if="!isViewer"
+      :opponent="playerOpponent"
+    />
+    <PopupsGameHintsShop v-if="!isViewer" />
+    <PopupsGameHint v-if="!isViewer" />
+    <PopupsGameResign v-if="!isViewer" />
+    <PopupsGameConfirmRevenge
+      :opponent="playerOpponent"
+      v-if="!isViewer"
+    />
+    <PopupsGameIncomeRevenge
+      :opponent="playerOpponent"
+      v-if="!isViewer"
+    />
+    <PopupsLobbySearch
+      ref="GameSearchPopupRef"
+      v-if="!isViewer"
+    />
     <PopupsLobbySettings
       ref="GameSettingsPopupRef"
       @play-now="openGameSearchPopup"
@@ -297,7 +309,8 @@ const join = async () => {
 
 const timerMeFunc = () => {
   clearInterval(timerOpponentInterval)
-  if (timer.value.me > 100) timer.value.me = lastTimerValue - (new Date() - lastTimeForInterval);
+  console.log(lastTimerValue, lastTimeForInterval)
+  if (timer.value.me > 100) timer.value.me = Math.max(lastTimerValue - (new Date() - lastTimeForInterval), 0) || 0;
   else {
     clearInterval(timerOpponentInterval)
     clearInterval(timerMeInterval)
@@ -308,7 +321,8 @@ const timerMeFunc = () => {
 
 const timerOpponentFunc = () => {
   clearInterval(timerMeInterval)
-  if (timer.value.opponent > 100) timer.value.opponent = lastTimerValue - (new Date() - lastTimeForInterval);
+  console.log(lastTimerValue, lastTimeForInterval)
+  if (timer.value.opponent > 100) timer.value.opponent = Math.max(lastTimerValue - (new Date() - lastTimeForInterval), 0) || 0;
   else {
     clearInterval(timerOpponentInterval)
     clearInterval(timerMeInterval)
@@ -424,24 +438,7 @@ onMounted(async () => {
       clearInterval(timerMeInterval)
       clearInterval(timerOpponentInterval)
       activeTimer.value = null
-      timer.value.me =
-        // 3600 * 1000
-        (game.value.config.timeForGame * 1000) -
-        (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-        (timeAddedPerMove * 1000) -
-        // minus 100 - because interval is not immediate
-        100 +
-        // 'restore' from opponent's time
-        (game.value.config.timeForGame * 1000 - timer.value.opponent);
-      timer.value.opponent =
-        // 3600 * 1000
-        (game.value.config.timeForGame * 1000) -
-        (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-        (timeAddedPerMove * 1000) -
-        // minus 100 - because interval is not immediate
-        100 +
-        // 'restore' from opponent's time
-        (game.value.config.timeForGame * 1000 - timer.value.me);
+      boardConfig.viewOnly = true;
     }
     else if (!isViewer.value && resp.type == 'OFFER_DRAW') {
       $togglePopup("GameIncomeDrawPopup")
@@ -575,60 +572,73 @@ onMounted(async () => {
 
     console.log("turn, mine color, opponent's color:", body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
 
-    if (body.game.state.turn == playerMe.value.color) {
-      lastTimerValue = timer.value.me
-      console.log(timer.value.me, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
-      if (game.value.moves.length == 0) {
-        timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt)) - 5000;
-      }
-      console.log(game.value.status);
-      if (game.value.status == 'FINISHED') {
-        clearInterval(timerMeInterval)
-        clearInterval(timerOpponentInterval)
-        activeTimer.value = null
-        $togglePopup('GameEndsPopup')
-      }
-      else if (timer.value.me >= game.value.config.timeForGame * 1000 - 2000) {
-        setTimeout(() => {
+    let awaitFiveSec = true
+    if(new Date(body.game.startedAt) - new Date() > 0){
+      showBegins.value = true;
+      awaitFiveSec = false
+    }
+
+    setTimeout(() => {
+      if (body.game.state.turn == playerMe.value.color) {
+        lastTimerValue = timer.value.me
+        console.log(timer.value.me, (new Date() - new Date(body.game.startedAt)), game.value.moves.length == 0)
+        if (game.value.moves.length == 0) {
+          timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt));
+        }
+        console.log(game.value.status);
+        console.error(timer.value.me, game.value.config.timeForGame * 1000 - 2000, timer.value.me >= game.value.config.timeForGame * 1000 - 2000, showBegins.value)
+        if (game.value.status == 'FINISHED') {
+          clearInterval(timerMeInterval)
+          clearInterval(timerOpponentInterval)
+          activeTimer.value = null
+          $togglePopup('GameEndsPopup')
+        }
+        else if (timer.value.me >= game.value.config.timeForGame * 1000 - 2000 && timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000) {
+          setTimeout(() => {
+            activeTimer.value = 'me'
+            timerMeInterval = setInterval(timerMeFunc, 100)
+          }, awaitFiveSec ? 5000 : 0)
+          showBegins.value = true;
+        }
+        else {
           activeTimer.value = 'me'
           timerMeInterval = setInterval(timerMeFunc, 100)
-        }, 5000)
-        showBegins.value = true;
+          showBegins.value = false;
+        }
       }
-      else {
-        activeTimer.value = 'me'
-        timerMeInterval = setInterval(timerMeFunc, 100)
-        showBegins.value = false;
-      }
-    }
-    else if (body.game.state.turn == playerOpponent.value.color) {
-      lastTimerValue = timer.value.opponent
-      console.log(timer.value.opponent, (new Date() - new Date(body.game.startedAt)) - 5000, game.value.moves.length == 0)
-      if (game.value.moves.length == 0) {
-        timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt)) - 5000;
-      }
-      console.log(game.value.status);
-      if (game.value.status == 'FINISHED') {
-        clearInterval(timerMeInterval)
-        clearInterval(timerOpponentInterval)
-        activeTimer.value = null
-        $togglePopup('GameEndsPopup')
-      }
-      else if (timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000) {
-        setTimeout(() => {
+      else if (body.game.state.turn == playerOpponent.value.color) {
+        lastTimerValue = timer.value.opponent
+        console.log(timer.value.opponent, (new Date() - new Date(body.game.startedAt)), game.value.moves.length == 0)
+        if (game.value.moves.length == 0) {
+          timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt));
+        }
+        console.log(game.value.status);
+        console.error(timer.value.opponent, game.value.config.timeForGame * 1000 - 2000, timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000, showBegins.value)
+        if (game.value.status == 'FINISHED') {
+          clearInterval(timerMeInterval)
+          clearInterval(timerOpponentInterval)
+          activeTimer.value = null
+          $togglePopup('GameEndsPopup')
+        }
+        else if (timer.value.me >= game.value.config.timeForGame * 1000 - 2000 && timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000) {
+          setTimeout(() => {
+            activeTimer.value = 'opponent'
+            timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+          }, awaitFiveSec ? 5000 : 0)
+          showBegins.value = true;
+        }
+        else {
           activeTimer.value = 'opponent'
           timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-        }, 5000)
-        showBegins.value = true;
+          showBegins.value = false;
+        }
       }
-      else {
-        activeTimer.value = 'opponent'
-        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-        showBegins.value = false;
-      }
-    }
+      // timing when game starts
+    }, Math.max(0, new Date(body.game.startedAt) - new Date()))
   }
-  else showBegins.value = true;
+  else {
+    showBegins.value = true;
+  }
 
   console.error(timer.value.me, timer.value.opponent)
 
