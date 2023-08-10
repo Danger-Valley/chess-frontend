@@ -194,7 +194,7 @@ cg-board square.oc.move-dest {
   background: radial-gradient(transparent 0%, transparent 80%, #7B61FF80 80%)
 }
 
-cg-board square.selecte, cg-board square.last-move {
+cg-board square.selected, cg-board square.last-move {
   background-color: #7B61FF80;
 }
 

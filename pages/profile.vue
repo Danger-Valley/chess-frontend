@@ -541,4 +541,17 @@ watch(user, () => {
     }
   }
 }
+
+@media screen and (max-width: #{map-get($sizes, "desktop-low") + px}) {
+  .content{
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+}
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .main{
+    margin: 8px 50px;
+  }
+}
 </style>

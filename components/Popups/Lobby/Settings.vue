@@ -210,6 +210,7 @@ defineExpose({ playWith, gameMode, color })
   }
 
   &__front {
+    display: flex;
     height: calc(100% - 4px);
     margin: 2px;
     transition: .3s;

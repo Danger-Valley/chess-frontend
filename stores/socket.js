@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { io } from 'socket.io-client';
 
 export const useSocketStore = defineStore('socket', () => {
+  let { $showToast } = useNuxtApp();
   const socket = ref()
 
   const socketGetter = computed(() => socket.value)
@@ -12,20 +13,24 @@ export const useSocketStore = defineStore('socket', () => {
     socket.value = io(url)
 
     socket.value.on('disconnect', () => {
+      $showToast("DISCONNECT", 'error')
       console.warn("DISCONNECT")
       setTimeout(() => socket.value.connect(), 500)
     })
 
     socket.value.on('connect_error', () => {
+      $showToast("CONNECT ERROR", 'error')
       console.warn("CONNECT ERROR")
       setTimeout(() => socket.value.connect(), 500)
     })
 
     socket.value.on("reconnection_attempt", () => {
+      $showToast("RECONNECTION ATTEMPT", 'info')
       console.warn("RECONNECTION ATTEMPT")
     })
 
     socket.value.on("reconnect", () => {
+      $showToast("RECONNECTED")
       console.warn("RECONNECTED")
       if(!process.client) return;
       if(localStorage.getItem('accessToken')) {

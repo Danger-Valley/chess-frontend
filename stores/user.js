@@ -27,6 +27,11 @@ export const useUserStore = defineStore('user', () => {
 
     let resp = await $API().User.update(accessToken, objToPass);
     let body = await resp.json();
+
+    console.log(body)
+
+    if(body.errors) return $showToast(body.errors[0].message, 'error');
+
     user.value = body.user;
     console.log(`User updated!`, user.value)
   }

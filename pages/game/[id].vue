@@ -59,7 +59,7 @@
           v-if="canInit"
           :board-config="boardConfig"
           reactive-config
-          @board-created="(api) => (boardAPI = api)"
+          @board-created="(api) => { (boardAPI = api); initAfterBoardCreated() }"
           :player-color="playerMe?.color == 'w' ? 'white' : 'black'"
         />
 
@@ -92,7 +92,7 @@
             >{{ counter / 2 + 1 }}.</div>
             <div
               class="turn__item"
-              :class="{ 'turn__item--active': counter + 1 == turns.length }"
+              :class="{ 'turn__item--active': counter == activeTurnIndex - 1 }"
             >{{ turn }}</div>
           </div>
         </div>
@@ -124,19 +124,35 @@
             />
           </div>
 
-          <div class="panel__container">
+          <div
+            class="panel__container"
+            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+            @click="stepHistory(-2)"
+          >
             <BackAll class="panel__icon" />
           </div>
 
-          <div class="panel__container">
+          <div
+            class="panel__container"
+            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+            @click="stepHistory(-1)"
+          >
             <BackOne class="panel__icon" />
           </div>
 
-          <div class="panel__container panel__container--inactive">
+          <div
+            class="panel__container"
+            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+            @click="stepHistory(1)"
+          >
             <ForwardOne class="panel__icon" />
           </div>
 
-          <div class="panel__container panel__container--inactive">
+          <div
+            class="panel__container"
+            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+            @click="stepHistory(2)"
+          >
             <ForwardAll class="panel__icon" />
           </div>
         </div>
@@ -207,6 +223,7 @@ const store = useSocketStore(),
 
 let boardConfig = reactive({}),
   turns = ref([]),
+  activeTurnIndex = ref(0),
   canInit = ref(false),
   game = ref(),
   playerMe = ref(),
@@ -229,7 +246,8 @@ let boardConfig = reactive({}),
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref(),
   showBegins = ref(false),
-  isViewer = ref(true)
+  isViewer = ref(true),
+  doTriggerAfterMove = false
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -286,9 +304,35 @@ const sendMessage = async () => {
   document.querySelector('.chat__messages').scrollBy(0, 100000)
 }
 
+const stepHistory = async (step) => {
+  if (!boardAPI.value) return;
+
+  console.log(step, activeTurnIndex.value, turns.value.length)
+
+  if (step == 2) {
+    activeTurnIndex.value = turns.value.length;
+    return boardAPI.value.stopViewingHistory()
+  }
+  else if (step == 1) {
+    activeTurnIndex.value = Math.min(activeTurnIndex.value + 1, turns.value.length);
+    return boardAPI.value.viewNext()
+  }
+  else if (step == -1) {
+    activeTurnIndex.value = Math.max(activeTurnIndex.value - 1, 0);
+    return boardAPI.value.viewPrevious()
+  }
+  else if (step == -2) {
+    activeTurnIndex.value = 0;
+    return boardAPI.value.viewStart()
+  }
+}
+
 const afterMove = async (e) => {
   console.log("After move:", e)
+  if (!doTriggerAfterMove) return false;
   turns.value.push(e.san);
+  boardAPI.value.stopViewingHistory()
+  activeTurnIndex.value = turns.value.length;
   if (e.color !== playerMe.value?.color) return;
   await $API().Chess.move({
     id: useRoute().params.id,
@@ -309,7 +353,6 @@ const join = async () => {
 
 const timerMeFunc = () => {
   clearInterval(timerOpponentInterval)
-  console.log(lastTimerValue, lastTimeForInterval)
   if (timer.value.me > 100) timer.value.me = Math.max(lastTimerValue - (new Date() - lastTimeForInterval), 0) || 0;
   else {
     clearInterval(timerOpponentInterval)
@@ -321,7 +364,6 @@ const timerMeFunc = () => {
 
 const timerOpponentFunc = () => {
   clearInterval(timerMeInterval)
-  console.log(lastTimerValue, lastTimeForInterval)
   if (timer.value.opponent > 100) timer.value.opponent = Math.max(lastTimerValue - (new Date() - lastTimeForInterval), 0) || 0;
   else {
     clearInterval(timerOpponentInterval)
@@ -519,34 +561,9 @@ onMounted(async () => {
     isViewer.value;
   }
 
-  // calculate timer by counting moves and their timestamps
-  console.warn("Moves:", game.value.moves.length)
-  if (game.value.moves.length > 0) {
-    let lastTime = beginTime;
-    game.value.moves.map(el => {
-      console.log(timer.value.me, timer.value.opponent, el.createdAt, lastTime)
-      turns.value.push(el.move);
-      if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
-      else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
-      lastTime = el.createdAt;
-    })
-
-    if (game.value.moves.at(-1).playerId == playerMe.value.id) {
-      //timer.value.opponent = timer.value.opponent - (new Date() - new Date(lastTime)) - 5000
-      lastTimerValue = timer.value.opponent
-    }
-    else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) {
-      //timer.value.me = timer.value.me - (new Date() - new Date(lastTime)) - 5000
-      lastTimerValue = timer.value.me
-    }
-
-    lastTimeForInterval = new Date(lastTime);
-    console.log(timer.value.me, timer.value.opponent, new Date(lastTime))
-  }
-
   // set board config
   boardConfig = {
-    fen: body.game.state.fen,
+    //fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
     coordinates: true,
     viewOnly: isViewer.value,
@@ -562,28 +579,57 @@ onMounted(async () => {
   }
 
   canInit.value = true;
+})
+
+const initAfterBoardCreated = async () => {
+  // calculate timer by counting moves and their timestamps
+  console.warn("Moves:", game.value.moves.length)
+  if (game.value.moves.length > 0) {
+    let lastTime = beginTime;
+    game.value.moves.map(el => {
+      console.log(timer.value.me, timer.value.opponent, el.createdAt, lastTime)
+      turns.value.push(el.move);
+      activeTurnIndex.value++;
+      if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
+      else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
+      lastTime = el.createdAt;
+      boardAPI.value.move(el.move);
+    })
+
+    if (game.value.moves.at(-1).playerId == playerMe.value.id) {
+      //timer.value.opponent = timer.value.opponent - (new Date() - new Date(lastTime)) - 5000
+      lastTimerValue = timer.value.opponent
+    }
+    else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) {
+      //timer.value.me = timer.value.me - (new Date() - new Date(lastTime)) - 5000
+      lastTimerValue = timer.value.me
+    }
+
+    lastTimeForInterval = new Date(lastTime);
+    console.log(timer.value.me, timer.value.opponent, new Date(lastTime))
+  }
 
   console.log("Start timestamp", new Date())
 
-  if (body.game.playerOne.joined && body.game.playerTwo.joined) {
+  if (game.value.playerOne.joined && game.value.playerTwo.joined) {
     clearInterval(timerMeInterval)
     clearInterval(timerOpponentInterval)
-    beginTime = body.game.startedAt;
+    beginTime = game.value.startedAt;
 
-    console.log("turn, mine color, opponent's color:", body.game.state.turn, playerMe.value.color, playerOpponent.value.color)
+    console.log("turn, mine color, opponent's color:", game.value.state.turn, playerMe.value.color, playerOpponent.value.color)
 
     let awaitFiveSec = true
-    if(new Date(body.game.startedAt) - new Date() > 0){
+    if (new Date(game.value.startedAt) - new Date() > 0) {
       showBegins.value = true;
       awaitFiveSec = false
     }
 
     setTimeout(() => {
-      if (body.game.state.turn == playerMe.value.color) {
+      if (game.value.state.turn == playerMe.value.color) {
         lastTimerValue = timer.value.me
-        console.log(timer.value.me, (new Date() - new Date(body.game.startedAt)), game.value.moves.length == 0)
+        console.log(timer.value.me, (new Date() - new Date(game.value.startedAt)), game.value.moves.length == 0)
         if (game.value.moves.length == 0) {
-          timer.value.me = timer.value.me - (new Date() - new Date(body.game.startedAt));
+          timer.value.me = timer.value.me - (new Date() - new Date(game.value.startedAt));
         }
         console.log(game.value.status);
         console.error(timer.value.me, game.value.config.timeForGame * 1000 - 2000, timer.value.me >= game.value.config.timeForGame * 1000 - 2000, showBegins.value)
@@ -606,11 +652,11 @@ onMounted(async () => {
           showBegins.value = false;
         }
       }
-      else if (body.game.state.turn == playerOpponent.value.color) {
+      else if (game.value.state.turn == playerOpponent.value.color) {
         lastTimerValue = timer.value.opponent
-        console.log(timer.value.opponent, (new Date() - new Date(body.game.startedAt)), game.value.moves.length == 0)
+        console.log(timer.value.opponent, (new Date() - new Date(game.value.startedAt)), game.value.moves.length == 0)
         if (game.value.moves.length == 0) {
-          timer.value.opponent = timer.value.opponent - (new Date() - new Date(body.game.startedAt));
+          timer.value.opponent = timer.value.opponent - (new Date() - new Date(game.value.startedAt));
         }
         console.log(game.value.status);
         console.error(timer.value.opponent, game.value.config.timeForGame * 1000 - 2000, timer.value.opponent >= game.value.config.timeForGame * 1000 - 2000, showBegins.value)
@@ -634,11 +680,13 @@ onMounted(async () => {
         }
       }
       // timing when game starts
-    }, Math.max(0, new Date(body.game.startedAt) - new Date()))
+    }, Math.max(0, new Date(game.value.startedAt) - new Date()))
   }
   else {
     showBegins.value = true;
   }
+
+  doTriggerAfterMove = true;
 
   console.error(timer.value.me, timer.value.opponent)
 
@@ -647,7 +695,7 @@ onMounted(async () => {
   window.addEventListener("keydown", async (e) => {
     if (e.key == "Enter") await sendMessage();
   })
-})
+}
 
 onUnmounted(() => {
   clearInterval(timerMeInterval)

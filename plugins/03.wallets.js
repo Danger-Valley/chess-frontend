@@ -65,7 +65,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           console.error(body);
           return false;
         }
-        await this.getWallets();
+        await getWallets();
         return true;
       },
       async disconnectWallet(id){
