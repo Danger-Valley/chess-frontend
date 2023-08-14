@@ -423,6 +423,32 @@ class Deposit {
     });
   }
 }
+class Events {
+  constructor(path) {
+    this.localPath = `${path}/events`;
+  }
+
+  async getArena() {
+    return await fetch(`${this.localPath}/arena`);
+  }
+
+  async getById({ id }) {
+    return await fetch(`${this.localPath}/${id}`);
+  }
+
+  async getLeaderboard({ id }) {
+    return await fetch(`${this.localPath}/${id}/leaderboard`);
+  }
+
+  async register({ accessToken, id }) {
+    return await fetch(`${this.localPath}/${id}/register`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -446,7 +472,8 @@ export default defineNuxtPlugin(() => {
           Payments: {
             Hints: new Hints(`${path}/payments/api/v1`),
             Deposit: new Deposit(`${path}/payments/api/v1`)
-          }
+          },
+          Events: new Events(`${path}/events/api/v1`)
         }
       }
     }

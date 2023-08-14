@@ -539,7 +539,7 @@ onMounted(async () => {
   }
 }
 
-@media screen and (max-width: #{map-get($sizes, "mobile")-1 + px}) {
+@media screen and (max-width: #{map-get($sizes, "mobile") + px}) {
   .header {
     padding: 26px 15px;
   }
