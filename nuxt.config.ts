@@ -47,6 +47,48 @@ export default defineNuxtConfig({
           rel: 'apple-touch-icon',
           href: '/favicon/favicon-retina-ipad.png'
         }
+      ],
+      meta: [
+        {
+          property: 'author',
+          content: 'Danger Valley'
+        },
+        {
+          property: 'keywords',
+          content: 'chess, web3, online chess, multiplayer, gaming, solana, solana chess, web3 chess, blockchain'
+        },
+        {
+          property: 'og:site_name',
+          content: 'xchess.io'
+        },
+        {
+          property: 'og:type',
+          content: 'website'
+        },
+        {
+          property: 'og:image',
+          content: 'https://images.xchess.io/static/thumbnail.png'
+        },
+        {
+          property: 'twitter:image',
+          content: 'https://images.xchess.io/static/thumbnail.png'
+        },
+        {
+          property: 'twitter:card',
+          content: 'summary_large_image'
+        },
+        {
+          property: 'twitter:site',
+          content: '@xChess_io'
+        },
+        {
+          property: 'fb:app_id',
+          content: '811815390630618'
+        },
+        {
+          property: 'og:url',
+          content: '{REPLACE_WITH_CURRENT_URL}'
+        }
       ]
     }
   },

@@ -192,6 +192,7 @@ onMounted(async () => {
   flex-direction: row;
   gap: 40px;
   align-items: baseline;
+  z-index: 3;
 
   &__mobile {
     display: flex;

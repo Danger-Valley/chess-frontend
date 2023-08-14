@@ -4,7 +4,7 @@
 
     <div class="top">
       <div class="top__heading">{{ arena?.event.title }}</div>
-      <div class="top__underheading">Open Rated Tournament for Everyone</div>
+      <div class="top__underheading">{{ arena?.event.description }}</div>
       <div class="top__modes">
         <div class="mode">
           <GameModeFigure />
@@ -33,7 +33,9 @@
       v-if="arena"
     >
       <div class="register">
-        <div class="register__btn">Register</div>
+        <div class="register__btn" v-if="!event?.isRegistered" @click="register">Register</div>
+        <div class="register__btn" v-else-if="new Date() < new Date(arena?.event.startAt)">Registered</div>
+        <div class="register__btn" v-else>Play Now</div>
         <div class="progress">
           <div class="progress__start">{{ formatDate(new Date(arena?.event.startAt)) }}</div>
           <div class="progress__end">{{ formatDate(new Date(arena?.event.endAt)) }}</div>
@@ -115,6 +117,15 @@ const formatDate = (date) => {
   let str = `${month} ${day}, ${year}, ${time}`
   console.log(str)
   return str
+}
+
+const register = async () => {
+  let resp = await $API().Events.register({
+    accessToken: localStorage.getItem('accessToken'),
+    id: arena.value.event.id
+  });
+  let body = await resp.json();
+  console.log(body);
 }
 
 onMounted(async () => {

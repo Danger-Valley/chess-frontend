@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <Header></Header>
-    
+
     <main class="main">
       <div class="main__heading">
         CLASSIC CHESS. BUT DIFFERENT.
@@ -13,12 +13,21 @@
         <div> another experience</div>
       </div>
 
-      <NuxtLink class="main__create-game link link--normal link--green" to="">
+      <NuxtLink
+        class="main__create-game link link--normal link--green"
+        to=""
+      >
         <div>Create Game</div>
-        <IconArrow class="link__arrow" alt="arrow"></IconArrow>
+        <IconArrow
+          class="link__arrow"
+          alt="arrow"
+        ></IconArrow>
       </NuxtLink>
 
-      <img class="main__img" src="@/assets/imgs/white-king-min.png"/>
+      <img
+        class="main__img"
+        src="@/assets/imgs/white-king-min.png"
+      />
     </main>
 
     <Footer></Footer>
@@ -29,11 +38,30 @@
 import IconArrow from "@/assets/imgs/Arrow.svg"
 import { useUserStore } from "~/stores/user";
 
-if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
+useHead({
+  title: 'xChess - community-driven web3 chess platform',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'xChess - community-driven web3 chess platform'
+    }, {
+      property: 'twitter:title',
+      content: 'xChess - community-driven web3 chess platform'
+    },{
+      property: 'description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    },{
+      property: 'og:description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }
+  ]
+})
+
+if (useUserStore().getUser.value?.id) await navigateTo('/lobby')
 </script>
 
 <style lang="scss" scoped>
-.main{
+.main {
   $margin_to_set: min(200px, 50vh);
   /*
   margin: #{$margin_to_set} 0;
@@ -46,7 +74,7 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
   margin-left: 23vw;
   margin-top: 76px;
 
-  &__heading{
+  &__heading {
     font-family: 'Neue Plak';
     font-weight: 600;
     font-size: 14px;
@@ -55,7 +83,7 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
     margin-bottom: 20px;
   }
 
-  &__text{
+  &__text {
     max-width: min(580px, 70%);
     font-family: 'Neue Plak';
     font-weight: 400;
@@ -64,11 +92,11 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
     color: #E9DEFF;
   }
 
-  &__create-game{
+  &__create-game {
     margin-top: 85px;
   }
 
-  &__img{
+  &__img {
     position: absolute;
     width: clamp(355px, 19vw, 100vw);
     right: 22.2vw;
@@ -77,7 +105,7 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
   }
 }
 
-#text-effect{
+#text-effect {
   font-family: Georgia;
   font-style: italic;
   background: linear-gradient(93deg, #38B6EC 49.3%, #23FFB0 87.76%);
@@ -86,30 +114,34 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
 }
 
 @media screen and (min-width: #{map-get($sizes, "desktop-high") + px}) {
-  .main{
+  .main {
     margin-left: 20vw;
-    &__heading{
+
+    &__heading {
       font-size: 18px;
     }
-    &__text{
+
+    &__text {
       font-size: 120px;
     }
-    &__create-game{
+
+    &__create-game {
       margin-top: 135px;
     }
   }
 }
 
 @media screen and (min-width: #{map-get($sizes, "desktop-low") + px}) and (max-width: #{map-get($sizes, "desktop")-1 + px}) {
-  .main{
+  .main {
     margin-left: 10vw;
   }
 }
 
 @media screen and (min-width: #{map-get($sizes, "tablet") + px}) and (max-width: #{map-get($sizes, "desktop-low")-1 + px}) {
-  .main{
+  .main {
     margin-left: 50px;
-    &__img{
+
+    &__img {
       width: 431px;
       opacity: 0.1;
       right: 22px;
@@ -120,40 +152,45 @@ if(useUserStore().getUser.value?.id) await navigateTo('/lobby')
 }
 
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
-  .main{
+  .main {
     margin-left: 20px;
-    &__text{
+
+    &__text {
       font-size: 68px;
     }
-    &__img{
+
+    &__img {
       width: 324px;
       opacity: 0.1;
       right: 0;
       bottom: -20px;
       filter: blur(5px);
     }
-    &__create-game{
+
+    &__create-game {
       margin-top: 60px;
     }
   }
 }
 
 @media screen and (max-width: #{map-get($sizes, "mobile") + px}) {
-  .main{
+  .main {
     margin-top: 50px;
     margin-left: 15px;
-    &__text{
+
+    &__text {
       font-size: 48px;
     }
-    &__img{
+
+    &__img {
       width: 180px;
       right: 38px;
       bottom: 0;
       filter: blur(5px);
     }
-    &__create-game{
+
+    &__create-game {
       margin-top: 40px;
     }
   }
-}
-</style>
+}</style>

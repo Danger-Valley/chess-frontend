@@ -4,7 +4,7 @@
 
     <div class="top">
       <div class="top__heading">{{ event?.event.title }}</div>
-      <div class="top__underheading">Open Rated Tournament for Everyone</div>
+      <div class="top__underheading">{{ event?.event.description }}</div>
       <div class="top__modes">
         <div class="mode">
           <GameModeFigure />
@@ -33,7 +33,9 @@
       v-if="event"
     >
       <div class="register">
-        <div class="register__btn">Register</div>
+        <div class="register__btn" v-if="!event?.isRegistered" @click="$togglePopup('ChooseTeamPopup')">Register</div>
+        <div class="register__btn" v-else-if="new Date() < new Date(event?.event.startAt)">Registered</div>
+        <div class="register__btn" v-else>Play Now</div>
         <div class="progress">
           <div class="progress__start">{{ formatDate(new Date(event?.event.startAt)) }}</div>
           <div class="progress__end">{{ formatDate(new Date(event?.event.endAt)) }}</div>
@@ -102,6 +104,8 @@
         <div>{{ rank.reward }}</div>
       </div>
     </div>
+
+    <PopupsChooseTeam :teams="event?.event.teams" @register="register"/>
   </div>
 </template>
 
@@ -142,6 +146,16 @@ const formatDate = (date) => {
   return str
 }
 
+const register = async (teamId) => {
+  let resp = await $API().Events.register({
+    accessToken: localStorage.getItem('accessToken'),
+    id: event.value.event.id,
+    teamId
+  });
+  let body = await resp.json();
+  console.log(body);
+}
+
 onMounted(async () => {
   let resp = await $API().Events.getById({ id: useRoute().params.id });
   let body = await resp.json();
@@ -150,7 +164,7 @@ onMounted(async () => {
   foundGameMode.value = findGameModeParams(body.event.gameMode);
   resp = await $API().Events.getLeaderboard({ id: body.event.id });
   body = await resp.json();
-  //participants.value = body.participants
+  participants.value = body.participants
   dateNow.value = new Date();
   setInterval(() => {
     dateNow.value = new Date()
@@ -346,7 +360,7 @@ onMounted(async () => {
 }
 
 .team {
-  width: 370px;
+  min-width: 370px;
   display: flex;
   flex-direction: row;
   border-radius: 20px;
@@ -388,9 +402,9 @@ onMounted(async () => {
   &s {
     display: flex;
     flex-direction: row;
-    gap: 20px;
-    overflow: auto;
     max-width: 100%;
+    overflow: auto;
+    gap: 20px;
     margin: 0 50px 20px;
   }
 }
@@ -482,6 +496,7 @@ onMounted(async () => {
     &s {
       flex-direction: column;
       margin: 0 20px 20px;
+      max-height: unset;
     }
   }
 

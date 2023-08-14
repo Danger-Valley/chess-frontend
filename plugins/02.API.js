@@ -440,10 +440,12 @@ class Events {
     return await fetch(`${this.localPath}/${id}/leaderboard`);
   }
 
-  async register({ accessToken, id }) {
+  async register({ accessToken, id, teamId }) {
     return await fetch(`${this.localPath}/${id}/register`, {
       method: "POST",
+      body: teamId ? JSON.stringify({teamId}) : null,
       headers: {
+        'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
       }
     });
