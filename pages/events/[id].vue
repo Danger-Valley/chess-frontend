@@ -162,6 +162,7 @@ const play = async () => {
   })
   let body = await resp.json();
   console.log(body);
+  await navigateTo(`game/${body.game.id}`)
 }
 
 const formatDate = (date) => {
