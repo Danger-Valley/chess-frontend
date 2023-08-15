@@ -43,7 +43,7 @@ onMounted(async () => {
   
   console.log(redirect_original_url)
 
-  //navigateTo(redirect_original_url, { external: true });
+  navigateTo(redirect_original_url, { external: true });
 });
 </script>
 <style lang="scss" scoped>
