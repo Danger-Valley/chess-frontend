@@ -5,12 +5,9 @@
 </template>
 
 <script setup>
-import mixpanel from 'mixpanel-browser';
+import { useMixpanelStore } from "@/stores/mixpanel"
 
-let env = useRuntimeConfig();
-mixpanel.init(env.public.MIXPANEL_TOKEN, {debug: true}); 
-if(process.client && localStorage.getItem("userId")) mixpanel.identify(localStorage.getItem("userId"));
-mixpanel.track('Init');
+useMixpanelStore().init();
 </script>
 
 <style lang="scss">
@@ -163,4 +160,5 @@ a {
       }
     }
   }
-}</style>
+}
+</style>

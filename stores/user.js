@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useSocketStore } from './socket'
+import { useMixpanelStore } from "@/stores/mixpanel"
 
 export const useUserStore = defineStore('user', () => {
   let { $API, $getWallets, $connectWallet, $formatWallet } = useNuxtApp()
@@ -46,7 +47,7 @@ export const useUserStore = defineStore('user', () => {
       let body = await resp.json()
       user.value = body.user;
       localStorage.setItem('userId', body.user.id)
-      mixpanel.identify(body.user.id);
+      useMixpanelStore().identify();
       socket.emit('auth', JSON.stringify({ accessToken }))
       $getWallets();
     }
