@@ -148,7 +148,7 @@ const openGameSearchPopup = async () => {
 }
 
 onMounted(async () => {
-  if(!useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
+  if(useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
