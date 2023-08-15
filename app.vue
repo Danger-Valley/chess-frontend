@@ -4,6 +4,15 @@
   </ClientOnly>
 </template>
 
+<script setup>
+import mixpanel from 'mixpanel-browser';
+
+let env = useRuntimeConfig();
+mixpanel.init(env.public.MIXPANEL_TOKEN, {debug: true}); 
+if(process.client && localStorage.getItem("userId")) mixpanel.identify(localStorage.getItem("userId"));
+mixpanel.track('Init');
+</script>
+
 <style lang="scss">
 * {
   box-sizing: border-box;

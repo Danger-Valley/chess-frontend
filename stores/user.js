@@ -19,7 +19,7 @@ export const useUserStore = defineStore('user', () => {
     await obtainUser();
     console.log(`User saved!`, user.value)
     document.querySelector(`#SignInPopup`)?.classList?.remove('popup__wrapper--active');
-    socket.emit('auth', JSON.stringify({accessToken}))
+    socket.emit('auth', JSON.stringify({ accessToken }))
   }
 
   async function updateUser(objToPass) {
@@ -30,7 +30,7 @@ export const useUserStore = defineStore('user', () => {
 
     console.log(body)
 
-    if(body.errors) return $showToast(body.errors[0].message, 'error');
+    if (body.errors) return $showToast(body.errors[0].message, 'error');
 
     user.value = body.user;
     console.log(`User updated!`, user.value)
@@ -46,7 +46,8 @@ export const useUserStore = defineStore('user', () => {
       let body = await resp.json()
       user.value = body.user;
       localStorage.setItem('userId', body.user.id)
-      socket.emit('auth', JSON.stringify({accessToken}))
+      mixpanel.identify(body.user.id);
+      socket.emit('auth', JSON.stringify({ accessToken }))
       $getWallets();
     }
   }
