@@ -23,6 +23,7 @@ onMounted(async () => {
       codeChallenge: localStorage.getItem("codeChallenge")
     });
     body = await resp.json();
+    console.log(body);
 
     if (body.errors) {
       return console.error(body);
@@ -40,7 +41,9 @@ onMounted(async () => {
   localStorage.removeItem("connectType");
   localStorage.removeItem("codeChallenge");
   
-  navigateTo(redirect_original_url, { external: true });
+  console.log(redirect_original_url)
+
+  //navigateTo(redirect_original_url, { external: true });
 });
 </script>
 <style lang="scss" scoped>

@@ -35,7 +35,7 @@
       <div class="register">
         <div class="register__btn" v-if="!event?.isRegistered" @click="register">Register</div>
         <div class="register__btn" v-else-if="new Date() < new Date(arena?.event.startAt)">Registered</div>
-        <div class="register__btn" v-else>Play Now</div>
+        <div class="register__btn" v-else @click="play">Play Now</div>
         <div class="progress">
           <div class="progress__start">{{ formatDate(new Date(arena?.event.startAt)) }}</div>
           <div class="progress__end">{{ formatDate(new Date(arena?.event.endAt)) }}</div>
@@ -87,7 +87,28 @@ import GameModeFigure from "@/assets/imgs/game-mode-figure.svg"
 import GameModeTime from "@/assets/imgs/game-mode-time.svg"
 import GameModeCoins from "@/assets/imgs/game-mode-coins.svg"
 import gameModes from "@/assets/content/gameModes.json"
+
+useHead({
+  title: 'xChess - community-driven web3 chess platform',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'xChess - community-driven web3 chess platform'
+    }, {
+      property: 'twitter:title',
+      content: 'xChess - community-driven web3 chess platform'
+    },{
+      property: 'description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    },{
+      property: 'og:description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }
+  ]
+})
+
 let { $API } = useNuxtApp();
+
 let arena = ref(),
   foundGameMode = ref(),
   dateNow = ref(),
@@ -117,6 +138,15 @@ const formatDate = (date) => {
   let str = `${month} ${day}, ${year}, ${time}`
   console.log(str)
   return str
+}
+
+const play = async () => {
+  let resp = await $API().Chess.initEventGame({
+    id: arena.value.event.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(body);
 }
 
 const register = async () => {

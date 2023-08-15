@@ -220,6 +220,7 @@ class Wallet {
 class Chess {
   constructor(path) {
     this.localPath = `${path}/games`;
+    this.path = path;
   }
 
   async find_create({ mode, color, everyoneCanJoin, isAI, accessToken }) {
@@ -323,6 +324,15 @@ class Chess {
 
   async acceptRevenge({ id, accessToken }) {
     return await fetch(`${this.localPath}/${id}/offer/revenge/accept`, {
+      method: "POST",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async initEventGame({ id, accessToken }) {
+    return await fetch(`${this.path}/events/${id}/games/init`, {
       method: "POST",
       headers: {
         'Authorization': `Bearer ${accessToken}`

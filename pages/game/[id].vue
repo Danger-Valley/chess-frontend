@@ -216,6 +216,25 @@ import ForwardAll from "@/assets/imgs/forwardAll.svg"
 import ForwardOne from "@/assets/imgs/forwardOne.svg"
 import { useUserStore } from '~/stores/user';
 
+useHead({
+  title: 'Play Chess online for Free with Friends, Family, or AI - xChess',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'Play Chess online for Free with Friends, Family, or AI - xChess'
+    }, {
+      property: 'twitter:title',
+      content: 'Play Chess online for Free with Friends, Family, or AI - xChess'
+    },{
+      property: 'description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    },{
+      property: 'og:description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }
+  ]
+})
+
 let { $togglePopup, $API } = useNuxtApp();
 
 const store = useSocketStore(),

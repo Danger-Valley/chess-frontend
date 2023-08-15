@@ -204,6 +204,25 @@ import IconEdit from "@/assets/imgs/edit.svg"
 import { useUserStore } from "~/stores/user"
 import { WalletModalProvider, useWallet } from "solana-wallets-vue";
 
+useHead({
+  title: 'Profile - xChess',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'xChess - community-driven web3 chess platform'
+    }, {
+      property: 'twitter:title',
+      content: 'xChess - community-driven web3 chess platform'
+    },{
+      property: 'description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    },{
+      property: 'og:description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }
+  ]
+})
+
 let chosenTabIndex = ref(0),
   walletModalProviderRef = ref(),
   PFPPopupref = ref()

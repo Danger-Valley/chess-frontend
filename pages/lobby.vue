@@ -72,7 +72,7 @@
       </div>
 
       <div class="block block--double event-2">
-        <div class="event-2__heading">To be announced</div>
+        <div class="event-2__heading">Team Tournaments<br/>are coming...</div>
         <img
           src="@/assets/imgs/lobby_piece_1.png"
           class="event-2__image"
@@ -100,6 +100,25 @@
 <script setup>
 import NoGamesIcon from "@/assets/imgs/no-icon.svg"
 import { useUserStore } from "~/stores/user";
+
+useHead({
+  title: 'Lobby - xChess',
+  meta: [
+    {
+      property: 'og:title',
+      content: 'xChess - community-driven web3 chess platform'
+    }, {
+      property: 'twitter:title',
+      content: 'xChess - community-driven web3 chess platform'
+    },{
+      property: 'description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    },{
+      property: 'og:description',
+      content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }
+  ]
+})
 
 let { $togglePopup, $API } = useNuxtApp();
 
