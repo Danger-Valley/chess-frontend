@@ -9,13 +9,18 @@ export const useMixpanelStore = defineStore('mixpanel', () => {
     
     let env = useRuntimeConfig();
     mixpanel.init(env.public.MIXPANEL_TOKEN, { debug: true });
+    console.log('init')
     isInited.value = true;
     mixpanel.track('Init');
+    console.log('track init')
     identify()
   }
 
   function identify() {
-    if (isInited.value && process.client && localStorage.getItem("userId")) mixpanel.identify(localStorage.getItem("userId"));
+    if (isInited.value && process.client && localStorage.getItem("userId")) {
+      mixpanel.identify(localStorage.getItem("userId"));
+      console.log('identify')
+    }
   }
 
   return { init, identify }
