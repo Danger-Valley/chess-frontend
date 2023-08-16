@@ -114,7 +114,7 @@
           </div>
           <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
           <div>{{ rank.score }}</div>
-          <div>{{ rank.score }}</div>
+          <div>{{ rank.team }}</div>
           <div>{{ rank.reward }}</div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 <template>
   <ClientOnly>
     <div class="page">
-      <Header></Header>
+      <Header :isAI="isAI"></Header>
 
       <main class="main">
 
@@ -66,7 +66,10 @@
           <div class="event-1__underheading">Play ranked games 24/7, complete with high-skilled players, and earn your
             rank.
           </div>
-          <NuxtLink class="event-1__text" to="/events/arena">Compete Now</NuxtLink>
+          <NuxtLink
+            class="event-1__text"
+            to="/events/arena"
+          >Compete Now</NuxtLink>
         </div>
 
         <div class="block event-1">
@@ -94,12 +97,6 @@
         </div>
       </main>
 
-      <PopupsLobbySearch ref="GameSearchPopupRef" />
-      <PopupsLobbySettings
-        ref="GameSettingsPopupRef"
-        :isAI="isAI"
-        @play-now="openGameSearchPopup"
-      />
       <PopupsSetUsername />
     </div>
   </ClientOnly>
@@ -131,36 +128,15 @@ useHead({
   ]
 })
 
-if (!useUserStore().getUser.value?.id) await navigateTo('/')
-
 let { $togglePopup, $API } = useNuxtApp();
 
 let lobby = ref(),
-  GameSearchPopupRef = ref(),
-  GameSettingsPopupRef = ref(),
   isAI = ref(false)
 
-const openGameSearchPopup = async () => {
-  //localStorage.setItem('autoJoin', true);
-  $togglePopup('GameSearchPopup')
-  GameSearchPopupRef.value.startTimeTracking()
-  let body = {
-    mode: GameSettingsPopupRef.value.gameMode,
-    accessToken: localStorage.getItem('accessToken'),
-    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0,
-    isAI: GameSettingsPopupRef.value.playWith == 2
-  }
-  if (GameSettingsPopupRef.value.color) body = {
-    ...body,
-    color: GameSettingsPopupRef.value.color
-  }
-  let resp = await $API().Chess.find_create(body);
-  body = await resp.json();
-  console.log(body);
-  await navigateTo(`game/${body.game.id}`)
-}
-
 onMounted(async () => {
+  console.log('redirect could be here')
+  //if (!useUserStore().getUser.value?.id) await navigateTo('/')
+
   if (useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
@@ -555,5 +531,4 @@ onMounted(async () => {
       order: 0;
     }
   }
-}
-</style>
+}</style>

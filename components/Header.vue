@@ -15,7 +15,7 @@
           <div class="animation__bg"></div>
         </div>
         <div>
-          {{ activeBoards || 0 }} active board{{activeBoards != 1 ? 's' : ''}}
+          {{ activeBoards || 0 }} active board{{ activeBoards != 1 ? 's' : '' }}
         </div>
       </div>
 
@@ -39,7 +39,7 @@
           </div>
           <div
             class="profile profile--desktop"
-            @click="navigateTo('/profile')"
+            @click="isClosed = !isClosed"
           >
             <img
               class="profile__avatar"
@@ -70,51 +70,52 @@
             >
               Close
             </div>
-            <NuxtLink
+            <div
               v-if="user"
               class="menu__item profile profile--mobile"
-              to="/profile"
             >
               <img
                 class="profile__avatar"
                 :src="user.avatar"
               />
               <div class="profile__name">{{ user.username || user.email }}</div>
-            </NuxtLink>
+            </div>
             <NuxtLink
+              v-if="user"
               class="menu__item"
               to="/lobby"
             >Lobby</NuxtLink>
             <NuxtLink
+              v-if="user"
               class="menu__item"
-              to=""
-            >Leaderboard</NuxtLink>
+              to="/profile"
+            >Profile</NuxtLink>
             <NuxtLink
               class="menu__item"
-              to=""
-            >Tournaments</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
-            >Chess tv</NuxtLink>
-            <NuxtLink
-              class="menu__item"
-              to=""
+              to="https://docs.xchess.io"
             >Wiki</NuxtLink>
-            <NuxtLink
+            <div
+              v-if="user"
               class="menu__item menu__item--action"
-              to=""
-              @click="meme"
+              @click="$togglePopup('GameSettingsPopup')"
             >
               <div>Create game</div>
               <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
-            </NuxtLink>
+            </div>
 
             <div
               class="menu__item menu__item--signin"
               @click="singIn"
+              v-if="!user"
             >
               Sign In
+            </div>
+            <div
+              class="menu__item menu__item--logout"
+              @click="store.logout"
+              v-else
+            >
+              Logout
             </div>
           </div>
         </div>
@@ -124,6 +125,13 @@
   </header>
 
   <PopupsSignIn></PopupsSignIn>
+
+  <PopupsLobbySearch ref="GameSearchPopupRef" />
+  <PopupsLobbySettings
+    ref="GameSettingsPopupRef"
+    :isAI="props.isAI"
+    @play-now="openGameSearchPopup"
+  />
 </template>
 
 <script setup>
@@ -136,15 +144,39 @@ let activeBoards = ref(),
   // for mobile
   isToggled = ref(false),
   // for desktop
-  isClosed = ref(false)
+  isClosed = ref(false),
+  GameSearchPopupRef = ref(),
+  GameSettingsPopupRef = ref()
+
+const props = defineProps(['isAI'])
 
 const store = useUserStore()
 
 const user = computed(() => store.getUser.value)
 
 watch(user, async (newVal, oldVal) => {
-  if(!oldVal?.id && user.value?.id) await navigateTo('/lobby')
+  if (!oldVal?.id && user.value?.id) await navigateTo('/lobby')
 })
+
+const openGameSearchPopup = async () => {
+  //localStorage.setItem('autoJoin', true);
+  $togglePopup('GameSearchPopup')
+  GameSearchPopupRef.value.startTimeTracking()
+  let body = {
+    mode: GameSettingsPopupRef.value.gameMode,
+    accessToken: localStorage.getItem('accessToken'),
+    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0,
+    isAI: GameSettingsPopupRef.value.playWith == 2
+  }
+  if (GameSettingsPopupRef.value.color) body = {
+    ...body,
+    color: GameSettingsPopupRef.value.color
+  }
+  let resp = await $API().Chess.find_create(body);
+  body = await resp.json();
+  console.log(body);
+  await navigateTo(`game/${body.game.id}`)
+}
 
 const toggleMenu = () => {
   // TODO get var from scss?
@@ -153,12 +185,6 @@ const toggleMenu = () => {
 
 const singIn = async () => {
   if (!user.value) $togglePopup('SignInPopup')
-}
-
-function meme() {
-  document.querySelectorAll('div, a, span').forEach(el => {
-    if (el.innerHTML && !el.innerHTML.includes('<')) el.textContent = 'hehe'
-  })
 }
 
 onMounted(async () => {
@@ -277,7 +303,6 @@ onMounted(async () => {
   flex-direction: column;
   width: 213px;
   padding: 16px 20px;
-  background: radial-gradient(136px 60.5px at 24px 255px, #{$color1}1a 0%, #{$color1}00 100%), rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(50px);
   border-radius: 20px;
@@ -292,17 +317,18 @@ onMounted(async () => {
 
   &--logged {
     align-self: flex-start;
-    background: radial-gradient(136px 60.5px at 24px 255px, #{$color1}1a 0%, #{$color1}00 100%), rgba(255, 255, 255, 0.05);
+    background: radial-gradient(136px 60.5px at 24px 195px, #{$color1}1a 0%, #{$color1}00 100%),
+    rgba(255, 255, 255, 0.05);
   }
 
   &__list {
     &-wrapper {
-      height: 304px;
+      height: 126px;
       transition: .5s height;
       overflow: hidden;
 
       &--logged {
-        height: 218px;
+        height: 210px;
 
         .menu__item--signin {
           height: 0;
@@ -351,8 +377,9 @@ onMounted(async () => {
       color: $color1;
     }
 
-    &--signin {
-      margin-top: 62px;
+    &--signin,
+    &--logout {
+      margin-top: 20px;
     }
   }
 }

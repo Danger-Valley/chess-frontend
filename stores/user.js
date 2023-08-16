@@ -23,6 +23,11 @@ export const useUserStore = defineStore('user', () => {
     socket.emit('auth', JSON.stringify({ accessToken }))
   }
 
+  async function logout() {
+    localStorage.removeItem('accessToken')
+    user.value = null;
+  }
+
   async function updateUser(objToPass) {
     let accessToken = localStorage.getItem('accessToken')
 
@@ -53,5 +58,5 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  return { getUser, getWallets, saveUser, obtainUser, updateUser, saveWallets }
+  return { getUser, getWallets, saveUser, obtainUser, updateUser, saveWallets, logout }
 })
