@@ -134,7 +134,6 @@ let lobby = ref(),
   isAI = ref(false)
 
 onMounted(async () => {
-  console.log('redirect is be here')
   if (!useUserStore().getUser.value?.id) await navigateTo('/')
 
   if (useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
