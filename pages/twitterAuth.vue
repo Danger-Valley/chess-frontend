@@ -26,10 +26,8 @@ onMounted(async () => {
     console.log(body);
 
     if (body.errors) {
-      return console.error(body);
-    }
-
-    await userStore.saveUser(body.accessToken)
+      console.error(body);
+    } else await userStore.saveUser(body.accessToken)
   }
   else if (localStorage.getItem("connectType") == 'update') {
     await userStore.updateUser({ twitter: { authCode: code, codeChallenge: localStorage.getItem("codeChallenge") } })

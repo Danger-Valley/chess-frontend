@@ -1,100 +1,108 @@
 <template>
-  <div class="page">
-    <Header></Header>
+  <ClientOnly>
+    <div class="page">
+      <Header></Header>
 
-    <main class="main">
+      <main class="main">
 
-      <div class="heading">Rating</div>
-      <div class="heading">Active games</div>
-      <div class="heading">Daily missions</div>
-      <div class="heading">Arena</div>
+        <div class="heading">Rating</div>
+        <div class="heading">Active games</div>
+        <div class="heading">Daily missions</div>
+        <div class="heading">Arena</div>
 
-      <div class="block rating">
-        <template v-if="lobby?.user.rating != null">
-          <div class="rating__points">{{ lobby.user.rating }}</div>
-          <div class="rating__text">Leaderboard position</div>
-          <div class="rating__position">
-            #{{ lobby?.user.leaderboard.position }}
-            <span class="rating__max"> / {{ lobby?.user.leaderboard.total }}</span>
-          </div>
-        </template>
-        <template v-else>
-          <div class="rating__points">{rank}</div>
-          <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more ranked {{ lobby?.user.rank.gamesLeftTillRank==1 ? 'game' : 'games' }} to get your rank
-          </div>
-          <div class="rating__position">
-            {{ 30 - lobby?.user.rank.gamesLeftTillRank }}
-            <span class="rating__max"> / 30</span>
-          </div>
-        </template>
-      </div>
-
-      <div class="block active-games">
-        <template v-if="lobby?.activeGames?.length">
-          <div
-            class="game"
-            v-for="(game, counter) in lobby.activeGames"
-          >
-            <div
-              v-if="counter != 0"
-              class="game__hr"
-            ></div>
-            <div class="game__name">{{ game.title }}</div>
-            <div
-              class="game__btn"
-              @click="navigateTo(`game/${game.gameId}`)"
-            >Open</div>
-          </div>
-        </template>
-        <div
-          class="active-games__empty"
-          v-else
-        >
-          <NoGamesIcon></NoGamesIcon>
-          No active games
+        <div class="block rating">
+          <template v-if="lobby?.user.rating != null">
+            <div class="rating__points">{{ lobby.user.rating }}</div>
+            <div class="rating__text">Leaderboard position</div>
+            <div class="rating__position">
+              #{{ lobby?.user.leaderboard.position }}
+              <span class="rating__max"> / {{ lobby?.user.leaderboard.total }}</span>
+            </div>
+          </template>
+          <template v-else>
+            <div class="rating__points">{rank}</div>
+            <div class="rating__text">You have to win {{ lobby?.user.rank.gamesLeftTillRank }} more ranked {{
+              lobby?.user.rank.gamesLeftTillRank == 1 ? 'game' : 'games' }} to get your rank
+            </div>
+            <div class="rating__position">
+              {{ 30 - lobby?.user.rank.gamesLeftTillRank }}
+              <span class="rating__max"> / 30</span>
+            </div>
+          </template>
         </div>
-      </div>
 
-      <div class="block">
-        <div class="block__double">Coming soon</div>
-      </div>
+        <div class="block active-games">
+          <template v-if="lobby?.activeGames?.length">
+            <div
+              class="game"
+              v-for="(game, counter) in lobby.activeGames"
+            >
+              <div
+                v-if="counter != 0"
+                class="game__hr"
+              ></div>
+              <div class="game__name">{{ game.title }}</div>
+              <div
+                class="game__btn"
+                @click="navigateTo(`game/${game.gameId}`)"
+              >Open</div>
+            </div>
+          </template>
+          <div
+            class="active-games__empty"
+            v-else
+          >
+            <NoGamesIcon></NoGamesIcon>
+            No active games
+          </div>
+        </div>
 
-      <div class="block event-1">
-        <div class="event-1__heading">24/7</div>
-        <div class="event-1__underheading">Play ranked games 24/7, complete with high-skilled players, and earn your rank.</div>
-        <div class="event-1__text">Compete Now</div>
-      </div>
+        <div class="block">
+          <div class="block__double">Coming soon</div>
+        </div>
 
-      <div class="block event-1">
-        <div class="event-1__heading">AI</div>
-        <div class="event-1__underheading">Want to improve your Chess skills and play with the most powerful AI?</div>
-        <div class="event-1__text" @click="isAI = true; $togglePopup('GameSettingsPopup')">Play Now</div>
-      </div>
+        <div class="block event-1">
+          <div class="event-1__heading">24/7</div>
+          <div class="event-1__underheading">Play ranked games 24/7, complete with high-skilled players, and earn your
+            rank.
+          </div>
+          <NuxtLink class="event-1__text" to="/events/arena">Compete Now</NuxtLink>
+        </div>
 
-      <div class="block block--double event-2">
-        <div class="event-2__heading">Team Tournaments<br/>are coming...</div>
-        <img
-          src="@/assets/imgs/lobby_piece_1.png"
-          class="event-2__image"
-        />
-      </div>
+        <div class="block event-1">
+          <div class="event-1__heading">AI</div>
+          <div class="event-1__underheading">Want to improve your Chess skills and play with the most powerful AI?</div>
+          <div
+            class="event-1__text"
+            @click="isAI = true; $togglePopup('GameSettingsPopup')"
+          >Play Now</div>
+        </div>
 
-      <div
-        class="block play"
-        @click="isAI = false; $togglePopup('GameSettingsPopup')"
-      >
-        Play now
-      </div>
-    </main>
+        <div class="block block--double event-2">
+          <div class="event-2__heading">Team Tournaments<br />are coming...</div>
+          <img
+            src="@/assets/imgs/lobby_piece_1.png"
+            class="event-2__image"
+          />
+        </div>
 
-    <PopupsLobbySearch ref="GameSearchPopupRef"/>
-    <PopupsLobbySettings
-      ref="GameSettingsPopupRef"
-      :isAI="isAI"
-      @play-now="openGameSearchPopup"
-    />
-    <PopupsSetUsername/>
-  </div>
+        <div
+          class="block play"
+          @click="isAI = false; $togglePopup('GameSettingsPopup')"
+        >
+          Play now
+        </div>
+      </main>
+
+      <PopupsLobbySearch ref="GameSearchPopupRef" />
+      <PopupsLobbySettings
+        ref="GameSettingsPopupRef"
+        :isAI="isAI"
+        @play-now="openGameSearchPopup"
+      />
+      <PopupsSetUsername />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -110,15 +118,20 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'xChess - community-driven web3 chess platform'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })
+
+if (!useUserStore().getUser.value?.id) await navigateTo('/')
 
 let { $togglePopup, $API } = useNuxtApp();
 
@@ -148,7 +161,7 @@ const openGameSearchPopup = async () => {
 }
 
 onMounted(async () => {
-  if(useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
+  if (useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
@@ -425,7 +438,9 @@ onMounted(async () => {
   }
 
   .heading {
-    &:nth-of-type(3), &:nth-of-type(4){
+
+    &:nth-of-type(3),
+    &:nth-of-type(4) {
       display: none;
     }
   }
@@ -438,6 +453,7 @@ onMounted(async () => {
         display: none;
       }
     }
+
     &.play {
       position: fixed;
       left: 0;
@@ -539,4 +555,5 @@ onMounted(async () => {
       order: 0;
     }
   }
-}</style>
+}
+</style>

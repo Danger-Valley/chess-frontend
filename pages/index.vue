@@ -1,37 +1,39 @@
 <template>
-  <div class="page">
-    <Header></Header>
+  <ClientOnly>
+    <div class="page">
+      <Header></Header>
 
-    <main class="main">
-      <div class="main__heading">
-        CLASSIC CHESS. BUT DIFFERENT.
-      </div>
+      <main class="main">
+        <div class="main__heading">
+          CLASSIC CHESS. BUT DIFFERENT.
+        </div>
 
-      <div class="main__text">
-        <div>Get a </div>
-        <span id="text-effect">completely</span>
-        <div> another experience</div>
-      </div>
+        <div class="main__text">
+          <div>Get a </div>
+          <span id="text-effect">completely</span>
+          <div> another experience</div>
+        </div>
 
-      <NuxtLink
-        class="main__create-game link link--normal link--green"
-        to=""
-      >
-        <div>Create Game</div>
-        <IconArrow
-          class="link__arrow"
-          alt="arrow"
-        ></IconArrow>
-      </NuxtLink>
+        <NuxtLink
+          class="main__create-game link link--normal link--green"
+          to=""
+        >
+          <div>Create Game</div>
+          <IconArrow
+            class="link__arrow"
+            alt="arrow"
+          ></IconArrow>
+        </NuxtLink>
 
-      <img
-        class="main__img"
-        src="@/assets/imgs/white-king-min.png"
-      />
-    </main>
+        <img
+          class="main__img"
+          src="@/assets/imgs/white-king-min.png"
+        />
+      </main>
 
-    <Footer></Footer>
-  </div>
+      <Footer></Footer>
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -47,12 +49,15 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'xChess - community-driven web3 chess platform'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })
@@ -193,4 +198,5 @@ if (useUserStore().getUser.value?.id) await navigateTo('/lobby')
       margin-top: 40px;
     }
   }
-}</style>
+}
+</style>

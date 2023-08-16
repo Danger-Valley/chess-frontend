@@ -84,10 +84,6 @@ export default defineNuxtConfig({
         {
           property: 'fb:app_id',
           content: '811815390630618'
-        },
-        {
-          property: 'og:url',
-          content: '{REPLACE_WITH_CURRENT_URL}'
         }
       ]
     }

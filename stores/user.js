@@ -3,7 +3,7 @@ import { useSocketStore } from './socket'
 import { useMixpanelStore } from "@/stores/mixpanel"
 
 export const useUserStore = defineStore('user', () => {
-  let { $API, $getWallets, $connectWallet, $formatWallet } = useNuxtApp()
+  let { $API, $getWallets, $connectWallet, $formatWallet, $showToast } = useNuxtApp()
   const user = ref(),
     wallets = ref()
   const socket = useSocketStore()

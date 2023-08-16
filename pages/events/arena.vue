@@ -1,85 +1,98 @@
 <template>
-  <div class="page">
-    <Header></Header>
+  <ClientOnly>
+    <div class="page">
+      <Header></Header>
 
-    <div class="top">
-      <div class="top__heading">{{ arena?.event.title }}</div>
-      <div class="top__underheading">{{ arena?.event.description }}</div>
-      <div class="top__modes">
-        <div class="mode">
-          <GameModeFigure />
-          {{ foundGameMode?.name }}
-        </div>
-        <div class="mode">
-          <GameModeTime />
-          {{ foundGameMode?.dur }}
-        </div>
-        <div class="mode">
-          <GameModeCoins />
-          {{ arena?.event.participationFee }}
-        </div>
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info__block">{{ arena?.infoline }}</div>
-      <div class="info__block">{{ arena?.infoline }}</div>
-      <div class="info__block">{{ arena?.infoline }}</div>
-      <div class="info__block">{{ arena?.infoline }}</div>
-    </div>
-
-    <div
-      class="main"
-      v-if="arena"
-    >
-      <div class="register">
-        <div class="register__btn" v-if="!event?.isRegistered" @click="register">Register</div>
-        <div class="register__btn" v-else-if="new Date() < new Date(arena?.event.startAt)">Registered</div>
-        <div class="register__btn" v-else @click="play">Play Now</div>
-        <div class="progress">
-          <div class="progress__start">{{ formatDate(new Date(arena?.event.startAt)) }}</div>
-          <div class="progress__end">{{ formatDate(new Date(arena?.event.endAt)) }}</div>
-          <div class="progress__bar">
-            <div
-              class="progress__bar-active"
-              :style="`width: ${Math.max(Math.min((new Date(arena?.event.endAt) - dateNow) / (new Date(arena?.event.endAt) - new Date(arena?.event.startAt)), 100), 0)}%;`"
-            ></div>
+      <div class="top">
+        <div class="top__heading">{{ arena?.event.title }}</div>
+        <div class="top__underheading">{{ arena?.event.description }}</div>
+        <div class="top__modes">
+          <div class="mode">
+            <GameModeFigure />
+            {{ foundGameMode?.name }}
+          </div>
+          <div class="mode">
+            <GameModeTime />
+            {{ foundGameMode?.dur }}
+          </div>
+          <div class="mode">
+            <GameModeCoins />
+            {{ arena?.event.participationFee }}
           </div>
         </div>
-        <div class="prize">
-          <div class="prize__heading">Prize Pool</div>
-          <div class="prize__underheading">{{ arena?.event.prizePool.all }}</div>
-        </div>
       </div>
-    </div>
 
-    <div class="ranks">
-      <div class="ranks__heading">
-        <div>#</div>
-        <div>Username</div>
-        <div>W-D-L</div>
-        <div>Score</div>
-        <div>Reward</div>
+      <div class="info">
+        <div class="info__block">{{ arena?.infoline }}</div>
+        <div class="info__block">{{ arena?.infoline }}</div>
+        <div class="info__block">{{ arena?.infoline }}</div>
+        <div class="info__block">{{ arena?.infoline }}</div>
       </div>
+
       <div
-        class="rank"
-        v-for="(rank, counter) in participants"
+        class="main"
+        v-if="arena"
       >
-        <div>{{ counter + 1 }}</div>
-        <div>
-          <img
-            class="rank__avatar"
-            v-if="rank.user?.avatar"
-            :src="rank.user.avatar"
-          />
-          {{ rank.user.username }}
+        <div class="register">
+          <div
+            class="register__btn"
+            v-if="!arena?.event?.isRegistered"
+            @click="register"
+          >Register</div>
+          <div
+            class="register__btn register__btn--registered"
+            v-else-if="new Date() < new Date(arena?.event.startAt)"
+          >Registered</div>
+          <div
+            class="register__btn"
+            v-else
+            @click="play"
+          >Play Now</div>
+          <div class="progress">
+            <div class="progress__start">{{ formatDate(new Date(arena?.event.startAt)) }}</div>
+            <div class="progress__end">{{ formatDate(new Date(arena?.event.endAt)) }}</div>
+            <div class="progress__bar">
+              <div
+                class="progress__bar-active"
+                :style="`width: ${Math.max(Math.min((dateNow - new Date(arena?.event.startAt)) * 100 / (new Date(arena?.event.endAt) - new Date(arena?.event.startAt)), 100), 0)}%;`"
+              ></div>
+            </div>
+          </div>
+          <div class="prize">
+            <div class="prize__heading">Prize Pool</div>
+            <div class="prize__underheading">{{ arena?.event.prizePool.all }}</div>
+          </div>
         </div>
-        <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
-        <div>{{ rank.score }}</div>
-        <div>{{ rank.reward }}</div>
+      </div>
+
+      <div class="ranks">
+        <div class="ranks__heading">
+          <div>#</div>
+          <div>Username</div>
+          <div>W-D-L</div>
+          <div>Score</div>
+          <div>Reward</div>
+        </div>
+        <div
+          class="rank"
+          v-for="(rank, counter) in participants"
+        >
+          <div>{{ counter + 1 }}</div>
+          <div>
+            <img
+              class="rank__avatar"
+              v-if="rank.user?.avatar"
+              :src="rank.user.avatar"
+            />
+            {{ rank.user.username }}
+          </div>
+          <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
+          <div>{{ rank.score }}</div>
+          <div>{{ rank.reward }}</div>
+        </div>
       </div>
     </div>
-  </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -97,12 +110,15 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'xChess - community-driven web3 chess platform'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })
@@ -160,14 +176,14 @@ const register = async () => {
 }
 
 onMounted(async () => {
-  let resp = await $API().Events.getArena();
+  let resp = await $API().Events.getArena({ accessToken: localStorage.getItem('accessToken')});
   let body = await resp.json();
   console.log(body);
   arena.value = body;
   foundGameMode.value = findGameModeParams(body.event.gameMode);
   resp = await $API().Events.getLeaderboard({ id: body.event.id });
   body = await resp.json();
-  //participants.value = body.participants
+  participants.value = body.participants
   dateNow.value = new Date();
   setInterval(() => {
     dateNow.value = new Date()
@@ -294,6 +310,10 @@ onMounted(async () => {
     font-weight: 400;
     line-height: 100%;
     cursor: pointer;
+
+    &--registered{
+      background: #27F4BA;
+    }
   }
 }
 
@@ -331,7 +351,6 @@ onMounted(async () => {
       position: absolute;
       height: inherit;
       left: 0;
-      width: 60%;
       z-index: 2;
       border-radius: inherit;
       background: #1FA2F3;
@@ -447,5 +466,4 @@ onMounted(async () => {
       grid-template-columns: 20px 160px 50px 50px auto;
     }
   }
-}
-</style>
+}</style>

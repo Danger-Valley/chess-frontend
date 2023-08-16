@@ -100,10 +100,10 @@ class User {
     });
   }
 
-  async checkUsername({accessToken, username}) {
+  async checkUsername({ accessToken, username }) {
     return await fetch(`${this.localPath}/checkUsername`, {
       method: "POST",
-      body: JSON.stringify({username}),
+      body: JSON.stringify({ username }),
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
@@ -116,45 +116,45 @@ class User {
    * @param {Array} ids - array of ids of wanted users 
    */
   async getByIds(ids) {
-      return await fetch(`${this.localPath}/${ids.join(',')}`);
-    }
+    return await fetch(`${this.localPath}/${ids.join(',')}`);
+  }
 
   async update(accessToken, body) {
-      return await fetch(`${this.localPath}`, {
-        method: "POST",
-        /**
-         * body: {
-            username,
-            avatar,
-            twitter: {
-              twitterAuthCode, codeChallenge
-            },
-            discord: {
-              discordAuthCode
-            },
-            google: {
-              token
-            }
+    return await fetch(`${this.localPath}`, {
+      method: "POST",
+      /**
+       * body: {
+          username,
+          avatar,
+          twitter: {
+            twitterAuthCode, codeChallenge
           },
-         */
-        body: JSON.stringify(body),
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-    }
-
-  async delete (accessToken) {
-      return await fetch(`${this.localPath}`, {
-        method: "DELETE",
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`
-        }
-      });
-    }
+          discord: {
+            discordAuthCode
+          },
+          google: {
+            token
+          }
+        },
+       */
+      body: JSON.stringify(body),
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
   }
+
+  async delete(accessToken) {
+    return await fetch(`${this.localPath}`, {
+      method: "DELETE",
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 class Wallet {
   constructor(path) {
     this.localPath = `${path}/users`;
@@ -438,12 +438,20 @@ class Events {
     this.localPath = `${path}/events`;
   }
 
-  async getArena() {
-    return await fetch(`${this.localPath}/arena`);
+  async getArena({ accessToken }) {
+    return await fetch(`${this.localPath}/arena`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
   }
 
-  async getById({ id }) {
-    return await fetch(`${this.localPath}/${id}`);
+  async getById({ accessToken, id }) {
+    return await fetch(`${this.localPath}/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
   }
 
   async getLeaderboard({ id }) {
@@ -453,7 +461,7 @@ class Events {
   async register({ accessToken, id, teamId }) {
     return await fetch(`${this.localPath}/${id}/register`, {
       method: "POST",
-      body: teamId ? JSON.stringify({teamId}) : null,
+      body: teamId ? JSON.stringify({ teamId }) : null,
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`

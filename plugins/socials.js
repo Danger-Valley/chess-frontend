@@ -85,7 +85,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           let body = await resp.json();
 
           if (body.errors) {
-            //nuxtApp.$showToast(body.errors[0].message, "error");
+            nuxtApp.$showToast(body.errors[0].message, "error");
             return console.error(body);
           }
 

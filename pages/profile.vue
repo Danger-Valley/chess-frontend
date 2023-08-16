@@ -1,199 +1,202 @@
 <template>
-  <div class="page">
-    <Header></Header>
+  <ClientOnly>
+    <div class="page">
+      <Header></Header>
 
-    <main class="main">
-      <nav class="nav">
-        <div
-          v-for="(tab, counter) in ['Profile', 'Last games']"
-          class="nav__tab"
-          :class="{ 'nav__tab--active': counter == chosenTabIndex }"
-          @click="chooseTabIndex(counter)"
-        >
-          {{ tab }}
-        </div>
-      </nav>
-
-      <div class="content">
-        <template v-if="chosenTabIndex == 0">
-          <div class="tab">
-            <div class="tab__heading">Your name</div>
-            <div class="tab__item info">
-              <img
-                class="info__avatar"
-                :src="user?.avatar"
-                @click="PFPPopupref.open()"
-              />
-              <div
-                class="info__nickname"
-                id="nickname"
-              >{{ user.username || 'Your username' }}</div>
-              <IconEdit
-                class="info__edit"
-                @click="$togglePopup('SetUsernamePopup')"
-                title="Click to edit/save"
-              ></IconEdit>
-            </div>
+      <main class="main">
+        <nav class="nav">
+          <div
+            v-for="(tab, counter) in ['Profile', 'Last games']"
+            class="nav__tab"
+            :class="{ 'nav__tab--active': counter == chosenTabIndex }"
+            @click="chooseTabIndex(counter)"
+          >
+            {{ tab }}
           </div>
+        </nav>
 
-          <div class="tab">
-            <div class="tab__text">Verify your identity so we can easily message you about a giveaway or allowlist.</div>
-
-            <div class="tab__item">
-              <div
-                class="social"
-                :class="{ 'social--connected': user?.discordUser?.id }"
-                id="social-discord"
-                @click="$connectDiscord('update')"
-              >
-                <IconDiscord
-                  class="social__icon"
-                  alt="discord icon"
-                ></IconDiscord>
-                <div class="user">
-                  <template v-if="user?.discordUser">
-                    <img
-                      class="user__avatar"
-                      v-if="user.discordUser.avatar"
-                      :src="user.discordUser.avatar"
-                    />
-                    <div class="user__username">{{ user.discordUser.username }}</div>
-                    <div
-                      class="user__disconnect"
-                      @click.stop="$disconnectDiscord()"
-                    >Disconnect</div>
-                  </template>
-
-                  <template v-else>
-                    Connect Discord
-                  </template>
-                </div>
-              </div>
-
-              <div
-                class="social"
-                :class="{ 'social--connected': user?.twitterUser }"
-                id="social-twitter"
-                @click="$connectTwitter('update')"
-              >
-                <IconTwitter
-                  class="social__icon"
-                  alt="twitter icon"
-                ></IconTwitter>
-                <div class="user">
-                  <template v-if="user?.twitterUser">
-                    <img
-                      class="user__avatar"
-                      v-if="user.twitterUser.avatar"
-                      :src="user.twitterUser.avatar"
-                    />
-                    <div class="user__username">{{ user.twitterUser.username }}</div>
-                    <div
-                      class="user__disconnect"
-                      @click.stop="$disconnectTwitter()"
-                    >Disconnect</div>
-                  </template>
-
-                  <template v-else>
-                    Connect Twitter
-                  </template>
-                </div>
-              </div>
-
-              <div
-                class="social"
-                :class="{ 'social--connected': user?.googleUser }"
-                id="social-google"
-                @click="user?.googleUser ? null : login()"
-              >
-                <IconGoogle
-                  class="social__icon"
-                  alt="google icon"
-                ></IconGoogle>
-                <div class="user">
-                  <template v-if="user?.googleUser">
-                    <div class="user__username">{{ user.googleUser.email }}</div>
-                  </template>
-                  <template v-else>
-                    Connect Google
-                  </template>
-                </div>
+        <div class="content">
+          <template v-if="chosenTabIndex == 0">
+            <div class="tab">
+              <div class="tab__heading">Your name</div>
+              <div class="tab__item info">
+                <img
+                  class="info__avatar"
+                  :src="user?.avatar"
+                  @click="PFPPopupref.open()"
+                />
+                <div
+                  class="info__nickname"
+                  id="nickname"
+                >{{ user.username || 'Your username' }}</div>
+                <IconEdit
+                  class="info__edit"
+                  @click="$togglePopup('SetUsernamePopup')"
+                  title="Click to edit/save"
+                ></IconEdit>
               </div>
             </div>
-          </div>
 
-          <div class="tab">
-            <div class="tab__text">Add multiple wallets to verify token ownership.</div>
-            <div class="tab__item">
-              <div
-                class="wallet"
-                v-for="walletType in ['Solana']"
-              >
-                <div class="wallet__type">{{ walletType }} Wallets</div>
-                <div class="wallet__amount">{{ userWallets?.filter(el => el.blockchain.toUpperCase() ==
-                  walletType.toUpperCase())?.length || 0 }} Wallets Connected</div>
+            <div class="tab">
+              <div class="tab__text">Verify your identity so we can easily message you about a giveaway or allowlist.
+              </div>
+
+              <div class="tab__item">
                 <div
-                  class="wallet__connect"
-                  :class="{ 'wallet__connect--soon': walletType != 'Solana' }"
-                  @click="openWalletModalProvider(walletType)"
+                  class="social"
+                  :class="{ 'social--connected': user?.discordUser?.id }"
+                  id="social-discord"
+                  @click="$connectDiscord('update')"
                 >
-                  <template v-if="walletType == 'Solana'">
-                    Connect Wallet
-                  </template>
-                  <template v-else>Soon!</template>
+                  <IconDiscord
+                    class="social__icon"
+                    alt="discord icon"
+                  ></IconDiscord>
+                  <div class="user">
+                    <template v-if="user?.discordUser">
+                      <img
+                        class="user__avatar"
+                        v-if="user.discordUser.avatar"
+                        :src="user.discordUser.avatar"
+                      />
+                      <div class="user__username">{{ user.discordUser.username }}</div>
+                      <div
+                        class="user__disconnect"
+                        @click.stop="$disconnectDiscord()"
+                      >Disconnect</div>
+                    </template>
+
+                    <template v-else>
+                      Connect Discord
+                    </template>
+                  </div>
                 </div>
+
                 <div
-                  class="wallet__connected"
-                  v-if="walletType == 'Solana' && userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())?.length > 0"
-                  v-for="connectedWallet in userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())"
+                  class="social"
+                  :class="{ 'social--connected': user?.twitterUser }"
+                  id="social-twitter"
+                  @click="$connectTwitter('update')"
                 >
-                  <div class="connectedWallet">
-                    {{ $formatWallet(connectedWallet?.walletAddress) }}
-                    <svg
-                      @click="$disconnectWallet(connectedWallet?.id)"
-                      class="connectedWallet__delete"
-                      width="14"
-                      height="14"
-                      viewBox="0 0 14 14"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M12.8996 4.04973C10.7196 3.82973 8.51961 3.71973 6.32961 3.71973C5.02961 3.71973 3.72961 3.78972 2.43961 3.91972L1.09961 4.04973"
-                        stroke="#646669"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                  <IconTwitter
+                    class="social__icon"
+                    alt="twitter icon"
+                  ></IconTwitter>
+                  <div class="user">
+                    <template v-if="user?.twitterUser">
+                      <img
+                        class="user__avatar"
+                        v-if="user.twitterUser.avatar"
+                        :src="user.twitterUser.avatar"
                       />
-                      <path
-                        d="M4.70898 3.38994L4.84898 2.52994C4.94898 1.90994 5.02898 1.43994 6.13898 1.43994H7.85898C8.96898 1.43994 9.04897 1.92994 9.14897 2.52994L9.28897 3.37994"
-                        stroke="#646669"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                      <path
-                        d="M11.49 4.12988L11.06 10.7299C10.99 11.7599 10.93 12.5599 9.10001 12.5599H4.89C3.06 12.5599 2.99999 11.7599 2.92999 10.7299L2.5 4.12988"
-                        stroke="#646669"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
+                      <div class="user__username">{{ user.twitterUser.username }}</div>
+                      <div
+                        class="user__disconnect"
+                        @click.stop="$disconnectTwitter()"
+                      >Disconnect</div>
+                    </template>
+
+                    <template v-else>
+                      Connect Twitter
+                    </template>
+                  </div>
+                </div>
+
+                <div
+                  class="social"
+                  :class="{ 'social--connected': user?.googleUser }"
+                  id="social-google"
+                  @click="user?.googleUser ? null : login()"
+                >
+                  <IconGoogle
+                    class="social__icon"
+                    alt="google icon"
+                  ></IconGoogle>
+                  <div class="user">
+                    <template v-if="user?.googleUser">
+                      <div class="user__username">{{ user.googleUser.email }}</div>
+                    </template>
+                    <template v-else>
+                      Connect Google
+                    </template>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </template>
-      </div>
-    </main>
 
-    <WalletModalProvider
-      dark
-      ref="walletModalProviderRef"
-    ></WalletModalProvider>
+            <div class="tab">
+              <div class="tab__text">Add multiple wallets to verify token ownership.</div>
+              <div class="tab__item">
+                <div
+                  class="wallet"
+                  v-for="walletType in ['Solana']"
+                >
+                  <div class="wallet__type">{{ walletType }} Wallets</div>
+                  <div class="wallet__amount">{{ userWallets?.filter(el => el.blockchain.toUpperCase() ==
+                    walletType.toUpperCase())?.length || 0 }} Wallets Connected</div>
+                  <div
+                    class="wallet__connect"
+                    :class="{ 'wallet__connect--soon': walletType != 'Solana' }"
+                    @click="openWalletModalProvider(walletType)"
+                  >
+                    <template v-if="walletType == 'Solana'">
+                      Connect Wallet
+                    </template>
+                    <template v-else>Soon!</template>
+                  </div>
+                  <div
+                    class="wallet__connected"
+                    v-if="walletType == 'Solana' && userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())?.length > 0"
+                    v-for="connectedWallet in userWallets?.filter(el => el.blockchain.toUpperCase() == walletType.toUpperCase())"
+                  >
+                    <div class="connectedWallet">
+                      {{ $formatWallet(connectedWallet?.walletAddress) }}
+                      <svg
+                        @click="$disconnectWallet(connectedWallet?.id)"
+                        class="connectedWallet__delete"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 14 14"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M12.8996 4.04973C10.7196 3.82973 8.51961 3.71973 6.32961 3.71973C5.02961 3.71973 3.72961 3.78972 2.43961 3.91972L1.09961 4.04973"
+                          stroke="#646669"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M4.70898 3.38994L4.84898 2.52994C4.94898 1.90994 5.02898 1.43994 6.13898 1.43994H7.85898C8.96898 1.43994 9.04897 1.92994 9.14897 2.52994L9.28897 3.37994"
+                          stroke="#646669"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                        <path
+                          d="M11.49 4.12988L11.06 10.7299C10.99 11.7599 10.93 12.5599 9.10001 12.5599H4.89C3.06 12.5599 2.99999 11.7599 2.92999 10.7299L2.5 4.12988"
+                          stroke="#646669"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </main>
 
-    <PopupsProfileSelectAvatar ref="PFPPopupref"/>
-    <PopupsSetUsername :canClose="true"/>
-  </div>
+      <WalletModalProvider
+        dark
+        ref="walletModalProviderRef"
+      ></WalletModalProvider>
+
+      <PopupsProfileSelectAvatar ref="PFPPopupref" />
+      <PopupsSetUsername :canClose="true" />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -213,12 +216,15 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'xChess - community-driven web3 chess platform'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })
@@ -562,14 +568,15 @@ watch(user, () => {
 }
 
 @media screen and (max-width: #{map-get($sizes, "desktop-low") + px}) {
-  .content{
+  .content {
     flex-direction: column;
     align-items: center;
     gap: 40px;
   }
 }
+
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
-  .main{
+  .main {
     margin: 8px 50px;
   }
 }

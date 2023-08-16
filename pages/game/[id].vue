@@ -1,201 +1,203 @@
 <template>
-  <div class="page">
+  <ClientOnly>
+    <div class="page">
 
-    <NuxtLink
-      class="back-to-lobby"
-      to="/lobby"
-    >
-      <ArrowIcon />
-      Back to lobby
-    </NuxtLink>
+      <NuxtLink
+        class="back-to-lobby"
+        to="/lobby"
+      >
+        <ArrowIcon />
+        Back to lobby
+      </NuxtLink>
 
-    <main class="main">
-      <aside class="aside chat">
-        <div class="aside__heading aside__heading--uppercase">Chat</div>
-        <div class="aside__divider"></div>
-        <div class="chat__messages">
-          <div
-            v-for="message in messages"
-            class="message"
-          >
-            <div class="message__author">
-              <template v-if="message.userId == 'system'">System message</template>
-              <template v-else>
-                {{ message.userId == playerMe.id ? playerMe.user.username : playerOpponent.user.username }}
-              </template>
+      <main class="main">
+        <aside class="aside chat">
+          <div class="aside__heading aside__heading--uppercase">Chat</div>
+          <div class="aside__divider"></div>
+          <div class="chat__messages">
+            <div
+              v-for="message in messages"
+              class="message"
+            >
+              <div class="message__author">
+                <template v-if="message.userId == 'system'">System message</template>
+                <template v-else>
+                  {{ message.userId == playerMe.id ? playerMe.user.username : playerOpponent.user.username }}
+                </template>
+              </div>
+              <div class="message__text">{{ message.text }}</div>
             </div>
-            <div class="message__text">{{ message.text }}</div>
           </div>
-        </div>
-        <ClientOnly>
-          <div
-            class="chat__inputField"
-            v-if="userId && playerMe"
-          >
-            <input
-              class="chat__input"
-              type="text"
-              placeholder="Your message"
-              :disabled="userId !== playerMe.id"
-            />
-            <ChatSend
-              class="chat__send"
-              @click="sendMessage"
-            />
-          </div>
-        </ClientOnly>
-      </aside>
-
-      <div class="playboard">
-        <GamePlayer
-          class="player"
-          :player="playerOpponent"
-          :timer="timer.opponent"
-          :active="activeTimer == 'opponent'"
-        ></GamePlayer>
-
-        <TheChessboard
-          @move="afterMove"
-          v-if="canInit"
-          :board-config="boardConfig"
-          reactive-config
-          @board-created="(api) => { (boardAPI = api); initAfterBoardCreated() }"
-          :player-color="playerMe?.color == 'w' ? 'white' : 'black'"
-        />
-
-        <GamePlayer
-          class="player"
-          :player="playerMe"
-          :timer="timer.me"
-          :active="activeTimer == 'me'"
-        ></GamePlayer>
-      </div>
-
-      <aside class="aside info">
-        <div class="aside__heading">
-          Information
-          <DropdownArrowIcon></DropdownArrowIcon>
-        </div>
-        <div class="aside__divider"></div>
-        <div class="aside__heading">
-          History
-          <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
-        </div>
-        <div class="turns">
-          <div
-            class="turn"
-            v-for="(turn, counter) in turns"
-          >
+          <ClientOnly>
             <div
-              class="turn__counter"
-              v-if="counter % 2 == 0"
-            >{{ counter / 2 + 1 }}.</div>
+              class="chat__inputField"
+              v-if="userId && playerMe"
+            >
+              <input
+                class="chat__input"
+                type="text"
+                placeholder="Your message"
+                :disabled="userId !== playerMe.id"
+              />
+              <ChatSend
+                class="chat__send"
+                @click="sendMessage"
+              />
+            </div>
+          </ClientOnly>
+        </aside>
+
+        <div class="playboard">
+          <GamePlayer
+            class="player"
+            :player="playerOpponent"
+            :timer="timer.opponent"
+            :active="activeTimer == 'opponent'"
+          ></GamePlayer>
+
+          <TheChessboard
+            @move="afterMove"
+            v-if="canInit"
+            :board-config="boardConfig"
+            reactive-config
+            @board-created="(api) => { (boardAPI = api); initAfterBoardCreated() }"
+            :player-color="playerMe?.color == 'w' ? 'white' : 'black'"
+          />
+
+          <GamePlayer
+            class="player"
+            :player="playerMe"
+            :timer="timer.me"
+            :active="activeTimer == 'me'"
+          ></GamePlayer>
+        </div>
+
+        <aside class="aside info">
+          <div class="aside__heading">
+            Information
+            <DropdownArrowIcon></DropdownArrowIcon>
+          </div>
+          <div class="aside__divider"></div>
+          <div class="aside__heading">
+            History
+            <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
+          </div>
+          <div class="turns">
             <div
-              class="turn__item"
-              :class="{ 'turn__item--active': counter == activeTurnIndex - 1 }"
-            >{{ turn }}</div>
-          </div>
-        </div>
-
-        <div class="aside__divider aside__divider--bottom"></div>
-        <div class="panel">
-          <div
-            class="panel__container panel__container--hint"
-            @click="$togglePopup('GameHintsShopPopup')"
-          >
-            <Lightbulb class="panel__icon" />
-            <span>0</span>
+              class="turn"
+              v-for="(turn, counter) in turns"
+            >
+              <div
+                class="turn__counter"
+                v-if="counter % 2 == 0"
+              >{{ counter / 2 + 1 }}.</div>
+              <div
+                class="turn__item"
+                :class="{ 'turn__item--active': counter == activeTurnIndex - 1 }"
+              >{{ turn }}</div>
+            </div>
           </div>
 
-          <div
-            class="panel__container"
-            @click="$togglePopup('GameConfirmDrawPopup')"
-          >
-            <OneSlashTwo class="panel__icon" />
-          </div>
+          <div class="aside__divider aside__divider--bottom"></div>
+          <div class="panel">
+            <div
+              class="panel__container panel__container--hint"
+              @click="$togglePopup('GameHintsShopPopup')"
+            >
+              <Lightbulb class="panel__icon" />
+              <span>0</span>
+            </div>
 
-          <div
-            class="panel__container"
-            @click="$togglePopup('GameResignPopup')"
-          >
-            <Flag
-              class="panel__icon"
-              style="height: 100%; padding: 11px;"
-            />
-          </div>
+            <div
+              class="panel__container"
+              @click="$togglePopup('GameConfirmDrawPopup')"
+            >
+              <OneSlashTwo class="panel__icon" />
+            </div>
 
-          <div
-            class="panel__container"
-            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
-            @click="stepHistory(-2)"
-          >
-            <BackAll class="panel__icon" />
-          </div>
+            <div
+              class="panel__container"
+              @click="$togglePopup('GameResignPopup')"
+            >
+              <Flag
+                class="panel__icon"
+                style="height: 100%; padding: 11px;"
+              />
+            </div>
 
-          <div
-            class="panel__container"
-            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
-            @click="stepHistory(-1)"
-          >
-            <BackOne class="panel__icon" />
-          </div>
+            <div
+              class="panel__container"
+              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+              @click="stepHistory(-2)"
+            >
+              <BackAll class="panel__icon" />
+            </div>
 
-          <div
-            class="panel__container"
-            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
-            @click="stepHistory(1)"
-          >
-            <ForwardOne class="panel__icon" />
-          </div>
+            <div
+              class="panel__container"
+              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+              @click="stepHistory(-1)"
+            >
+              <BackOne class="panel__icon" />
+            </div>
 
-          <div
-            class="panel__container"
-            :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
-            @click="stepHistory(2)"
-          >
-            <ForwardAll class="panel__icon" />
-          </div>
-        </div>
-      </aside>
-    </main>
+            <div
+              class="panel__container"
+              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+              @click="stepHistory(1)"
+            >
+              <ForwardOne class="panel__icon" />
+            </div>
 
-    <PopupsGameBegins
-      :me="playerMe"
-      :opponent="playerOpponent"
-      :show="showBegins"
-    ></PopupsGameBegins>
-    <PopupsGameEnds
-      :me="playerMe"
-      :opponent="playerOpponent"
-      :whoWon="whoWon"
-      @find-game="$togglePopup('GameSettingsPopup')"
-    />
-    <PopupsGameConfirmDraw v-if="!isViewer" />
-    <PopupsGameIncomeDraw
-      v-if="!isViewer"
-      :opponent="playerOpponent"
-    />
-    <PopupsGameHintsShop v-if="!isViewer" />
-    <PopupsGameHint v-if="!isViewer" />
-    <PopupsGameResign v-if="!isViewer" />
-    <PopupsGameConfirmRevenge
-      :opponent="playerOpponent"
-      v-if="!isViewer"
-    />
-    <PopupsGameIncomeRevenge
-      :opponent="playerOpponent"
-      v-if="!isViewer"
-    />
-    <PopupsLobbySearch
-      ref="GameSearchPopupRef"
-      v-if="!isViewer"
-    />
-    <PopupsLobbySettings
-      ref="GameSettingsPopupRef"
-      @play-now="openGameSearchPopup"
-      v-if="!isViewer"
-    />
-  </div>
+            <div
+              class="panel__container"
+              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+              @click="stepHistory(2)"
+            >
+              <ForwardAll class="panel__icon" />
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <PopupsGameBegins
+        :me="playerMe"
+        :opponent="playerOpponent"
+        :show="showBegins"
+      ></PopupsGameBegins>
+      <PopupsGameEnds
+        :me="playerMe"
+        :opponent="playerOpponent"
+        :whoWon="whoWon"
+        @find-game="$togglePopup('GameSettingsPopup')"
+      />
+      <PopupsGameConfirmDraw v-if="!isViewer" />
+      <PopupsGameIncomeDraw
+        v-if="!isViewer"
+        :opponent="playerOpponent"
+      />
+      <PopupsGameHintsShop v-if="!isViewer" />
+      <PopupsGameHint v-if="!isViewer" />
+      <PopupsGameResign v-if="!isViewer" />
+      <PopupsGameConfirmRevenge
+        :opponent="playerOpponent"
+        v-if="!isViewer"
+      />
+      <PopupsGameIncomeRevenge
+        :opponent="playerOpponent"
+        v-if="!isViewer"
+      />
+      <PopupsLobbySearch
+        ref="GameSearchPopupRef"
+        v-if="!isViewer"
+      />
+      <PopupsLobbySettings
+        ref="GameSettingsPopupRef"
+        @play-now="openGameSearchPopup"
+        v-if="!isViewer"
+      />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -225,12 +227,15 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'Play Chess online for Free with Friends, Family, or AI - xChess'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })

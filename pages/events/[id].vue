@@ -1,112 +1,130 @@
 <template>
-  <div class="page">
-    <Header></Header>
+  <ClientOnly>
+    <div class="page">
+      <Header></Header>
 
-    <div class="top">
-      <div class="top__heading">{{ event?.event.title }}</div>
-      <div class="top__underheading">{{ event?.event.description }}</div>
-      <div class="top__modes">
-        <div class="mode">
-          <GameModeFigure />
-          {{ foundGameMode?.name }}
-        </div>
-        <div class="mode">
-          <GameModeTime />
-          {{ foundGameMode?.dur }}
-        </div>
-        <div class="mode">
-          <GameModeCoins />
-          {{ event?.event.participationFee }}
-        </div>
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info__block">{{ event?.infoline }}</div>
-      <div class="info__block">{{ event?.infoline }}</div>
-      <div class="info__block">{{ event?.infoline }}</div>
-      <div class="info__block">{{ event?.infoline }}</div>
-    </div>
-
-    <div
-      class="main"
-      v-if="event"
-    >
-      <div class="register">
-        <div class="register__btn" v-if="!event?.isRegistered" @click="$togglePopup('ChooseTeamPopup')">Register</div>
-        <div class="register__btn" v-else-if="new Date() < new Date(event?.event.startAt)">Registered</div>
-        <div class="register__btn" v-else @click="play">Play Now</div>
-        <div class="progress">
-          <div class="progress__start">{{ formatDate(new Date(event?.event.startAt)) }}</div>
-          <div class="progress__end">{{ formatDate(new Date(event?.event.endAt)) }}</div>
-          <div class="progress__bar">
-            <div
-              class="progress__bar-active"
-              :style="`width: ${Math.max(Math.min((new Date(event?.event.endAt) - dateNow) / (new Date(event?.event.endAt) - new Date(event?.event.startAt)), 100), 0)}%;`"
-            ></div>
+      <div class="top">
+        <div class="top__heading">{{ event?.event.title }}</div>
+        <div class="top__underheading">{{ event?.event.description }}</div>
+        <div class="top__modes">
+          <div class="mode">
+            <GameModeFigure />
+            {{ foundGameMode?.name }}
           </div>
-        </div>
-        <div class="prize">
-          <div class="prize__heading">Prize Pool</div>
-          <div class="prize__underheading">{{ event?.event.prizePool.all }}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="teams">
-      <div
-        class="team"
-        v-for="team in event?.event?.teams"
-      >
-        <img
-          class="team__logo"
-          :src="team?.image"
-        />
-        <div class="team__text">
-          <div class="team__heading">{{ team.name }}</div>
-          <div class="team__info">
-            Score: {{ team.score }}
-            <br />
-            Participants: {{ team.participantsCount }}
-            <br />
-            Games played: {{ team.winsCount + team.losesCount + team.drawsCount }}
-            <br />
-            Win rate: {{ (team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) }}
-            <br />
+          <div class="mode">
+            <GameModeTime />
+            {{ foundGameMode?.dur }}
+          </div>
+          <div class="mode">
+            <GameModeCoins />
+            {{ event?.event.participationFee }}
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="ranks">
-      <div class="ranks__heading">
-        <div>#</div>
-        <div>Username</div>
-        <div>W-D-L</div>
-        <div>Score</div>
-        <div>Reward</div>
+      <div class="info">
+        <div class="info__block">{{ event?.infoline }}</div>
+        <div class="info__block">{{ event?.infoline }}</div>
+        <div class="info__block">{{ event?.infoline }}</div>
+        <div class="info__block">{{ event?.infoline }}</div>
       </div>
+
       <div
-        class="rank"
-        v-for="(rank, counter) in participants"
+        class="main"
+        v-if="event"
       >
-        <div>{{ counter + 1 }}</div>
-        <div>
+        <div class="register">
+          <div
+            class="register__btn"
+            v-if="!event?.isRegistered"
+            @click="$togglePopup('ChooseTeamPopup')"
+          >Register</div>
+          <div
+            class="register__btn register__btn--registered"
+            v-else-if="new Date() < new Date(event?.event.startAt)"
+          >Registered</div>
+          <div
+            class="register__btn"
+            v-else
+            @click="play"
+          >Play Now</div>
+          <div class="progress">
+            <div class="progress__start">{{ formatDate(new Date(event?.event.startAt)) }}</div>
+            <div class="progress__end">{{ formatDate(new Date(event?.event.endAt)) }}</div>
+            <div class="progress__bar">
+              <div
+                class="progress__bar-active"
+                :style="`width: ${Math.max(Math.min((dateNow - new Date(event?.event.startAt)) * 100 / (new Date(event?.event.endAt) - new Date(event?.event.startAt)), 100), 0)}%;`"
+              ></div>
+            </div>
+          </div>
+          <div class="prize">
+            <div class="prize__heading">Prize Pool</div>
+            <div class="prize__underheading">{{ event?.event.prizePool.all }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="teams">
+        <div
+          class="team"
+          v-for="team in event?.event?.teams"
+        >
           <img
-            class="rank__avatar"
-            v-if="rank.user?.avatar"
-            :src="rank.user.avatar"
+            class="team__logo"
+            :src="team?.image"
           />
-          {{ rank.user.username }}
+          <div class="team__text">
+            <div class="team__heading">{{ team.name }}</div>
+            <div class="team__info">
+              Score: {{ team.score }}
+              <br />
+              Participants: {{ team.participantsCount }}
+              <br />
+              Games played: {{ team.winsCount + team.losesCount + team.drawsCount }}
+              <br />
+              Win rate: {{ (team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) }}
+              <br />
+            </div>
+          </div>
         </div>
-        <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
-        <div>{{ rank.score }}</div>
-        <div>{{ rank.reward }}</div>
       </div>
-    </div>
 
-    <PopupsChooseTeam :teams="event?.event.teams" @register="register"/>
-  </div>
+      <div class="ranks">
+        <div class="ranks__heading">
+          <div>#</div>
+          <div>Username</div>
+          <div>W-D-L</div>
+          <div>Score</div>
+          <div>Team</div>
+          <div>Rewards</div>
+        </div>
+        <div
+          class="rank"
+          v-for="(rank, counter) in participants"
+        >
+          <div>{{ counter + 1 }}</div>
+          <div>
+            <img
+              class="rank__avatar"
+              v-if="rank.user?.avatar"
+              :src="rank.user.avatar"
+            />
+            {{ rank.user.username }}
+          </div>
+          <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
+          <div>{{ rank.score }}</div>
+          <div>{{ rank.score }}</div>
+          <div>{{ rank.reward }}</div>
+        </div>
+      </div>
+
+      <PopupsChooseTeam
+        :teams="event?.event.teams"
+        @register="register"
+      />
+    </div>
+  </ClientOnly>
 </template>
 
 <script setup>
@@ -124,12 +142,15 @@ useHead({
     }, {
       property: 'twitter:title',
       content: 'xChess - community-driven web3 chess platform'
-    },{
+    }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
-    },{
+    }, {
       property: 'og:description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
+    }, {
+      property: 'og:url',
+      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
     }
   ]
 })
@@ -188,7 +209,7 @@ const register = async (teamId) => {
 }
 
 onMounted(async () => {
-  let resp = await $API().Events.getById({ id: useRoute().params.id });
+  let resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
   let body = await resp.json();
   console.log(body);
   event.value = body;
@@ -322,6 +343,10 @@ onMounted(async () => {
     font-weight: 400;
     line-height: 100%;
     cursor: pointer;
+
+    &--registered {
+      background: #27F4BA;
+    }
   }
 }
 
@@ -470,7 +495,7 @@ onMounted(async () => {
   &s {
     display: flex;
     flex-direction: column;
-    grid-template-columns: 50px 300px repeat(3, calc((100% - 350px - 20px * 4) / 3));
+    grid-template-columns: 50px 300px repeat(4, calc((100% - 350px - 20px * 5) / 4));
     font-family: "Space Mono";
     margin: 0 50px;
     max-height: 50vh;
@@ -498,7 +523,7 @@ onMounted(async () => {
     padding: 52px 20px;
   }
 
-  .main{
+  .main {
     padding: 20px;
   }
 
@@ -539,4 +564,5 @@ onMounted(async () => {
       grid-template-columns: 20px 160px 50px 50px auto;
     }
   }
-}</style>
+}
+</style>
