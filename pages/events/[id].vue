@@ -60,7 +60,7 @@
           </div>
           <div class="prize">
             <div class="prize__heading">Prize Pool</div>
-            <div class="prize__underheading">{{ event?.event.prizePool.all }}</div>
+            <div class="prize__underheading" v-html="event?.event.prizePool.all"></div>
           </div>
         </div>
       </div>
