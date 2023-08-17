@@ -123,7 +123,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
+      content: useRequestURL().href
     }
   ]
 })
@@ -134,6 +134,8 @@ let lobby = ref(),
   isAI = ref(false)
 
 onMounted(async () => {
+  console.log(useNuxtApp().ssrContext?.event.node.req.headers, useRequestURL());
+
   if (!useUserStore().getUser.value?.id) await navigateTo('/')
 
   if (useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')

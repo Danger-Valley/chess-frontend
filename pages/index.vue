@@ -57,12 +57,14 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
+      content: useRequestURL().href
     }
   ]
 })
 
-if (useUserStore().getUser.value?.id) await navigateTo('/lobby')
+onMounted(async () => {
+  if (useUserStore().getUser.value?.id) await navigateTo('lobby')
+})
 </script>
 
 <style lang="scss" scoped>

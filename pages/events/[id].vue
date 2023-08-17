@@ -150,7 +150,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useNuxtApp().ssrContext?.event?.node?.req?.headers?.host + useRoute().fullPath
+      content: useRequestURL().href
     }
   ]
 })
