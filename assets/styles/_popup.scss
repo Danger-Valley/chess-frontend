@@ -1,7 +1,8 @@
 .popup{
   &__wrapper{
-    position: absolute;
+    position: fixed;
     top: 0;
+    left: 0;
     z-index: -1;
     width: 100vw;
     height: 100vh;
@@ -36,5 +37,13 @@
     line-height: 100%;
     text-transform: uppercase;
     color: #FFFFFF;
+  }
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .popup{
+    min-width: unset !important;
+    max-width: calc(100vw);
+    margin-top: 40px;
   }
 }

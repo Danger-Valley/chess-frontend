@@ -81,13 +81,19 @@
           >Play Now</div>
         </div>
 
-        <div class="block block--double event-2">
+        <NuxtLink
+          class="block block--double event-2"
+          :to="`${lobby?.banner?.link}`"
+          :style="lobby?.banner?.image ? `backgroundImage: url(${bannerBg})` : ''"
+        >
+          <!--
           <div class="event-2__heading">Team Tournaments<br />are coming...</div>
           <img
             src="@/assets/imgs/lobby_piece_1.png"
             class="event-2__image"
           />
-        </div>
+          -->
+        </NuxtLink>
 
         <div
           class="block play"
@@ -123,7 +129,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useRequestURL().href
+      content: 'xchess.io' + useRequestURL().pathname
     }
   ]
 })
@@ -131,7 +137,8 @@ useHead({
 let { $togglePopup, $API } = useNuxtApp();
 
 let lobby = ref(),
-  isAI = ref(false)
+  isAI = ref(false),
+  bannerBg = ref()
 
 onMounted(async () => {
   console.log(useNuxtApp().ssrContext?.event.node.req.headers, useRequestURL());
@@ -147,6 +154,13 @@ onMounted(async () => {
   if (body.errors) return console.error(body.errors);
 
   lobby.value = body;
+
+  bannerBg.value = lobby.value?.banner?.image;
+
+  window.addEventListener('resize', () => {
+    if(window.innerWidth < 1440 && window.innerWidth > 833) bannerBg.value = lobby.value?.banner?.imageSquare;
+    else bannerBg.value = lobby.value?.banner?.image;
+  })
 })
 </script>
 
@@ -333,6 +347,9 @@ onMounted(async () => {
   flex-direction: row;
   gap: 10px;
   background: #000008;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   padding: 20px;
   overflow: hidden;
 
@@ -513,6 +530,7 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     gap: 25px;
+    padding-bottom: 120px;
   }
 
   .block {
@@ -532,4 +550,5 @@ onMounted(async () => {
       order: 0;
     }
   }
-}</style>
+}
+</style>

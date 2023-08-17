@@ -72,8 +72,10 @@
 import { useWallet, WalletModalProvider } from "solana-wallets-vue";
 import { Transaction } from "@solana/web3.js"
 
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 let { publicKey, readyState, connected, signTransaction, connect } = useWallet();
+
+let emits = defineEmits(['update'])
 
 let tokens = ref([]),
   selectedToken = ref(),
@@ -139,10 +141,22 @@ const purchase = async () => {
     body = await resp.json();
     console.log(body);
 
-    if (body.status == 'COMPLETED' || body.status == 'ERROR') {
+    if (body.status == 'COMPLETED') {
       clearInterval(int)
       waiting.value = false;
       success.value = true;
+      emits('update');
+      setTimeout(() => $togglePopup('GameHintsShopPopup'), 2000)
+      setTimeout(() => {
+        waiting.value = false;
+        success.value = false;
+      }, 3000)
+    }
+    else if(body.status == 'ERROR') {
+      clearInterval(int)
+      waiting.value = false;
+      success.value = false;
+      $showToast('Something went wrong. Try again.', 'error')
     }
   }, 5000)
 }

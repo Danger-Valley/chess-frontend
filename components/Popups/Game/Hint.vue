@@ -24,7 +24,24 @@
 </template>
 
 <script setup>
-let { $togglePopup } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
+
+let emits = defineEmits(['hint'])
+
+const useHint = async () => {
+  let resp = await $API().Chess.getHintForMove({
+    id: useRoute().params.id,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  conbsole.log(body);
+  if(body.errors) {
+    $showToast('Something went wrong. Try again.', 'error')
+    return console.error(body.errors[0].message);
+  }
+  emits('hint', body)
+  $togglePopup('GameHintPopup');
+}
 </script>
 
 <style lang="scss" scoped>

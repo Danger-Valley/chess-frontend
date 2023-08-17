@@ -105,7 +105,7 @@
 
             <div
               class="menu__item menu__item--signin"
-              @click="singIn"
+              @click="$togglePopup('SignInPopup')"
               v-if="!user"
             >
               Sign In
@@ -181,10 +181,6 @@ const openGameSearchPopup = async () => {
 const toggleMenu = () => {
   // TODO get var from scss?
   isToggled.value = !isToggled.value;
-}
-
-const singIn = async () => {
-  if (!user.value) $togglePopup('SignInPopup')
 }
 
 onMounted(async () => {
@@ -323,7 +319,7 @@ onMounted(async () => {
 
   &__list {
     &-wrapper {
-      height: 126px;
+      height: 92px;
       transition: .5s height;
       overflow: hidden;
 

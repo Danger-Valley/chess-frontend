@@ -178,4 +178,12 @@ onUnmounted(() => {
     margin-left: 5px;
     color: #ffffff4d;
   }
-}</style>
+}
+
+@media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
+  .content{
+    min-width: unset !important;
+    max-width: calc(100vw);
+  }
+}
+</style>

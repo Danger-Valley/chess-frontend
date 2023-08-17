@@ -64,7 +64,7 @@ let timeout = ref(5)
 let props = defineProps(['me', 'opponent', 'show'])
 
 watch(() => [props.opponent, props.show], () => {
-  if (props.show && props.opponent.joined) {
+  if (props.show && props.opponent?.joined) {
     console.time();
     let closeInterval = setInterval(() => {
 
@@ -78,7 +78,7 @@ watch(() => [props.opponent, props.show], () => {
       }
     }, 1000)
   }
-}, {deep: true})
+}, { deep: true })
 </script>
 
 <style lang="scss" scoped>

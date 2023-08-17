@@ -14,16 +14,16 @@
           <div> another experience</div>
         </div>
 
-        <NuxtLink
+        <div
           class="main__create-game link link--normal link--green"
-          to=""
+          @click="$togglePopup('SignInPopup')"
         >
           <div>Create Game</div>
           <IconArrow
             class="link__arrow"
             alt="arrow"
           ></IconArrow>
-        </NuxtLink>
+        </div>
 
         <img
           class="main__img"
@@ -57,7 +57,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useRequestURL().href
+      content: 'xchess.io'+useRequestURL().pathname
     }
   ]
 })

@@ -339,6 +339,15 @@ class Chess {
       }
     });
   }
+
+  async getHintForMove({ id, accessToken }) {
+    return await fetch(`${this.localPath}/${id}/hint`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
 }
 class Lobby {
   constructor(path) {

@@ -102,10 +102,10 @@
           <div class="panel">
             <div
               class="panel__container panel__container--hint"
-              @click="$togglePopup('GameHintsShopPopup')"
+              @click="hints == 0 ? $togglePopup('GameHintsShopPopup') : $togglePopup('GameHintPopup')"
             >
               <Lightbulb class="panel__icon" />
-              <span>0</span>
+              <span>{{ hints }}</span>
             </div>
 
             <div
@@ -176,8 +176,8 @@
         v-if="!isViewer"
         :opponent="playerOpponent"
       />
-      <PopupsGameHintsShop v-if="!isViewer" />
-      <PopupsGameHint v-if="!isViewer" />
+      <PopupsGameHintsShop @update="getHints" v-if="!isViewer" />
+      <PopupsGameHint @hint="useHint" v-if="!isViewer" />
       <PopupsGameResign v-if="!isViewer" />
       <PopupsGameConfirmRevenge
         :opponent="playerOpponent"
@@ -235,7 +235,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: useRequestURL().href
+      content: 'xchess.io'+useRequestURL().pathname
     }
   ]
 })
@@ -271,7 +271,8 @@ let boardConfig = reactive({}),
   GameSettingsPopupRef = ref(),
   showBegins = ref(false),
   isViewer = ref(true),
-  doTriggerAfterMove = false
+  doTriggerAfterMove = false,
+  hints = ref(0)
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -371,6 +372,10 @@ const join = async () => {
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
+  if(body.errors) {
+    console.error(body.errors[0].message)
+    return null
+  }
   console.log("Join: ", body);
   return body;
 }
@@ -397,6 +402,23 @@ const timerOpponentFunc = () => {
   }
 }
 
+const getHints = async () => {
+  let resp = await $API().User.getPaymentProfile(localStorage.getItem('accessToken'));
+  let body = await resp.json();
+  console.log(body);
+  hints.value = body.user.hintsCount;
+}
+
+const useHint = (e) => {
+  hints.value = e.user.hintsCount;
+  boardAPI.value.drawMove(e.from, e.to, 'blue');
+}
+
+const tryHint = () => {
+  console.log('draw move e4')
+  boardAPI.value.drawMove('e4', 'e6', 'blue');
+}
+
 onMounted(async () => {
   // get my user
   let meResp, meBody;
@@ -404,6 +426,8 @@ onMounted(async () => {
     meResp = await $API().User.get(localStorage.getItem('accessToken'))
     meBody = await meResp.json();
   }
+
+  await getHints();
 
   // socket func
   store.listen('game_event', async (resp) => {
@@ -545,7 +569,8 @@ onMounted(async () => {
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
   ) console.error('Two players have already joined the game');
   else if (localStorage.getItem('accessToken') && (!body.game.playerOne.joined || !body.game.playerTwo.joined)) {
-    body = await join();
+    let joinBody = await join();
+    if(joinBody) body = joinBody;
     game.value = body.game;
   }
 
@@ -598,6 +623,11 @@ onMounted(async () => {
     events: {
       move: (from, to, capture) => {
         console.log(from, to, capture)
+      }
+    },
+    drawable: {
+      brushes: {
+        blue: { key: 'b', color: '#1FA2F3', opacity: 1, lineWidth: 10 }
       }
     }
   }
@@ -969,6 +999,7 @@ onUnmounted(() => {
   .page {
     display: flex;
     flex-direction: column;
+    overflow: auto;
   }
 
   .back-to-lobby {
@@ -983,6 +1014,10 @@ onUnmounted(() => {
   .playboard {
     order: -1;
     height: auto;
+  }
+
+  .turns{
+    margin-bottom: 5px;
   }
 }
 </style>

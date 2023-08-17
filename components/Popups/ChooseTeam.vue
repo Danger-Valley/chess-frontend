@@ -30,7 +30,7 @@
       <div class="popup__actions">
         <div
           class="btn"
-          @click="emits('register', chosenTeam)"
+          @click="register"
         >Register</div>
         <div class="popup__actions-text">You won’t be able to change the team in future.</div>
       </div>
@@ -40,10 +40,25 @@
 
 <script setup>
 let props = defineProps(['teams'])
-let emits = defineEmits(['register'])
 
 let { $API, $togglePopup } = useNuxtApp();
+let emits = defineEmits(['register'])
 let chosenTeam = ref()
+
+const register = async () => {
+  let resp = await $API().Events.register({
+    accessToken: localStorage.getItem('accessToken'),
+    id: useRoute().params.id,
+    teamId
+  });
+  let body = await resp.json();
+  console.log(body);
+  if(body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+  emits('register')
+  $togglePopup('ChooseTeamPopup')
+}
 
 watch(() => props.teams, () => {
   chosenTeam.value = props?.teams?.[0].id
