@@ -8,7 +8,7 @@
       class="popup"
       @click.stop
     >
-      <div class="popup__heading">You have 3 hints left, would you like to use one?</div>
+      <div class="popup__heading">You have {{ props.hints }} hints left, would you like to use one?</div>
       <div class="popup__actions">
         <div
           class="button button--active"
@@ -26,6 +26,7 @@
 <script setup>
 let { $togglePopup, $API, $showToast } = useNuxtApp();
 
+let props = defineProps(['hints'])
 let emits = defineEmits(['hint'])
 
 const useHint = async () => {
@@ -34,7 +35,7 @@ const useHint = async () => {
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
-  conbsole.log(body);
+  console.log(body);
   if(body.errors) {
     $showToast('Something went wrong. Try again.', 'error')
     return console.error(body.errors[0].message);
@@ -77,6 +78,7 @@ const useHint = async () => {
   font-weight: 500;
   line-height: 100%;
   background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
 
   &--active{
     background: $color1;

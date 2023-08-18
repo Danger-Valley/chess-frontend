@@ -49,11 +49,11 @@ const register = async () => {
   let resp = await $API().Events.register({
     accessToken: localStorage.getItem('accessToken'),
     id: useRoute().params.id,
-    teamId
+    teamId: chosenTeam.value
   });
   let body = await resp.json();
   console.log(body);
-  if(body.errors) {
+  if (body.errors) {
     return $showToast(body.errors[0].message, 'error')
   }
   emits('register')
@@ -156,7 +156,7 @@ watch(() => props.teams, () => {
 }
 
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
-  .popup{
+  .popup {
     width: calc(100vw - 2 * 20px);
     margin: 200px 20px;
   }

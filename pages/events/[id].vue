@@ -205,6 +205,11 @@ const getLeaderboard = async () => {
   resp = await $API().Events.getLeaderboard({ id: event.value.event.id });
   body = await resp.json();
   participants.value = body.participants
+
+  let resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
+  let body = await resp.json();
+  console.log(body);
+  event.value = body;
 }
 
 onMounted(async () => {
@@ -580,4 +585,5 @@ onMounted(async () => {
       }
     }
   }
-}</style>
+}
+</style>

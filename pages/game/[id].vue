@@ -166,6 +166,7 @@
         :show="showBegins"
       ></PopupsGameBegins>
       <PopupsGameEnds
+        :isViewer="isViewer"
         :me="playerMe"
         :opponent="playerOpponent"
         :whoWon="whoWon"
@@ -176,8 +177,15 @@
         v-if="!isViewer"
         :opponent="playerOpponent"
       />
-      <PopupsGameHintsShop @update="getHints" v-if="!isViewer" />
-      <PopupsGameHint @hint="useHint" v-if="!isViewer" />
+      <PopupsGameHintsShop
+        @update="getHints"
+        v-if="!isViewer"
+      />
+      <PopupsGameHint
+        :hints="hints"
+        @hint="useHint"
+        v-if="!isViewer"
+      />
       <PopupsGameResign v-if="!isViewer" />
       <PopupsGameConfirmRevenge
         :opponent="playerOpponent"
@@ -235,7 +243,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: 'xchess.io'+useRequestURL().pathname
+      content: 'xchess.io' + useRequestURL().pathname
     }
   ]
 })
@@ -372,7 +380,7 @@ const join = async () => {
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
-  if(body.errors) {
+  if (body.errors) {
     console.error(body.errors[0].message)
     return null
   }
@@ -409,9 +417,10 @@ const getHints = async () => {
   hints.value = body.user.hintsCount;
 }
 
-const useHint = (e) => {
+const useHint = async (e) => {
   hints.value = e.user.hintsCount;
   boardAPI.value.drawMove(e.from, e.to, 'blue');
+  await getHints();
 }
 
 const tryHint = () => {
@@ -570,7 +579,7 @@ onMounted(async () => {
   ) console.error('Two players have already joined the game');
   else if (localStorage.getItem('accessToken') && (!body.game.playerOne.joined || !body.game.playerTwo.joined)) {
     let joinBody = await join();
-    if(joinBody) body = joinBody;
+    if (joinBody) body = joinBody;
     game.value = body.game;
   }
 
@@ -749,6 +758,14 @@ const initAfterBoardCreated = async () => {
   window.addEventListener("keydown", async (e) => {
     if (e.key == "Enter") await sendMessage();
   })
+
+  if (game.value.state.isGameOver) {
+    if (game.value.state.isDraw) return whoWon.value = 'draw';
+    else {
+      if (playerMe.value.id == game.value.state.winnerUserId) whoWon.value = 'me';
+      else if (playerOpponent.value.id == game.value.state.winnerUserId) whoWon.value = 'opponent';
+    }
+  }
 }
 
 onUnmounted(() => {
@@ -1016,7 +1033,7 @@ onUnmounted(() => {
     height: auto;
   }
 
-  .turns{
+  .turns {
     margin-bottom: 5px;
   }
 }

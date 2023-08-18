@@ -26,6 +26,7 @@ export const useUserStore = defineStore('user', () => {
   async function logout() {
     localStorage.removeItem('accessToken')
     user.value = null;
+    await navigateTo('/')
   }
 
   async function updateUser(objToPass) {

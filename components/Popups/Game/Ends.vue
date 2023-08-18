@@ -22,17 +22,9 @@
         >won!</div>
         <div
           class="player__rating"
-          v-if="false"
+          v-else-if="props.whoWon == 'draw'"
         >
-          <template v-if="props.whoWon == 'me'">
-            +25 rating
-          </template>
-          <template v-else-if="props.whoWon == 'opponent'">
-            -25 rating
-          </template>
-          <template v-else-if="props.whoWon == 'draw'">
-            draw
-          </template>
+          draw
         </div>
       </div>
 
@@ -51,23 +43,23 @@
         >won!</div>
         <div
           class="player__rating"
-          v-if="false"
+          v-else-if="props.whoWon == 'draw'"
         >
-          <template v-if="props.whoWon == 'me'">
-            -25 rating
-          </template>
-          <template v-else-if="props.whoWon == 'opponent'">
-            +25 rating
-          </template>
-          <template v-else-if="props.whoWon == 'draw'">
-            draw
-          </template>
+          draw
         </div>
       </div>
 
       <div class="actions">
-        <div class="button" @click="emits('findGame')">Find a new game</div>
-        <div class="button" @click="offerRevenge">Offer revenge</div>
+        <div
+          v-if="!isViewer"
+          class="button"
+          @click="emits('findGame')"
+        >Find a new game</div>
+        <div
+          v-if="!isViewer"
+          class="button"
+          @click="offerRevenge"
+        >Offer revenge</div>
         <div
           class="button"
           @click="$togglePopup('GameEndsPopup')"
@@ -80,12 +72,12 @@
 <script setup>
 let { $togglePopup, $API } = useNuxtApp();
 
-let props = defineProps(['me', 'opponent', 'whoWon'])
+let props = defineProps(['me', 'opponent', 'whoWon', 'isViewer'])
 let emits = defineEmits(['findGame'])
 
 watch(() => props.whoWon, () => {
   console.log(props.me, props.opponent, props.whoWon)
-  $togglePopup('GameEndsPopup');
+  document.querySelector(`#GameEndsPopup`).classList.add('popup__wrapper--active')
 })
 
 const offerRevenge = async () => {
@@ -176,4 +168,5 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}</style>
+}
+</style>
