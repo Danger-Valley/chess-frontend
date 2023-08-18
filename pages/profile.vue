@@ -224,7 +224,7 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: 'xchess.io'+useRequestURL().pathname
+      content: 'https://xchess.io'+useRequestURL().pathname
     }
   ]
 })
