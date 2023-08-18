@@ -30,6 +30,9 @@ let props = defineProps(['hints'])
 let emits = defineEmits(['hint'])
 
 const useHint = async () => {
+  $showToast("Talking to AI...", 'info')
+  $togglePopup('GameHintPopup');
+
   let resp = await $API().Chess.getHintForMove({
     id: useRoute().params.id,
     accessToken: localStorage.getItem('accessToken')
@@ -37,11 +40,10 @@ const useHint = async () => {
   let body = await resp.json();
   console.log(body);
   if(body.errors) {
-    $showToast('Something went wrong. Try again.', 'error')
+    $showToast(body.errors[0].message, 'error')
     return console.error(body.errors[0].message);
   }
   emits('hint', body)
-  $togglePopup('GameHintPopup');
 }
 </script>
 
