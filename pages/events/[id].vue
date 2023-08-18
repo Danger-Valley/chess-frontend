@@ -86,7 +86,7 @@
               <br />
               Games played: {{ team.winsCount + team.losesCount + team.drawsCount }}
               <br />
-              Win rate: {{ (team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) }}
+              Win rate: {{ (team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) }}%
               <br />
             </div>
           </div>
@@ -99,7 +99,7 @@
           <div>Username</div>
           <div>W-D-L</div>
           <div>Score</div>
-          <div>Team</div>
+          <div v-for="team in event?.event?.teams">Team</div>
           <div>Rewards</div>
         </div>
         <div
@@ -117,7 +117,7 @@
           </div>
           <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
           <div>{{ rank.score }}</div>
-          <div>{{ rank.team }}</div>
+          <div v-for="team in event?.event?.teams">{{ rank.team }}</div>
           <div>{{ rank.reward }}</div>
         </div>
       </div>
