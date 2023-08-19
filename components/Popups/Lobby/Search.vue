@@ -45,7 +45,7 @@ let startTime = ref(),
   searchTime = ref(0),
   searchTimeInterval = ref(),
   player = ref({
-    rating: '1423',
+    rating: '',
     country: ''
   })
 
