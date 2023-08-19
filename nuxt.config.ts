@@ -92,6 +92,7 @@ export default defineNuxtConfig({
     public: {
       API_URL: process.env.API_URL,
       MIXPANEL_TOKEN: process.env.MIXPANEL_TOKEN,
+      SOCKET_URL: process.env.SOCKET_URL,
       Discord: {
         redirect: {
           dev: process.env.DISCORD_REDIRECT_URL_DEV,

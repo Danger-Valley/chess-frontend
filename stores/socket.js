@@ -7,10 +7,11 @@ export const useSocketStore = defineStore('socket', () => {
 
   const socketGetter = computed(() => socket.value)
 
-  function init(url='https://socket-dev.thechess.io'){
+  function init(){
     if(socket.value) return;
 
-    socket.value = io(url)
+    let env = useRuntimeConfig();
+    socket.value = io(env.public.SOCKET_URL)
 
     socket.value.on('disconnect', () => {
       $showToast("DISCONNECT", 'error')
