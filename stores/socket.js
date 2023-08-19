@@ -11,7 +11,9 @@ export const useSocketStore = defineStore('socket', () => {
     if(socket.value) return;
 
     let env = useRuntimeConfig();
-    socket.value = io(env.public.SOCKET_URL)
+    socket.value = io(env.public.SOCKET_URL, {
+      transports: ["websocket"]
+    })
 
     socket.value.on('disconnect', () => {
       $showToast("DISCONNECT", 'error')
