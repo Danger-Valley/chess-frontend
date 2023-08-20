@@ -373,10 +373,10 @@ onMounted(async () => {
       color: $color1;
     }
 
-    &--signin,
-    &--logout {
-      margin-top: 20px;
-    }
+    // &--signin,
+    // &--logout {
+    //   margin-top: 20px;
+    // }
   }
 }
 
@@ -501,9 +501,9 @@ onMounted(async () => {
         margin-top: 118px;
       }
 
-      &--signin {
-        margin-top: 40px;
-      }
+      // &--signin {
+      //   margin-top: 40px;
+      // }
     }
 
     &__mobile-close {
