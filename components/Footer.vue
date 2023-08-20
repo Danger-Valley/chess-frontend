@@ -14,11 +14,11 @@
       </NuxtLink>
     </div>
 
-    <NuxtLink class="event link link--small link--gray" to="">
+    <!-- <NuxtLink class="event link link--small link--gray" to="">
       <div>5 days left before the championship</div>
 
       <IconArrow class="link__arrow" alt="arrow"/>
-    </NuxtLink>
+    </NuxtLink> -->
   </footer>
 </template>
 
