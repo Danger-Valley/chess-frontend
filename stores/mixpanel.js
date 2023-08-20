@@ -17,7 +17,8 @@ export const useMixpanelStore = defineStore('mixpanel', () => {
   }
 
   function identify() {
-    if (isInited.value && process.client && localStorage.getItem("userId")) {
+    if (isInited.value && process.client && localStorage && localStorage.getItem("userId")) {
+      console.log('identify: (' + localStorage.getItem("userId") + ')');
       mixpanel.identify(localStorage.getItem("userId"));
       console.log('identify')
     }
