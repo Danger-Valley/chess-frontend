@@ -15,9 +15,15 @@ export const useSocketStore = defineStore('socket', () => {
       transports: ["websocket"]
     })
 
-    socket.value.on('disconnect', () => {
+    socket.value.on('disconnect', (reason) => {
       connectionToast = $showToast("Reconnection...", 'info', 0);
       // $showToast("Check your internet connection and if this message won't be gone - please, refresh the page.", 'error')
+
+      if (reason === "io server disconnect") {
+        // the disconnection was initiated by the server, you need to reconnect manually
+        socket.value.connect();
+      }
+      // else the socket will automatically try to reconnect
     })
 
     socket.value.on('connect_error', () => {
