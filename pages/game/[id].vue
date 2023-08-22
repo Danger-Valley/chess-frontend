@@ -414,7 +414,7 @@ const getHints = async () => {
   let resp = await $API().User.getPaymentProfile(localStorage.getItem('accessToken'));
   let body = await resp.json();
   console.log(body);
-  hints.value = body.user.hintsCount;
+  hints.value = body?.user?.hintsCount || 0;
 }
 
 const useHint = async (e) => {
