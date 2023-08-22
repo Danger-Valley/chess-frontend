@@ -9,7 +9,7 @@
     </NuxtLink>
 
     <div class="header__mobile">
-      <div class="status">
+      <!-- <div class="status">
         <div class="animation">
           <div class="animation__dot"></div>
           <div class="animation__bg"></div>
@@ -17,7 +17,7 @@
         <div>
           {{ activeBoards || 0 }} active board{{ activeBoards != 1 ? 's' : '' }}
         </div>
-      </div>
+      </div> -->
 
       <div
         class="menu"
