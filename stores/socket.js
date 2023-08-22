@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 export const useSocketStore = defineStore('socket', () => {
   let { $showToast } = useNuxtApp();
   const socket = ref()
-
+  let connectionToast = undefined;
   const socketGetter = computed(() => socket.value)
 
   function init(){
@@ -16,34 +16,29 @@ export const useSocketStore = defineStore('socket', () => {
     })
 
     socket.value.on('disconnect', () => {
-      $showToast("DISCONNECT", 'error')
-      console.warn("DISCONNECT")
-      setTimeout(() => socket.value.connect(), 500)
+      connectionToast = $showToast("Reconnection...", 'info', 0);
+      // $showToast("Check your internet connection and if this message won't be gone - please, refresh the page.", 'error')
     })
 
     socket.value.on('connect_error', () => {
-      $showToast("CONNECT ERROR", 'error')
+      $showToast("Connection Error. Please, refresh the page.", 'error')
       console.warn("CONNECT ERROR")
-      setTimeout(() => socket.value.connect(), 500)
     })
 
-    socket.value.on("reconnection_attempt", () => {
-      $showToast("RECONNECTION ATTEMPT", 'info')
-      console.warn("RECONNECTION ATTEMPT")
-    })
-
-    socket.value.on("reconnect", () => {
-      $showToast("RECONNECTED")
-      console.warn("RECONNECTED")
+    socket.value.on("connect", () => {
+      if (connectionToast != undefined){
+        connectionToast.dismiss();
+        connectionToast = undefined;
+      }
       if(!process.client) return;
       if(localStorage.getItem('accessToken')) {
         let accessToken = JSON.stringify({accessToken: localStorage.getItem('accessToken')})
-        console.log(`sending auth upon reconnect: ${accessToken}`)
-        emit('auth', accessToken)
+        console.log(`sending auth on connect: ${accessToken}`)
+        emit('auth', accessToken);
 
+        let route = useRoute();
         if(route.params.id) {
-          let route = useRoute();
-          console.log(`sending emit upon reconnect: ${JSON.stringify({ gameId: route.params.id })}`)
+          console.log(`sending emit on connect: ${JSON.stringify({ gameId: route.params.id })}`)
           emit('room', JSON.stringify({ gameId: route.params.id }))
         }
       }
