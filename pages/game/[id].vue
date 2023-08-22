@@ -164,6 +164,7 @@
         :me="playerMe"
         :opponent="playerOpponent"
         :show="showBegins"
+        :game="game"
       ></PopupsGameBegins>
       <PopupsGameEnds
         :isViewer="isViewer"
@@ -249,7 +250,7 @@ useHead({
   ]
 })
 
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 const store = useSocketStore(),
   user = useUserStore()
@@ -619,9 +620,10 @@ onMounted(async () => {
     }
     isViewer.value;
 
-    if (!body.game.playerOne.joined || !body.game.playerTwo.joined){
-      console.log('mitim togglePopup SignInPopup')
-      $togglePopup('SignInPopup');
+    if (game.status == "CREATED"){
+      if (!body.game.playerOne.joined || !body.game.playerTwo.joined){
+        $togglePopup('SignInPopup');
+      }
     }
 
   }
@@ -646,6 +648,10 @@ onMounted(async () => {
         blue: { key: 'b', color: '#1FA2F3', opacity: 1, lineWidth: 10 }
       }
     }
+  }
+
+  if (game.value.status == "CANCELED"){
+    $showToast('Game canceled because of inactivity. Start a new game in Lobby.', 'error', 0)
   }
 
   canInit.value = true;
