@@ -51,7 +51,7 @@
       <div
         class="connecting"
         v-else
-      >Opponent is connecting...</div>
+      >Looking for an opponent...</div>
     </div>
   </div>
 </template>
