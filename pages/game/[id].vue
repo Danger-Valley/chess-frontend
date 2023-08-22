@@ -204,6 +204,7 @@
         @play-now="openGameSearchPopup"
         v-if="!isViewer"
       />
+      <PopupsSignIn></PopupsSignIn>
     </div>
   </ClientOnly>
 </template>
@@ -617,6 +618,12 @@ onMounted(async () => {
       if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
     }
     isViewer.value;
+
+    if (!body.game.playerOne.joined || !body.game.playerTwo.joined){
+      console.log('mitim togglePopup SignInPopup')
+      $togglePopup('SignInPopup');
+    }
+
   }
 
   // set board config
