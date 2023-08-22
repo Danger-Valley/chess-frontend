@@ -99,7 +99,7 @@
           <div>Username</div>
           <div>W-D-L</div>
           <div>Score</div>
-          <div v-for="team in event?.event?.teams">Team</div>
+          <div>Team</div>
           <div>Rewards</div>
         </div>
         <div
@@ -117,7 +117,7 @@
           </div>
           <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
           <div>{{ rank.score }}</div>
-          <div v-for="team in event?.event?.teams">{{ rank.team }}</div>
+          <div>{{ rank.team }}</div>
           <div>{{ rank.reward }}</div>
         </div>
       </div>
