@@ -76,19 +76,23 @@ class User {
   }
 
   async get(accessToken) {
-    return await fetch(`${this.localPath}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
+    if (accessToken){
+      return await fetch(`${this.localPath}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });        
+    }
   }
 
   async getPaymentProfile(accessToken) {
-    return await fetch(`${this.path}/payments/api/v1/users`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
+    if (accessToken){
+      return await fetch(`${this.path}/payments/api/v1/users`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+    }
   }
 
   async chargeHint({ accessToken, id }) {
