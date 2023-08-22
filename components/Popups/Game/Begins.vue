@@ -61,10 +61,10 @@ let { $togglePopup } = useNuxtApp();
 
 let timeout = ref(5)
 
-let props = defineProps(['me', 'opponent', 'show'])
+let props = defineProps(['me', 'opponent', 'show', 'game'])
 
 watch(() => [props.opponent, props.show], () => {
-  if (props.show && props.opponent?.joined) {
+  if (props.show && props.opponent?.joined && props.game?.status != 'CANCELED') {
     console.time();
     let closeInterval = setInterval(() => {
 
