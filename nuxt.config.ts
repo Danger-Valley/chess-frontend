@@ -30,7 +30,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      title: 'The Chess',
+      title: 'xChess',
       link: [
         {
           rel: 'icon',
