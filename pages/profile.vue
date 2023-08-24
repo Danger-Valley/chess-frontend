@@ -212,10 +212,10 @@ useHead({
   meta: [
     {
       property: 'og:title',
-      content: 'xChess - community-driven web3 chess platform'
+      content: 'Profile - xChess'
     }, {
       property: 'twitter:title',
-      content: 'xChess - community-driven web3 chess platform'
+      content: 'Profile - xChess'
     }, {
       property: 'description',
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
