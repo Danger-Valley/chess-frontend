@@ -94,6 +94,16 @@
               class="menu__item"
               to="https://docs.xchess.io"
             >Wiki</NuxtLink>
+            <NuxtLink
+              v-if="!user"
+              class="menu__item"
+              to="https://docs.xchess.io/privacy-policy"
+            >Privacy Policy</NuxtLink>
+            <NuxtLink
+              v-if="!user"
+              class="menu__item"
+              to="https://docs.xchess.io/terms-of-service"
+            >Terms of Service</NuxtLink>
             <div
               v-if="user"
               class="menu__item menu__item--action"
@@ -104,11 +114,12 @@
             </div>
 
             <div
-              class="menu__item menu__item--signin"
+              class="menu__item menu__item--action"
               @click="$togglePopup('SignInPopup')"
               v-if="!user"
             >
-              Sign In
+              <div>Sign In</div>
+              <IconArrow style="height: calc(8px * 1.25);"></IconArrow>
             </div>
             <div
               class="menu__item menu__item--logout"
@@ -319,7 +330,7 @@ onMounted(async () => {
 
   &__list {
     &-wrapper {
-      height: 92px;
+      height: 142px;
       transition: .5s height;
       overflow: hidden;
 
