@@ -26,12 +26,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         localStorage.setItem("connectType", connectType)
 
         let env = useRuntimeConfig();
-        let url;
-
-        if (location.host.startsWith("dev") || location.host.startsWith("localhost"))
-          url = env.public.Discord.redirect.dev;
-        else
-          url = env.public.Discord.redirect.prod;
+        let url = env.public.Discord.redirect
 
         await navigateTo(url, {
           external: true
@@ -50,12 +45,7 @@ export default defineNuxtPlugin((nuxtApp) => {
         localStorage.setItem("connectType", connectType)
 
         let env = useRuntimeConfig();
-        let url;
-
-        if (location.host.startsWith("dev") || location.host.startsWith("localhost"))
-          url = env.public.Twitter.redirect.dev;
-        else
-          url = env.public.Twitter.redirect.prod;
+        let url = env.public.Twitter.redirect;
 
         let rndStr = randomString();
 
