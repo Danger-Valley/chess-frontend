@@ -18,9 +18,15 @@ onMounted(async () => {
   if (localStorage.getItem("connectType") == 'auth') {
     let resp, body;
 
+    let env = useRuntimeConfig();
+    let url = env.public.Twitter.redirect
+    const urlParams = new URLSearchParams(url);
+    const redirectUri = urlParams.get('redirect_uri');
+
     resp = await $API().Auth.Twitter.checkAuth({
       authCode: code,
-      codeChallenge: localStorage.getItem("codeChallenge")
+      codeChallenge: localStorage.getItem("codeChallenge"),
+      redirectUri
     });
     body = await resp.json();
     console.log(body);
