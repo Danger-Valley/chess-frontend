@@ -18,7 +18,12 @@ onMounted(async () => {
   if (localStorage.getItem("connectType") == 'auth') {
     let resp, body;
 
-    resp = await $API().Auth.Discord.checkAuth(code);
+    let env = useRuntimeConfig();
+    let url = env.public.Discord.redirect
+    const urlParams = new URLSearchParams(url);
+    const redirectUri = urlParams.get('redirect_uri');
+    
+    resp = await $API().Auth.Discord.checkAuth(code, redirectUri);
     body = await resp.json();
 
     if (body.errors) {

@@ -3,12 +3,13 @@ class Twitter {
     this.localPath = `${path}/twitter`;
   }
 
-  async checkAuth({ authCode, codeChallenge }) {
+  async checkAuth({ authCode, codeChallenge, redirectUri }) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
       body: JSON.stringify({
         authCode,
-        codeChallenge
+        codeChallenge,
+        redirectUri
       }),
       headers: { 'content-type': 'application/json' }
     });
@@ -19,11 +20,12 @@ class Discord {
     this.localPath = `${path}/discord`;
   }
 
-  async checkAuth(authCode) {
+  async checkAuth(authCode, redirectUri) {
     return await fetch(`${this.localPath}`, {
       method: "POST",
       body: JSON.stringify({
-        authCode
+        authCode,
+        redirectUri
       }),
       headers: { 'content-type': 'application/json' }
     });
