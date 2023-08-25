@@ -62,7 +62,7 @@
         </div>
 
         <div class="block event-1">
-          <div class="event-1__heading">ARENA 24/7</div>
+          <div class="event-1__heading">{arena}</div>
           <div class="event-1__underheading">Play ranked games 24/7, complete with high-skilled players, and earn your
             rank.
           </div>
