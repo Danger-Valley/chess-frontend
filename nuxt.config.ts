@@ -94,16 +94,10 @@ export default defineNuxtConfig({
       MIXPANEL_TOKEN: process.env.MIXPANEL_TOKEN,
       SOCKET_URL: process.env.SOCKET_URL,
       Discord: {
-        redirect: {
-          dev: process.env.DISCORD_REDIRECT_URL_DEV,
-          prod: process.env.DISCORD_REDIRECT_URL_PROD
-        }
+        redirect: process.env.DISCORD_REDIRECT_URL!
       },
       Twitter: {
-        redirect: {
-          dev: process.env.TWITTER_REDIRECT_URL_DEV,
-          prod: process.env.TWITTER_REDIRECT_URL_PROD
-        }
+        redirect: process.env.TWITTER_REDIRECT_URL!
       }
     }
   }
