@@ -43,10 +43,9 @@ const open = async () => {
 
   if (!wallet || imgs.value) return;
 
-  let resp = await $API().Wallet.getNFTs({
+  let resp = await $API().User.getNFTs({
     accessToken: localStorage.getItem('accessToken'),
     userId: localStorage.getItem('userId'),
-    id: wallet.id
   });
   let body = await resp.json();
   imgs.value = body.nfts;

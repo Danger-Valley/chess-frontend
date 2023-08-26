@@ -160,6 +160,16 @@ class User {
       }
     });
   }
+
+  async getNFTs({ accessToken, userId }) {
+    return await fetch(`${this.localPath}/${userId}/nfts`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
 }
 class Wallet {
   constructor(path) {
