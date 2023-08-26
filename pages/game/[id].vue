@@ -413,10 +413,16 @@ const timerOpponentFunc = () => {
 }
 
 const getHints = async () => {
-  let resp = await $API().User.getPaymentProfile(localStorage.getItem('accessToken'));
-  let body = await resp.json();
-  console.log(body);
-  hints.value = body?.user?.hintsCount || 0;
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken){
+    let resp = await $API().User.getPaymentProfile(accessToken);
+    let body = await resp.json();
+    console.log(body);
+    hints.value = body?.user?.hintsCount || 0;
+  }
+  else {
+    hints.value = 0; 
+  }
 }
 
 const useHint = async (e) => {
@@ -433,8 +439,9 @@ const tryHint = () => {
 onMounted(async () => {
   // get my user
   let meResp, meBody;
-  if (localStorage.getItem('accessToken')) {
-    meResp = await $API().User.get(localStorage.getItem('accessToken'))
+  const accessToken = localStorage.getItem('accessToken');
+  if (accessToken) {
+    meResp = await $API().User.get(accessToken)
     meBody = await meResp.json();
   }
 
