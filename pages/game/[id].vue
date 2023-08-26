@@ -617,18 +617,21 @@ onMounted(async () => {
   // if connected as viewer
   else {
     console.error('CONNECTED AS VIEWER')
-    if (Math.random() > .5) {
-      playerMe.value = body.game.playerTwo;
-      if (body.game.playerOne.joined) playerOpponent.value = body.game.playerOne;
-    }
-    else {
-      playerMe.value = body.game.playerOne;
-      if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
-    }
+    
+    playerMe.value = body.game.playerOne;
+    if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
+
     isViewer.value;
 
-    if (game.status == "CREATED"){
-      if (!body.game.playerOne.joined || !body.game.playerTwo.joined){
+    console.log("mitim", "playerMe", playerMe.value);
+    console.log("mitim", "playerOpponent", playerOpponent.value);
+    console.log("mitim", "game.status", game.value.status);
+    console.log("mitim", "body?.game?.playerOne?.joined", body?.game?.playerOne?.joined);
+    console.log("mitim", "body?.game?.playerTwo?.joined", body?.game?.playerTwo?.joined);
+
+
+    if (game.value.status == "CREATED"){
+      if (!body?.game?.playerOne?.joined || !body?.game?.playerTwo?.joined){
         $togglePopup('SignInPopup');
       }
     }
