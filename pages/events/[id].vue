@@ -136,17 +136,23 @@ import GameModeTime from "@/assets/imgs/game-mode-time.svg"
 import GameModeCoins from "@/assets/imgs/game-mode-coins.svg"
 import gameModes from "@/assets/content/gameModes.json"
 
+let { $API, $showToast } = useNuxtApp();
+
+let resp = await $API().Events.getById({ id: useRoute().params.id });
+let body = await resp.json();
+console.log(body);
+
 useHead({
-  title: 'Tournament - xChess',
+  title: `${body?.event?.title}`,
   meta: [
     {
+      property: 'description',
+      content: `${body?.event?.description}`
+    }, {
       property: 'og:title',
       content: 'Tournament - xChess'
     }, {
       property: 'twitter:title',
-      content: 'Tournament - xChess'
-    }, {
-      property: 'description',
       content: 'Tournament - xChess'
     }, {
       property: 'og:description',
@@ -157,8 +163,6 @@ useHead({
     }
   ]
 })
-
-let { $API, $showToast } = useNuxtApp();
 
 let event = ref(),
   foundGameMode = ref(),

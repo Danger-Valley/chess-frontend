@@ -4,7 +4,7 @@
 
       <NuxtLink
         class="back-to-lobby"
-        to="/lobby"
+        to="/"
       >
         <ArrowIcon />
         Back to lobby
