@@ -4,5 +4,5 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   
   await store.obtainUser()
 
-  if(!store.getUser.value && to.name == 'profile') return navigateTo('/')
+  if(process.client && !store?.getUser?.value && to?.name == 'profile') return navigateTo('/')
 })
