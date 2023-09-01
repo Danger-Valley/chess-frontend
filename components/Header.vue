@@ -203,7 +203,7 @@ const toggleMenu = (blockOnMobile = false) => {
 }
 
 onMounted(async () => {
-  if (user.value) isClosed.value = true;
+  isClosed.value = true;
   // logic here: if index page - we get boardsCount from page API -> props to this component; else page - we send API call
   if (useRoute().fullPath == '/') return;
 
