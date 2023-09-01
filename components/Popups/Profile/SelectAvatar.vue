@@ -34,7 +34,7 @@ import { useUserStore } from '~/stores/user';
 
 let emits = defineEmits(['update'])
 
-let { $API, $togglePopup } = useNuxtApp();
+let { $API, $togglePopup, $showToast } = useNuxtApp();
 let imgs = ref()
 
 const open = async () => {
@@ -43,12 +43,14 @@ const open = async () => {
 
   if (!wallet || imgs.value) return;
 
-  let resp = await $API().Wallet.getNFTs({
+  let resp = await $API().User.getNFTs({
     accessToken: localStorage.getItem('accessToken'),
     userId: localStorage.getItem('userId'),
-    id: wallet.id
   });
   let body = await resp.json();
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   imgs.value = body.nfts;
 
   console.log(imgs.value)

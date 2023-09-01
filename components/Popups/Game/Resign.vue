@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 const resing = async () => {
   let resp = await $API().Chess.resign({
@@ -34,6 +34,9 @@ const resing = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameResignPopup')
 }
 </script>

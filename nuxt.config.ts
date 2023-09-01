@@ -5,7 +5,9 @@ export default defineNuxtConfig({
   ssr: true,
   modules: [
     '@pinia/nuxt',
-    'nuxt-vue3-google-signin'
+    'nuxt-vue3-google-signin',
+    '@nuxtjs/robots',
+    'nuxt-simple-sitemap'
   ],
   googleSignIn: {
     clientId: process.env.GOOGLE_CLIENT_ID,

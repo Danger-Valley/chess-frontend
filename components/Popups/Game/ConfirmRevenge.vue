@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let props = defineProps(['opponent'])
 
@@ -36,6 +36,9 @@ const revenge = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameConfirmRevengePopup')
 }
 </script>
@@ -50,7 +53,7 @@ const revenge = async () => {
   background: rgba(24, 27, 32, 0.55);
   backdrop-filter: blur(50px);
 
-  &__wrapper{
+  &__wrapper {
     background: rgba(0, 0, 0, 0.4) !important;
   }
 
@@ -85,4 +88,5 @@ const revenge = async () => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}</style>
+}
+</style>
