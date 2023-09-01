@@ -123,7 +123,7 @@ useHead({
   ]
 })
 
-let { $API } = useNuxtApp();
+let { $API, $showToast } = useNuxtApp();
 
 let arena = ref(),
   foundGameMode = ref(),
@@ -163,6 +163,9 @@ const play = async () => {
   })
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo(`/game/${body.game.id}`)
 }
 
@@ -173,6 +176,10 @@ const register = async () => {
   });
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+  arena.value.isRegistered = body.success;
 }
 
 onMounted(async () => {
@@ -180,10 +187,16 @@ onMounted(async () => {
   let resp = await $API().Events.getArena({ accessToken: localStorage.getItem('accessToken')});
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   arena.value = body;
   foundGameMode.value = findGameModeParams(body.event.gameMode);
   resp = await $API().Events.getLeaderboard({ id: body.event.id });
   body = await resp.json();
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   participants.value = body.participants
   dateNow.value = new Date();
   setInterval(() => {

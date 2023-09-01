@@ -1,6 +1,9 @@
 <template>
   <ClientOnly>
-    <div class="page">
+    <div
+      class="page"
+      :class="{ 'page--noOverflow': isChatToggledMobile }"
+    >
 
       <NuxtLink
         class="back-to-lobby"
@@ -41,7 +44,10 @@
               />
             </svg>
 
-            <div class="header__newMessages" v-if="hasNewMessages"></div>
+            <div
+              class="header__newMessages"
+              v-if="hasNewMessages"
+            ></div>
           </div>
         </div>
 
@@ -150,6 +156,7 @@
           <div class="aside__divider aside__divider--bottom"></div>
           <div class="panel">
             <div
+              v-if="!isViewer"
               class="panel__container panel__container--hint"
               @click="hints == 0 ? $togglePopup('GameHintsShopPopup') : $togglePopup('GameHintPopup')"
             >
@@ -158,6 +165,7 @@
             </div>
 
             <div
+              v-if="!isViewer"
               class="panel__container"
               @click="$togglePopup('GameConfirmDrawPopup')"
             >
@@ -165,6 +173,7 @@
             </div>
 
             <div
+              v-if="!isViewer"
               class="panel__container"
               @click="$togglePopup('GameResignPopup')"
             >
@@ -351,6 +360,9 @@ const openGameSearchPopup = async () => {
   let resp = await $API().Chess.find_create(body);
   body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo({
     params: {
       id: body.game.id
@@ -371,7 +383,9 @@ const getMessages = async () => {
   let body = await resp.json();
   console.log(body);
 
-  if (body.errors) return console.error(body.errors);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   messages.value = body.messages;
 }
@@ -389,7 +403,10 @@ const sendMessage = async () => {
   let body = await resp.json();
   console.log(body);
 
-  if (body.errors) return console.error(body.errors);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+
 
   document.querySelector('.chat__input').value = "";
   document.querySelector('.chat__messages').scrollBy(0, 100000)
@@ -425,11 +442,16 @@ const afterMove = async (e) => {
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
   if (e.color !== playerMe.value?.color) return;
-  await $API().Chess.move({
+  let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
     accessToken: localStorage.getItem('accessToken')
   })
+  let body = await resp.json();
+
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 }
 
 const join = async () => {
@@ -440,7 +462,7 @@ const join = async () => {
   let body = await resp.json();
   if (body.errors) {
     console.error(body.errors[0].message)
-    return null
+    return $showToast(body.errors[0].message, 'error')
   }
   console.log("Join: ", body);
   return body;
@@ -474,6 +496,9 @@ const getHints = async () => {
     let resp = await $API().User.getPaymentProfile(accessToken);
     let body = await resp.json();
     console.log(body);
+    if (body.errors) {
+      return $showToast(body.errors[0].message, 'error')
+    }
     hints.value = body?.user?.hintsCount || 0;
   }
   else {
@@ -499,6 +524,9 @@ onMounted(async () => {
   if (accessToken) {
     meResp = await $API().User.get(accessToken)
     meBody = await meResp.json();
+    if (meBody.errors) {
+      return $showToast(meBody.errors[0].message, 'error')
+    }
   }
 
   await getHints();
@@ -549,6 +577,9 @@ onMounted(async () => {
         accessToken: localStorage.getItem('accessToken')
       })
       body = await resp.json();
+      if (body.errors) {
+        return $showToast(body.errors[0].message, 'error')
+      }
       game.value = body.game;
       if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
         playerMe.value = body.game.playerOne;
@@ -636,6 +667,9 @@ onMounted(async () => {
   })
   let body = await resp.json();
   console.log("Get game:", JSON.parse(JSON.stringify(body)))
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   game.value = body.game;
 
   if (
@@ -858,6 +892,9 @@ const initAfterBoardCreated = async () => {
     })
     let body = await resp.json();
     console.log("Get game:", JSON.parse(JSON.stringify(body)))
+    if (body.errors) {
+      return $showToast(body.errors[0].message, 'error')
+    }
     game.value = body.game;
     boardConfig.fen = body.game.state.fen;
 
@@ -914,12 +951,15 @@ onUnmounted(() => {
   display: grid;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   grid-template-rows: 14px auto;
   grid-template-columns: max(230px, 18%) auto max(290px, 18%);
   gap: 25px 20px;
   padding: 20px 33px;
   background-color: $color-font;
+
+  &--noOverflow {
+    overflow: hidden !important;
+  }
 }
 
 .back-to-lobby {
@@ -1159,7 +1199,8 @@ onUnmounted(() => {
   rotate: 90deg;
 }
 
-@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
+// used to be max-width: #{map-get($sizes, "tablet")-1 + px}
+@media screen and (max-width: 1200px) {
   .page {
     display: flex;
     flex-direction: column;
@@ -1183,9 +1224,10 @@ onUnmounted(() => {
       padding: 6px 10px;
       border-radius: 10px;
       background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
     }
 
-    &__newMessages{
+    &__newMessages {
       position: absolute;
       right: -2px;
       top: -2px;
@@ -1207,6 +1249,7 @@ onUnmounted(() => {
   }
 
   .chat {
+    overflow: hidden;
     position: absolute;
     width: 100vw;
     height: 100vh;
@@ -1232,6 +1275,7 @@ onUnmounted(() => {
       font-weight: 400;
       line-height: 100%;
       text-transform: uppercase;
+      cursor: pointer;
     }
 
     &__messages {
@@ -1274,7 +1318,7 @@ onUnmounted(() => {
       }
 
       &__divider {
-        margin: 11px;
+        margin: 11px 0;
       }
     }
   }

@@ -22,7 +22,7 @@
       <div
         class="menu"
         :class="{ 'menu--logged': user }"
-        @click="toggleMenu"
+        @click="toggleMenu(true)"
       >
         <div
           v-if="!user"
@@ -64,7 +64,7 @@
           >
             <div
               class="menu__mobile-close"
-              @click="toggleMenu"
+              @click.stop="toggleMenu(false)"
             >
               Close
             </div>
@@ -147,7 +147,7 @@
 import IconArrow from "@/assets/imgs/Arrow.svg"
 import IconCross from "@/assets/imgs/+.svg"
 import { useUserStore } from "~/stores/user";
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let activeBoards = ref(),
   // for mobile
@@ -190,11 +190,14 @@ const openGameSearchPopup = async () => {
   let resp = await $API().Chess.find_create(body);
   body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo(`game/${body.game.id}`)
 }
 
-const toggleMenu = () => {
-  // TODO get var from scss?
+const toggleMenu = (blockOnMobile = false) => {
+  if(blockOnMobile && window.innerWidth <= 1440 && isToggled.value) return;
   isToggled.value = !isToggled.value;
   isClosed.value = !isClosed.value;
 }
@@ -206,6 +209,10 @@ onMounted(async () => {
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
+
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   activeBoards.value = body.activeBoardsCount;
 })

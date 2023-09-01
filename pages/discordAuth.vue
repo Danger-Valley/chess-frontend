@@ -7,7 +7,7 @@
 import { useUserStore } from '~/stores/user';
 
 let userStore = useUserStore(),
-  { $API } = useNuxtApp()
+  { $API, $showToast } = useNuxtApp()
 
 onMounted(async () => {
   const fragment = new URLSearchParams(window.location.search);
@@ -27,6 +27,7 @@ onMounted(async () => {
     body = await resp.json();
 
     if (body.errors) {
+      $showToast(body.errors[0].message, 'error')
       return console.error(body);
     }
 

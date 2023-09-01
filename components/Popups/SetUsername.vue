@@ -41,7 +41,7 @@ let props = defineProps({
   }
 })
 
-let { $API, $togglePopup } = useNuxtApp();
+let { $API, $togglePopup, $showToast } = useNuxtApp();
 let status = ref(),
   checkTimeout = null
 
@@ -65,8 +65,10 @@ const check = async () => {
     });
     let body = await resp.json();
     console.log(body);
-
-    if (body.errors) return status.value = body.errors[0].message;
+    if (body.errors) {
+      $showToast(body.errors[0].message, 'error')
+      return status.value = body.errors[0].message;
+    }
 
     status.value = "Available"
   }, 300)

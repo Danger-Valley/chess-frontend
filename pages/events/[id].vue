@@ -143,11 +143,11 @@ let body = await resp.json();
 console.log(body);
 
 useHead({
-  title: `${body?.event?.title}`,
+  title: `${body?.event?.title || 'Tournament - xChess'}`,
   meta: [
     {
       property: 'description',
-      content: `${body?.event?.description}`
+      content: `${body?.event?.description || 'Tournament - xChess'}`
     }, {
       property: 'og:title',
       content: 'Tournament - xChess'
@@ -190,6 +190,9 @@ const play = async () => {
   })
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo(`/game/${body.game.id}`)
 }
 
@@ -208,11 +211,17 @@ const formatDate = (date) => {
 const getLeaderboard = async () => {
   resp = await $API().Events.getLeaderboard({ id: event.value.event.id });
   body = await resp.json();
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   participants.value = body.participants
 
   let resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   event.value = body;
 }
 
@@ -220,10 +229,16 @@ onMounted(async () => {
   let resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   event.value = body;
   foundGameMode.value = findGameModeParams(body.event.gameMode);
   resp = await $API().Events.getLeaderboard({ id: body.event.id });
   body = await resp.json();
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   participants.value = body.participants
   dateNow.value = new Date();
   setInterval(() => {

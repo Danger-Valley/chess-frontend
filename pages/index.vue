@@ -179,8 +179,11 @@ onMounted(async () => {
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
   console.log(body);
-
-  if (body.errors) return console.error(body.errors);
+  
+  if (body.errors) {
+    console.error(body.errors);
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   lobby.value = body;
 

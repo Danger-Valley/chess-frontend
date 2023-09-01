@@ -34,7 +34,7 @@ import { useUserStore } from '~/stores/user';
 
 let emits = defineEmits(['update'])
 
-let { $API, $togglePopup } = useNuxtApp();
+let { $API, $togglePopup, $showToast } = useNuxtApp();
 let imgs = ref()
 
 const open = async () => {
@@ -48,6 +48,9 @@ const open = async () => {
     userId: localStorage.getItem('userId'),
   });
   let body = await resp.json();
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   imgs.value = body.nfts;
 
   console.log(imgs.value)

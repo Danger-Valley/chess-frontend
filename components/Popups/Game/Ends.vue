@@ -70,7 +70,7 @@
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let props = defineProps(['me', 'opponent', 'whoWon', 'isViewer'])
 let emits = defineEmits(['findGame'])
@@ -88,6 +88,9 @@ const offerRevenge = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 }
 
 onMounted(() => {

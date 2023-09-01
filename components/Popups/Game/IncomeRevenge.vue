@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let props = defineProps(['opponent'])
 
@@ -30,6 +30,9 @@ const acceptRevenge = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo({
     params: {
       id: body.gameId
@@ -46,6 +49,9 @@ const rejectRevenge = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameIncomeRevengePopup')
 }
 </script>
