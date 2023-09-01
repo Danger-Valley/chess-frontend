@@ -52,6 +52,9 @@ export const useUserStore = defineStore('user', () => {
     if (accessToken) {
       let resp = await $API().User.get(accessToken)
       let body = await resp.json()
+      if (body.errors) {
+        return $showToast(body.errors[0].message, 'error')
+      }
       user.value = body.user;
       localStorage.setItem('userId', body.user.id)
       useMixpanelStore().identify();

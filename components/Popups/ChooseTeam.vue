@@ -41,7 +41,7 @@
 <script setup>
 let props = defineProps(['teams'])
 
-let { $API, $togglePopup } = useNuxtApp();
+let { $API, $togglePopup, $showToast } = useNuxtApp();
 let emits = defineEmits(['register'])
 let chosenTeam = ref()
 

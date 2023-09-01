@@ -7,7 +7,7 @@
 import { useUserStore } from '~/stores/user';
 
 let userStore = useUserStore(),
-  { $API } = useNuxtApp()
+  { $API, $showToast } = useNuxtApp()
 
 onMounted(async () => {
   const fragment = new URLSearchParams(window.location.search);
@@ -33,6 +33,7 @@ onMounted(async () => {
 
     if (body.errors) {
       console.error(body);
+      return $showToast(body.errors[0].message, 'error')
     } else await userStore.saveUser(body.accessToken)
   }
   else if (localStorage.getItem("connectType") == 'update') {

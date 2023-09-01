@@ -22,24 +22,23 @@
       <div
         class="menu"
         :class="{ 'menu--logged': user }"
+        @click="toggleMenu(true)"
       >
         <div
           v-if="!user"
           class="menu__name menu__name--desktop"
-          @click="toggleMenu()"
+          :class="{ 'menu__name--desktop-closed': isClosed }"
         >
           Menu
         </div>
         <template v-else>
           <div
             class="menu__name menu__name--mobile"
-            @click="toggleMenu()"
           >
             Menu
           </div>
           <div
             class="profile profile--desktop"
-            @click="isClosed = !isClosed"
           >
             <img
               class="profile__avatar"
@@ -49,7 +48,6 @@
             <div
               class="profile__cross"
               :class="{ 'profile__cross--closed': isClosed }"
-              @click.stop="isClosed = !isClosed"
             >
               <IconCross></IconCross>
             </div>
@@ -66,7 +64,7 @@
           >
             <div
               class="menu__mobile-close"
-              @click="toggleMenu()"
+              @click.stop="toggleMenu(false)"
             >
               Close
             </div>
@@ -83,7 +81,7 @@
             <NuxtLink
               v-if="user"
               class="menu__item"
-              to="/lobby"
+              to="/"
             >Lobby</NuxtLink>
             <NuxtLink
               v-if="user"
@@ -149,7 +147,7 @@
 import IconArrow from "@/assets/imgs/Arrow.svg"
 import IconCross from "@/assets/imgs/+.svg"
 import { useUserStore } from "~/stores/user";
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let activeBoards = ref(),
   // for mobile
@@ -159,14 +157,20 @@ let activeBoards = ref(),
   GameSearchPopupRef = ref(),
   GameSettingsPopupRef = ref()
 
-const props = defineProps(['isAI'])
+const props = defineProps(['isAI', 'activeBoards'])
 
 const store = useUserStore()
 
 const user = computed(() => store.getUser.value)
 
 watch(user, async (newVal, oldVal) => {
-  if (!oldVal?.id && user.value?.id) await navigateTo('/lobby')
+  // if user authorizes
+  if (!oldVal?.id && user.value?.id) await navigateTo('/')
+})
+
+watch(() => props.activeBoards, () => {
+  console.log(props.activeBoards)
+  if (props.activeBoards) return activeBoards.value = props.activeBoards;
 })
 
 const openGameSearchPopup = async () => {
@@ -186,19 +190,29 @@ const openGameSearchPopup = async () => {
   let resp = await $API().Chess.find_create(body);
   body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo(`game/${body.game.id}`)
 }
 
-const toggleMenu = () => {
-  // TODO get var from scss?
+const toggleMenu = (blockOnMobile = false) => {
+  if(blockOnMobile && window.innerWidth <= 1440 && isToggled.value) return;
   isToggled.value = !isToggled.value;
+  isClosed.value = !isClosed.value;
 }
 
 onMounted(async () => {
-  if (user.value) isClosed.value = true;
+  isClosed.value = true;
+  // logic here: if index page - we get boardsCount from page API -> props to this component; else page - we send API call
+  if (useRoute().fullPath == '/') return;
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
+
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   activeBoards.value = body.activeBoardsCount;
 })
@@ -321,6 +335,7 @@ onMounted(async () => {
   line-height: 1;
   text-transform: uppercase;
   color: #FFFFFF;
+  cursor: pointer;
 
   &--logged {
     align-self: flex-start;
@@ -335,7 +350,7 @@ onMounted(async () => {
       overflow: hidden;
 
       &--logged {
-        height: 210px;
+        height: 190px;
 
         .menu__item--signin {
           height: 0;
@@ -361,11 +376,18 @@ onMounted(async () => {
   }
 
   &__name {
+    transition: .5s;
     margin: 12px 6px 28px 6px;
     color: #ffffff4d;
 
     &--mobile {
       display: none;
+    }
+
+    &--desktop {
+      &-closed {
+        margin: 12px 6px;
+      }
     }
   }
 

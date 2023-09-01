@@ -1,18 +1,67 @@
 <template>
   <ClientOnly>
-    <div class="page">
+    <div
+      class="page"
+      :class="{ 'page--noOverflow': isChatToggledMobile }"
+    >
 
       <NuxtLink
         class="back-to-lobby"
-        to="/lobby"
+        to="/"
       >
         <ArrowIcon />
         Back to lobby
       </NuxtLink>
 
       <main class="main">
-        <aside class="aside chat">
-          <div class="aside__heading aside__heading--uppercase">Chat</div>
+        <div class="header">
+          <div
+            class="header__openChat"
+            @click="toggleChatMobile"
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.4698 16.83L18.8598 19.99C18.9598 20.82 18.0698 21.4 17.3598 20.97L13.1698 18.48C12.7098 18.48 12.2599 18.45 11.8199 18.39C12.5599 17.52 12.9998 16.42 12.9998 15.23C12.9998 12.39 10.5398 10.09 7.49985 10.09C6.33985 10.09 5.26985 10.42 4.37985 11C4.34985 10.75 4.33984 10.5 4.33984 10.24C4.33984 5.68999 8.28985 2 13.1698 2C18.0498 2 21.9998 5.68999 21.9998 10.24C21.9998 12.94 20.6098 15.33 18.4698 16.83Z"
+                fill="#181B20"
+                stroke="#575D65"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M13 15.2298C13 16.4198 12.56 17.5198 11.82 18.3898C10.83 19.5898 9.26 20.3598 7.5 20.3598L4.89 21.9098C4.45 22.1798 3.89 21.8098 3.95 21.2998L4.2 19.3298C2.86 18.3998 2 16.9098 2 15.2298C2 13.4698 2.94 11.9198 4.38 10.9998C5.27 10.4198 6.34 10.0898 7.5 10.0898C10.54 10.0898 13 12.3898 13 15.2298Z"
+                fill="#181B20"
+                stroke="white"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+
+            <div
+              class="header__newMessages"
+              v-if="hasNewMessages"
+            ></div>
+          </div>
+        </div>
+
+        <aside
+          class="aside chat"
+          :class="{ 'chat--opened': isChatToggledMobile }"
+        >
+          <div class="aside__heading aside__heading--uppercase">
+            Chat
+            <div
+              class="chat__close"
+              @click.stop="toggleChatMobile"
+            >Close</div>
+          </div>
           <div class="aside__divider"></div>
           <div class="chat__messages">
             <div
@@ -82,6 +131,12 @@
             History
             <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
           </div>
+
+          <div class="aside__headings--mobile">
+            <div class="aside__heading--mobile aside__heading--mobile--active">History</div>
+            <div class="aside__heading--mobile">Information</div>
+          </div>
+
           <div class="turns">
             <div
               class="turn"
@@ -101,6 +156,7 @@
           <div class="aside__divider aside__divider--bottom"></div>
           <div class="panel">
             <div
+              v-if="!isViewer"
               class="panel__container panel__container--hint"
               @click="hints == 0 ? $togglePopup('GameHintsShopPopup') : $togglePopup('GameHintPopup')"
             >
@@ -109,6 +165,7 @@
             </div>
 
             <div
+              v-if="!isViewer"
               class="panel__container"
               @click="$togglePopup('GameConfirmDrawPopup')"
             >
@@ -116,6 +173,7 @@
             </div>
 
             <div
+              v-if="!isViewer"
               class="panel__container"
               @click="$togglePopup('GameResignPopup')"
             >
@@ -282,7 +340,9 @@ let boardConfig = reactive({}),
   showBegins = ref(false),
   isViewer = ref(true),
   doTriggerAfterMove = false,
-  hints = ref(0)
+  hints = ref(0),
+  isChatToggledMobile = ref(false),
+  hasNewMessages = ref(false)
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -300,11 +360,19 @@ const openGameSearchPopup = async () => {
   let resp = await $API().Chess.find_create(body);
   body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   await navigateTo({
     params: {
       id: body.game.id
     }
   })
+}
+
+const toggleChatMobile = () => {
+  isChatToggledMobile.value = !isChatToggledMobile.value;
+  hasNewMessages.value = false;
 }
 
 const getMessages = async () => {
@@ -315,7 +383,9 @@ const getMessages = async () => {
   let body = await resp.json();
   console.log(body);
 
-  if (body.errors) return console.error(body.errors);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   messages.value = body.messages;
 }
@@ -333,7 +403,10 @@ const sendMessage = async () => {
   let body = await resp.json();
   console.log(body);
 
-  if (body.errors) return console.error(body.errors);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+
 
   document.querySelector('.chat__input').value = "";
   document.querySelector('.chat__messages').scrollBy(0, 100000)
@@ -369,11 +442,16 @@ const afterMove = async (e) => {
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
   if (e.color !== playerMe.value?.color) return;
-  await $API().Chess.move({
+  let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
     accessToken: localStorage.getItem('accessToken')
   })
+  let body = await resp.json();
+
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
 }
 
 const join = async () => {
@@ -384,7 +462,7 @@ const join = async () => {
   let body = await resp.json();
   if (body.errors) {
     console.error(body.errors[0].message)
-    return null
+    return $showToast(body.errors[0].message, 'error')
   }
   console.log("Join: ", body);
   return body;
@@ -414,14 +492,17 @@ const timerOpponentFunc = () => {
 
 const getHints = async () => {
   const accessToken = localStorage.getItem('accessToken');
-  if (accessToken){
+  if (accessToken) {
     let resp = await $API().User.getPaymentProfile(accessToken);
     let body = await resp.json();
     console.log(body);
+    if (body.errors) {
+      return $showToast(body.errors[0].message, 'error')
+    }
     hints.value = body?.user?.hintsCount || 0;
   }
   else {
-    hints.value = 0; 
+    hints.value = 0;
   }
 }
 
@@ -443,6 +524,9 @@ onMounted(async () => {
   if (accessToken) {
     meResp = await $API().User.get(accessToken)
     meBody = await meResp.json();
+    if (meBody.errors) {
+      return $showToast(meBody.errors[0].message, 'error')
+    }
   }
 
   await getHints();
@@ -493,6 +577,9 @@ onMounted(async () => {
         accessToken: localStorage.getItem('accessToken')
       })
       body = await resp.json();
+      if (body.errors) {
+        return $showToast(body.errors[0].message, 'error')
+      }
       game.value = body.game;
       if (body.game.playerOne.joined && body.game.playerOne.user.id == meBody.user.id) {
         playerMe.value = body.game.playerOne;
@@ -565,6 +652,7 @@ onMounted(async () => {
 
   store.listen('chat_message', (resp) => {
     messages.value.push(resp);
+    hasNewMessages.value = true;
     nextTick(() => {
       document.querySelector('.chat__messages').scrollBy(0, 100000)
     })
@@ -579,6 +667,9 @@ onMounted(async () => {
   })
   let body = await resp.json();
   console.log("Get game:", JSON.parse(JSON.stringify(body)))
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   game.value = body.game;
 
   if (
@@ -617,7 +708,7 @@ onMounted(async () => {
   // if connected as viewer
   else {
     console.error('CONNECTED AS VIEWER')
-    
+
     playerMe.value = body.game.playerOne;
     if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
 
@@ -630,8 +721,8 @@ onMounted(async () => {
     console.log("mitim", "body?.game?.playerTwo?.joined", body?.game?.playerTwo?.joined);
 
 
-    if (game.value.status == "CREATED"){
-      if (!body?.game?.playerOne?.joined || !body?.game?.playerTwo?.joined){
+    if (game.value.status == "CREATED") {
+      if (!body?.game?.playerOne?.joined || !body?.game?.playerTwo?.joined) {
         $togglePopup('SignInPopup');
       }
     }
@@ -660,7 +751,7 @@ onMounted(async () => {
     }
   }
 
-  if (game.value.status == "CANCELED"){
+  if (game.value.status == "CANCELED") {
     $showToast('Game canceled because of inactivity. Start a new game in Lobby.', 'error', 0)
   }
 
@@ -789,6 +880,64 @@ const initAfterBoardCreated = async () => {
       else if (playerOpponent.value.id == game.value.state.winnerUserId) whoWon.value = 'opponent';
     }
   }
+
+  store.listen("connect", async () => {
+    // force refresh board, timers, chat, moves
+    console.warn('FORCE REFRESH AFTER SOCKET CONNECT')
+
+    // board
+    let resp = await $API().Chess.get({
+      id: useRoute().params.id,
+      accessToken: localStorage.getItem('accessToken')
+    })
+    let body = await resp.json();
+    console.log("Get game:", JSON.parse(JSON.stringify(body)))
+    if (body.errors) {
+      return $showToast(body.errors[0].message, 'error')
+    }
+    game.value = body.game;
+    boardConfig.fen = body.game.state.fen;
+
+    // chat
+    await getMessages()
+
+    // moves & timers
+    timer.value = {
+      me: game.value.config.timeForGame * 1000,
+      opponent: game.value.config.timeForGame * 1000
+    }
+    timeAddedPerMove = game.value.config.timeAddedPerMove;
+
+    if (game.value.moves.length > 0) {
+      clearInterval(timerMeInterval)
+      clearInterval(timerOpponentInterval)
+      beginTime = game.value.startedAt;
+
+      turns.value = [];
+      let lastTime = beginTime;
+      game.value.moves.map(el => {
+        console.log(timer.value.me, timer.value.opponent, el.createdAt, lastTime)
+        turns.value.push(el.move);
+        activeTurnIndex.value++;
+        if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
+        else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
+        lastTime = el.createdAt;
+        //boardAPI.value.move(el.move);
+      })
+
+      if (game.value.moves.at(-1).playerId == playerMe.value.id) {
+        //timer.value.opponent = timer.value.opponent - (new Date() - new Date(lastTime)) - 5000
+        lastTimerValue = timer.value.opponent
+      }
+      else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) {
+        //timer.value.me = timer.value.me - (new Date() - new Date(lastTime)) - 5000
+        lastTimerValue = timer.value.me
+      }
+
+      lastTimeForInterval = new Date(lastTime);
+      console.log(timer.value.me, timer.value.opponent, new Date(lastTime))
+    }
+  })
 }
 
 onUnmounted(() => {
@@ -802,12 +951,15 @@ onUnmounted(() => {
   display: grid;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
   grid-template-rows: 14px auto;
   grid-template-columns: max(230px, 18%) auto max(290px, 18%);
   gap: 25px 20px;
   padding: 20px 33px;
   background-color: $color-font;
+
+  &--noOverflow {
+    overflow: hidden !important;
+  }
 }
 
 .back-to-lobby {
@@ -828,6 +980,10 @@ onUnmounted(() => {
     height: 8px;
     scale: -1 1;
   }
+}
+
+.header {
+  display: none;
 }
 
 .main {
@@ -857,6 +1013,10 @@ onUnmounted(() => {
     line-height: 22px;
     color: #FFFFFF;
 
+    &s--mobile {
+      display: none;
+    }
+
     &--uppercase {
       text-transform: uppercase;
     }
@@ -876,6 +1036,10 @@ onUnmounted(() => {
 
 .chat {
   grid-column: 1;
+
+  &__close {
+    display: none;
+  }
 
   &__messages {
     display: flex;
@@ -1035,20 +1199,182 @@ onUnmounted(() => {
   rotate: 90deg;
 }
 
-@media screen and (max-width: #{map-get($sizes, "tablet")-1 + px}) {
+// used to be max-width: #{map-get($sizes, "tablet")-1 + px}
+@media screen and (max-width: 1200px) {
   .page {
     display: flex;
     flex-direction: column;
     overflow: auto;
+    padding: unset;
+    overflow-x: hidden;
   }
 
   .back-to-lobby {
     display: none;
   }
 
+  .header {
+    order: -2;
+    display: flex;
+    margin-top: 62px;
+    margin-left: 10px;
+
+    &__openChat {
+      position: relative;
+      padding: 6px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      cursor: pointer;
+    }
+
+    &__newMessages {
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background-color: #6FC659;
+    }
+  }
+
   .main {
     display: flex;
     flex-direction: column;
+    gap: 34px;
+  }
+
+  .player {
+    padding: 0 10px;
+  }
+
+  .chat {
+    overflow: hidden;
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+    background: #25272B;
+    padding: unset;
+    left: -100vw;
+    transition: .5s;
+
+    &--opened {
+      left: 0;
+    }
+
+    &__close {
+      display: block;
+      color: #FFFFFF4d;
+      margin-left: auto;
+      margin-right: 20px;
+      font-feature-settings: 'clig' off, 'liga' off;
+      font-family: Neue Plak;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 400;
+      line-height: 100%;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    &__messages {
+      margin-top: 21px;
+      margin-left: 20px;
+      gap: 25px;
+      max-height: calc(100vh - 129px - 140px - 20px);
+    }
+
+    .message {
+      &__author {
+        font-size: 18px;
+      }
+
+      &__text {
+        font-size: 18px;
+      }
+    }
+
+    &__input {
+      &Field {
+        height: 140px;
+        padding: 15px 20px;
+        align-items: flex-start;
+      }
+
+      font-size: 16px;
+    }
+
+    &__send {
+      width: 24px;
+      height: 24px;
+    }
+
+    .aside {
+      &__heading {
+        font-size: 24px;
+        margin-top: 64px;
+        margin-left: 20px;
+      }
+
+      &__divider {
+        margin: 11px 0;
+      }
+    }
+  }
+
+  .info {
+    border: unset;
+    background: unset;
+    backdrop-filter: unset;
+    padding: unset;
+
+    .panel {
+      padding: 0 20px;
+      order: -1;
+      margin-bottom: 53px;
+    }
+
+    .aside {
+
+      &__divider,
+      &__heading {
+        display: none;
+      }
+
+      &__headings--mobile {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        padding: 0 20px;
+        margin-bottom: 20px;
+
+        .aside__heading--mobile {
+          display: block;
+          color: #FFFFFF4d;
+          font-family: "Neue Plak";
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+
+          &--active {
+            color: #FFF;
+          }
+        }
+      }
+    }
+
+    .turn {
+      &s {
+        justify-content: flex-start;
+        padding: 15px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.10);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(50px);
+      }
+    }
   }
 
   .playboard {

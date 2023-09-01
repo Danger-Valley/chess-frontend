@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let props = defineProps(['opponent'])
 
@@ -30,6 +30,9 @@ const acceptDraw = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameIncomeDrawPopup')
 }
 
@@ -41,6 +44,9 @@ const rejectDraw = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameIncomeDrawPopup')
 }
 </script>

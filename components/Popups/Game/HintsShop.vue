@@ -93,7 +93,7 @@ watch([connected, readyState], async () => {
     purchaseAfterConnection = false;
     purchase();
   }
-}, { immediate: true })
+})
 
 const purchase = async () => {
   console.log(publicKey.value?.toString())
@@ -114,6 +114,11 @@ const purchase = async () => {
   waiting.value = true;
 
   console.log(body)
+  if (body.errors) {
+    success.value = false;
+    waiting.value = false;
+    return $showToast(body.errors[0].message, 'error')
+  }
   let depositId = body.depositId
   let sign;
   try {
@@ -132,6 +137,11 @@ const purchase = async () => {
   })
   body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    success.value = false;
+    waiting.value = false;
+    return $showToast(body.errors[0].message, 'error')
+  }
 
   let int = setInterval(async () => {
     resp = await $API().Payments.Deposit.getStatus({
@@ -152,7 +162,7 @@ const purchase = async () => {
         success.value = false;
       }, 3000)
     }
-    else if(body.status == 'ERROR') {
+    else if (body.status == 'ERROR') {
       clearInterval(int)
       waiting.value = false;
       success.value = false;
@@ -166,6 +176,9 @@ onMounted(async () => {
   let body = await resp.json();
 
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   body.tokens.map(el => {
     tokens.value.push(el.splToken);
     el.prices.map(price => {

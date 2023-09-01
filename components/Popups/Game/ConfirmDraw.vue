@@ -10,15 +10,21 @@
     >
       <div class="popup__heading">Are you sure you want to offer a draw?</div>
       <div class="actions">
-        <div class="button" @click="offewDraw">Offer a draw</div>
-        <div class="button" @click="$togglePopup('GameConfirmDrawPopup')">Cancel</div>
+        <div
+          class="button"
+          @click="offewDraw"
+        >Offer a draw</div>
+        <div
+          class="button"
+          @click="$togglePopup('GameConfirmDrawPopup')"
+        >Cancel</div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-let { $togglePopup, $API } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 const offewDraw = async () => {
   let resp = await $API().Chess.offerDraw({
@@ -28,6 +34,9 @@ const offewDraw = async () => {
 
   let body = await resp.json();
   console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
   $togglePopup('GameConfirmDrawPopup')
 }
 </script>
@@ -42,7 +51,7 @@ const offewDraw = async () => {
   background: rgba(24, 27, 32, 0.55);
   backdrop-filter: blur(50px);
 
-  &__wrapper{
+  &__wrapper {
     background: rgba(0, 0, 0, 0.4) !important;
   }
 
@@ -77,5 +86,4 @@ const offewDraw = async () => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-</style>
+}</style>
