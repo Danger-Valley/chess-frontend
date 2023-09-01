@@ -174,7 +174,7 @@ let lobby = ref(),
 onMounted(async () => {
   console.log(useNuxtApp().ssrContext?.event.node.req.headers, useRequestURL());
 
-  if (useUserStore()?.getUser?.value.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
+  if (useUserStore()?.getUser?.value?.id && !useUserStore()?.getUser?.value?.username) $togglePopup('SetUsernamePopup')
 
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
