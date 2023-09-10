@@ -6,7 +6,7 @@
       <main class="main">
         <nav class="nav">
           <div
-            v-for="(tab, counter) in ['Profile', 'Last games']"
+            v-for="(tab, counter) in ['Profile', 'Last games', 'Rewards']"
             class="nav__tab"
             :class="{ 'nav__tab--active': counter == chosenTabIndex }"
             @click="chooseTabIndex(counter)"
@@ -185,6 +185,21 @@
               </div>
             </div>
           </template>
+          <template v-if="chosenTabIndex == 2">
+            <div class="rewards">
+              <div
+                class="reward"
+                v-for="reward in rewards"
+              >
+                <div class="reward__title">{{ reward.title }}</div>
+                <div class="reward__description">{{ reward.description }}</div>
+                <NuxtLink
+                  class="reward__claim"
+                  :to="reward.claimUrl"
+                >Claim reward</NuxtLink>
+              </div>
+            </div>
+          </template>
         </div>
       </main>
 
@@ -224,14 +239,15 @@ useHead({
       content: 'xChess - web3-powered community-driven chess platform on Solana blockchain'
     }, {
       property: 'og:url',
-      content: 'https://xchess.io'+useRequestURL().pathname
+      content: 'https://xchess.io' + useRequestURL().pathname
     }
   ]
 })
 
 let chosenTabIndex = ref(0),
   walletModalProviderRef = ref(),
-  PFPPopupref = ref()
+  PFPPopupref = ref(),
+  rewards = ref()
 
 const { publicKey, wallet, disconnect, connect, connecting, connected, ready, readyState } = useWallet();
 
@@ -240,7 +256,7 @@ const store = useUserStore()
 const user = computed(() => store.getUser.value),
   userWallets = computed(() => store.getWallets.value)
 
-let { $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $formatWallet, $connectWallet, $disconnectWallet } = useNuxtApp();
+let { $API, $showToast, $connectDiscord, $disconnectDiscord, $connectTwitter, $disconnectTwitter, $handleOnSuccess, $handleOnError, $formatWallet, $connectWallet, $disconnectWallet } = useNuxtApp();
 
 watch([connected, wallet, readyState], async () => {
   console.log(readyState.value, wallet.value)
@@ -281,10 +297,19 @@ const modifyGoogleIcon = () => {
   })
 }
 
-onMounted(() => {
+onMounted(async () => {
   chosenTabIndex.value = location.hash.slice(1);
   modifyGoogleIcon()
   console.log(publicKey.value)
+
+  let resp = await $API().Payments.Rewards.get({ accessToken: localStorage.getItem('accessToken') });
+  let body = await resp.json();
+
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+
+  rewards.value = body.rewards;
 })
 
 watch(user, () => {
@@ -564,6 +589,59 @@ watch(user, () => {
         }
       }
     }
+  }
+}
+
+.reward {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto 125px;
+  justify-content: space-between;
+  align-items: center;
+  font-family: "Neue Plak";
+  padding-bottom: 10px;
+
+  &:not(:last-of-type) {
+    border-bottom: 1px solid #3A3D40;
+  }
+
+  &s {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__title {
+    grid-column: 1;
+    grid-row: 1;
+    color: #FFF;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  &__description {
+    grid-column: 1;
+    grid-row: 2;
+    color: #ffffff4d;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  &__claim {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    padding: 13px 15px;
+    background: rgba(255, 255, 255, 0.05);
+
+    color: #FFF;
+    text-align: center;
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: "Montserrat";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
   }
 }
 
