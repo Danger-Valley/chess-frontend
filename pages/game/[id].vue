@@ -221,11 +221,11 @@
             <div class="hints__actions">
               <div
                 class="btn btn--blue"
-                @click="hints == 0 ? $togglePopup('GameHintsShopPopup') : $togglePopup('GameHintPopup')"
+                @click="hints == 0 ? openGameHintsShopPopup() : $togglePopup('GameHintPopup')"
               >Use hint</div>
               <div
                 class="btn"
-                @click="$togglePopup('GameHintsShopPopup')"
+                @click="openGameHintsShopPopup()"
               >Buy hints</div>
             </div>
           </aside>
@@ -250,9 +250,9 @@
         v-if="!isViewer"
         :opponent="playerOpponent"
       />
-      <PopupsGameHintsShop
+      <PopupsGameHintsShopAsync
         @update="getHints"
-        v-if="!isViewer"
+        v-if="!isViewer && PopupsGameHintsShopAsync"
       />
       <PopupsGameHint
         :hints="hints"
@@ -291,7 +291,6 @@ import { useSocketStore } from "~/stores/socket";
 import ArrowIcon from "@/assets/imgs/Arrow.svg"
 import ChatSend from "@/assets/imgs/chatSend.svg"
 import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
-import Lightbulb from "@/assets/imgs/lightbulb.svg"
 import OneSlashTwo from "@/assets/imgs/1slash2.svg"
 import Flag from "@/assets/imgs/flag.svg"
 import BackAll from "@/assets/imgs/backAll.svg"
@@ -356,7 +355,20 @@ let boardConfig = reactive({}),
   doTriggerAfterMove = false,
   hints = ref(0),
   isChatToggledMobile = ref(false),
-  hasNewMessages = ref(false)
+  hasNewMessages = ref(false),
+  canLoadComponent = ref(false),
+  PopupsGameHintsShopAsync = defineAsyncComponent({
+    loader: async () => import('~/components/Popups/Game/HintsShop.vue'),
+    delay: 0
+  })
+
+const openGameHintsShopPopup = () => {
+  if(!canLoadComponent.value) canLoadComponent.value = true;
+
+  nextTick(() => {
+    $togglePopup('GameHintsShopPopup')
+  })
+}
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
