@@ -357,13 +357,14 @@ let boardConfig = reactive({}),
   isChatToggledMobile = ref(false),
   hasNewMessages = ref(false),
   canLoadComponent = ref(false),
+  socketMove = false,
   PopupsGameHintsShopAsync = defineAsyncComponent({
     loader: async () => import('~/components/Popups/Game/HintsShop.vue'),
     delay: 0
   })
 
 const openGameHintsShopPopup = () => {
-  if(!canLoadComponent.value) canLoadComponent.value = true;
+  if (!canLoadComponent.value) canLoadComponent.value = true;
 
   nextTick(() => {
     $togglePopup('GameHintsShopPopup')
@@ -433,7 +434,6 @@ const sendMessage = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
 
-
   document.querySelector('.chat__input').value = "";
   document.querySelector('.chat__messages').scrollBy(0, 100000)
 }
@@ -467,7 +467,8 @@ const afterMove = async (e) => {
   turns.value.push(e.san);
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
-  if (e.color !== playerMe.value?.color) return;
+  // was if (e.color !== playerMe.value?.color || isViewer.value)
+  if(socketMove) return socketMove = false;;
   let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
@@ -544,6 +545,21 @@ const tryHint = () => {
 }
 
 onMounted(async () => {
+  window.addEventListener('freeze', (event) => {
+    console.log('freeze', event);
+  }, { capture: true });
+
+  window.addEventListener('resume', (event) => {
+    console.log('resume', event);
+    console.warn(`Is socket connected? ${store.socketGetter.connected}`)
+    if (!store.socketGetter.connected && process.client) {
+      setTimeout(() => {
+        console.warn(`Is socket connected? ${store.socketGetter.connected} - reloading`)
+        if (!store.socketGetter.connected) location.reload();
+      }, 3000)
+    }
+  }, { capture: true });
+
   // get my user
   let meResp, meBody;
   const accessToken = localStorage.getItem('accessToken');
@@ -562,7 +578,10 @@ onMounted(async () => {
     console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == game.value.id) {
       console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
-      if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
+      console.log(resp.payload.color, playerMe.value?.color);
+      // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
+      socketMove = true;
+      boardAPI.value.move(resp.payload.move);
 
       if (resp.payload.playerId == playerMe.value.id) {
         timer.value.me =

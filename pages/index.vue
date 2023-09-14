@@ -68,7 +68,7 @@
           </div>
         </div>
 
-        <div class="block">
+        <div class="block" style="display: flex; flex-direction: column;">
           <div class="block__double">Coming soon</div>
         </div>
 
