@@ -93,7 +93,7 @@ watch([connected, readyState], async () => {
     purchaseAfterConnection = false;
     purchase();
   }
-})
+}, { immediate: true })
 
 const purchase = async () => {
   console.log(publicKey.value?.toString())

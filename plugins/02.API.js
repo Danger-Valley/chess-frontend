@@ -494,6 +494,20 @@ class Events {
     });
   }
 }
+class Rewards {
+  constructor(path) {
+    this.localPath = `${path}/rewards`;
+  }
+
+  async get({ accessToken }) {
+    return await fetch(`${this.localPath}`, {
+      method: "GET",
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+}
 
 export default defineNuxtPlugin(() => {
   return {
@@ -516,7 +530,8 @@ export default defineNuxtPlugin(() => {
           Chat: new Chat(`${path}/game/api/v1`),
           Payments: {
             Hints: new Hints(`${path}/payments/api/v1`),
-            Deposit: new Deposit(`${path}/payments/api/v1`)
+            Deposit: new Deposit(`${path}/payments/api/v1`),
+            Rewards: new Rewards(`${path}/payments/api/v1`)
           },
           Events: new Events(`${path}/events/api/v1`)
         }

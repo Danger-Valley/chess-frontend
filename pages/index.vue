@@ -68,8 +68,8 @@
           </div>
         </div>
 
-        <div class="block">
-          <div class="block__double">Coming soon</div>
+        <div class="block block--coming-soon">
+          Coming soon
         </div>
 
         <div class="block event-1">
@@ -231,6 +231,21 @@ onMounted(async () => {
     grid-column: span 2;
     aspect-ratio: unset;
     padding: 0;
+  }
+
+  &--coming-soon{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    color: #FFFFFF4d;
+    text-align: center;
+    font-size: 16px;
+    font-family: "Neue Plak";
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
   }
 
   &__double {

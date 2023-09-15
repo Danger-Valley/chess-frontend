@@ -121,101 +121,115 @@
           ></GamePlayer>
         </div>
 
-        <aside class="aside info">
-          <div class="aside__heading">
-            Information
-            <DropdownArrowIcon></DropdownArrowIcon>
-          </div>
-          <div class="aside__divider"></div>
-          <div class="aside__heading">
-            History
-            <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
-          </div>
+        <div id="right-panels">
+          <aside class="aside info">
+            <div class="aside__heading">
+              Information
+              <DropdownArrowIcon></DropdownArrowIcon>
+            </div>
+            <div class="aside__divider"></div>
+            <div class="aside__heading">
+              History
+              <DropdownArrowIcon class="rotated"></DropdownArrowIcon>
+            </div>
 
-          <div class="aside__headings--mobile">
-            <div class="aside__heading--mobile aside__heading--mobile--active">History</div>
-            <div class="aside__heading--mobile">Information</div>
-          </div>
+            <div class="aside__headings--mobile">
+              <div class="aside__heading--mobile aside__heading--mobile--active">History</div>
+              <div class="aside__heading--mobile">Information</div>
+            </div>
 
-          <div class="turns">
-            <div
-              class="turn"
-              v-for="(turn, counter) in turns"
-            >
+            <div class="turns">
               <div
-                class="turn__counter"
-                v-if="counter % 2 == 0"
-              >{{ counter / 2 + 1 }}.</div>
+                class="turn"
+                v-for="(turn, counter) in turns"
+              >
+                <div
+                  class="turn__counter"
+                  v-if="counter % 2 == 0"
+                >{{ counter / 2 + 1 }}.</div>
+                <div
+                  class="turn__item"
+                  :class="{ 'turn__item--active': counter == activeTurnIndex - 1 }"
+                >{{ turn }}</div>
+              </div>
+            </div>
+
+            <div class="aside__divider aside__divider--bottom"></div>
+            <div class="panel">
               <div
-                class="turn__item"
-                :class="{ 'turn__item--active': counter == activeTurnIndex - 1 }"
-              >{{ turn }}</div>
-            </div>
-          </div>
+                v-if="!isViewer"
+                class="panel__container"
+                @click="$togglePopup('GameConfirmDrawPopup')"
+              >
+                <OneSlashTwo class="panel__icon" />
+              </div>
 
-          <div class="aside__divider aside__divider--bottom"></div>
-          <div class="panel">
-            <div
-              v-if="!isViewer"
-              class="panel__container panel__container--hint"
-              @click="hints == 0 ? $togglePopup('GameHintsShopPopup') : $togglePopup('GameHintPopup')"
-            >
-              <Lightbulb class="panel__icon" />
-              <span>{{ hints }}</span>
-            </div>
+              <div
+                v-if="!isViewer"
+                class="panel__container"
+                @click="$togglePopup('GameResignPopup')"
+              >
+                <Flag
+                  class="panel__icon"
+                  style="height: 100%; padding: 11px;"
+                />
+              </div>
 
-            <div
-              v-if="!isViewer"
-              class="panel__container"
-              @click="$togglePopup('GameConfirmDrawPopup')"
-            >
-              <OneSlashTwo class="panel__icon" />
-            </div>
+              <div
+                class="panel__container"
+                :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+                @click="stepHistory(-2)"
+              >
+                <BackAll class="panel__icon" />
+              </div>
 
-            <div
-              v-if="!isViewer"
-              class="panel__container"
-              @click="$togglePopup('GameResignPopup')"
-            >
-              <Flag
-                class="panel__icon"
-                style="height: 100%; padding: 11px;"
-              />
-            </div>
+              <div
+                class="panel__container"
+                :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
+                @click="stepHistory(-1)"
+              >
+                <BackOne class="panel__icon" />
+              </div>
 
-            <div
-              class="panel__container"
-              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
-              @click="stepHistory(-2)"
-            >
-              <BackAll class="panel__icon" />
-            </div>
+              <div
+                class="panel__container"
+                :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+                @click="stepHistory(1)"
+              >
+                <ForwardOne class="panel__icon" />
+              </div>
 
-            <div
-              class="panel__container"
-              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == 0 }"
-              @click="stepHistory(-1)"
-            >
-              <BackOne class="panel__icon" />
+              <div
+                class="panel__container"
+                :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
+                @click="stepHistory(2)"
+              >
+                <ForwardAll class="panel__icon" />
+              </div>
             </div>
-
-            <div
-              class="panel__container"
-              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
-              @click="stepHistory(1)"
-            >
-              <ForwardOne class="panel__icon" />
+          </aside>
+          <aside class="aside hints">
+            <div class="aside__heading">
+              Hints from AI
+              <span class="hints__mobile">{{ hints }} hints</span>
             </div>
-
-            <div
-              class="panel__container"
-              :class="{ 'panel__container--inactive': turns.length == 0 || activeTurnIndex == turns.length }"
-              @click="stepHistory(2)"
-            >
-              <ForwardAll class="panel__icon" />
+            <div class="aside__divider"></div>
+            <div class="hints__text">
+              You have {{ hints }} hints. You can use them on your
+              move in any game. AI will analyse the board and give the move suggestion.
             </div>
-          </div>
-        </aside>
+            <div class="hints__actions">
+              <div
+                class="btn btn--blue"
+                @click="hints == 0 ? openGameHintsShopPopup() : $togglePopup('GameHintPopup')"
+              >Use hint</div>
+              <div
+                class="btn"
+                @click="openGameHintsShopPopup()"
+              >Buy hints</div>
+            </div>
+          </aside>
+        </div>
       </main>
 
       <PopupsGameBegins
@@ -236,9 +250,9 @@
         v-if="!isViewer"
         :opponent="playerOpponent"
       />
-      <PopupsGameHintsShop
+      <PopupsGameHintsShopAsync
         @update="getHints"
-        v-if="!isViewer"
+        v-if="!isViewer && PopupsGameHintsShopAsync"
       />
       <PopupsGameHint
         :hints="hints"
@@ -277,7 +291,6 @@ import { useSocketStore } from "~/stores/socket";
 import ArrowIcon from "@/assets/imgs/Arrow.svg"
 import ChatSend from "@/assets/imgs/chatSend.svg"
 import DropdownArrowIcon from "@/assets/imgs/dropdownArrow.svg"
-import Lightbulb from "@/assets/imgs/lightbulb.svg"
 import OneSlashTwo from "@/assets/imgs/1slash2.svg"
 import Flag from "@/assets/imgs/flag.svg"
 import BackAll from "@/assets/imgs/backAll.svg"
@@ -342,7 +355,21 @@ let boardConfig = reactive({}),
   doTriggerAfterMove = false,
   hints = ref(0),
   isChatToggledMobile = ref(false),
-  hasNewMessages = ref(false)
+  hasNewMessages = ref(false),
+  canLoadComponent = ref(false),
+  socketMove = false,
+  PopupsGameHintsShopAsync = defineAsyncComponent({
+    loader: async () => import('~/components/Popups/Game/HintsShop.vue'),
+    delay: 0
+  })
+
+const openGameHintsShopPopup = () => {
+  if (!canLoadComponent.value) canLoadComponent.value = true;
+
+  nextTick(() => {
+    $togglePopup('GameHintsShopPopup')
+  })
+}
 
 const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
@@ -407,7 +434,6 @@ const sendMessage = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
 
-
   document.querySelector('.chat__input').value = "";
   document.querySelector('.chat__messages').scrollBy(0, 100000)
 }
@@ -441,7 +467,8 @@ const afterMove = async (e) => {
   turns.value.push(e.san);
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
-  if (e.color !== playerMe.value?.color) return;
+  // was if (e.color !== playerMe.value?.color || isViewer.value)
+  if(socketMove) return socketMove = false;;
   let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
@@ -518,6 +545,21 @@ const tryHint = () => {
 }
 
 onMounted(async () => {
+  window.addEventListener('freeze', (event) => {
+    console.log('freeze', event);
+  }, { capture: true });
+
+  window.addEventListener('resume', (event) => {
+    console.log('resume', event);
+    console.warn(`Is socket connected? ${store.socketGetter.connected}`)
+    if (!store.socketGetter.connected && process.client) {
+      setTimeout(() => {
+        console.warn(`Is socket connected? ${store.socketGetter.connected} - reloading`)
+        if (!store.socketGetter.connected) location.reload();
+      }, 3000)
+    }
+  }, { capture: true });
+
   // get my user
   let meResp, meBody;
   const accessToken = localStorage.getItem('accessToken');
@@ -536,7 +578,10 @@ onMounted(async () => {
     console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == game.value.id) {
       console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
-      if (resp.payload?.color !== playerMe.value?.color) boardAPI.value.move(resp.payload.move);
+      console.log(resp.payload.color, playerMe.value?.color);
+      // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
+      socketMove = true;
+      boardAPI.value.move(resp.payload.move);
 
       if (resp.payload.playerId == playerMe.value.id) {
         timer.value.me =
@@ -677,7 +722,11 @@ onMounted(async () => {
     body.game.playerTwo.joined &&
     !(body.game.playerOne.id == localStorage.getItem('userId') || body.game.playerTwo.id == localStorage.getItem('userId'))
   ) console.error('Two players have already joined the game');
-  else if (localStorage.getItem('accessToken') && (!body.game.playerOne.joined || !body.game.playerTwo.joined)) {
+  else if (
+    localStorage.getItem('accessToken') &&
+    (!body.game.playerOne.joined || !body.game.playerTwo.joined) &&
+    body.game.status == "CREATED"
+  ) {
     let joinBody = await join();
     if (joinBody) body = joinBody;
     game.value = body.game;
@@ -928,10 +977,14 @@ const initAfterBoardCreated = async () => {
       if (game.value.moves.at(-1).playerId == playerMe.value.id) {
         //timer.value.opponent = timer.value.opponent - (new Date() - new Date(lastTime)) - 5000
         lastTimerValue = timer.value.opponent
+        activeTimer.value = 'opponent'
+        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
       }
       else if (game.value.moves.at(-1).playerId == playerOpponent.value.id) {
         //timer.value.me = timer.value.me - (new Date() - new Date(lastTime)) - 5000
         lastTimerValue = timer.value.me
+        activeTimer.value = 'me'
+        timerMeInterval = setInterval(timerMeFunc, 100)
       }
 
       lastTimeForInterval = new Date(lastTime);
@@ -956,6 +1009,7 @@ onUnmounted(() => {
   gap: 25px 20px;
   padding: 20px 33px;
   background-color: $color-font;
+  overflow: hidden;
 
   &--noOverflow {
     overflow: hidden !important;
@@ -1096,6 +1150,7 @@ onUnmounted(() => {
 
 .info {
   grid-column: 3;
+  height: 100%;
 }
 
 .turn {
@@ -1199,6 +1254,57 @@ onUnmounted(() => {
   rotate: 90deg;
 }
 
+.hints {
+  &__mobile {
+    display: none;
+  }
+
+  &__text {
+    font-family: "Neue Plak";
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 16px;
+    letter-spacing: 0em;
+    text-align: left;
+    color: #fff;
+  }
+
+  &__actions {
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 13px 15px;
+    background: rgba(255, 255, 255, 0.05);
+
+    color: #FFF;
+    text-align: center;
+    font-feature-settings: 'clig' off, 'liga' off;
+    font-family: Montserrat;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
+    cursor: pointer;
+
+    &--blue {
+      color: #181B20;
+      background: #1FA2F3;
+    }
+  }
+}
+
+#right-panels {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 // used to be max-width: #{map-get($sizes, "tablet")-1 + px}
 @media screen and (max-width: 1200px) {
   .page {
@@ -1207,6 +1313,7 @@ onUnmounted(() => {
     overflow: auto;
     padding: unset;
     overflow-x: hidden;
+    overflow-y: auto;
   }
 
   .back-to-lobby {
@@ -1384,6 +1491,24 @@ onUnmounted(() => {
 
   .turns {
     margin-bottom: 5px;
+  }
+
+  #right-panels {
+    gap: 20px;
+  }
+
+  .hints {
+    order: -1;
+
+    &__mobile {
+      margin-left: auto;
+      display: block;
+    }
+
+    &__text,
+    .aside__divider {
+      display: none;
+    }
   }
 }
 </style>
