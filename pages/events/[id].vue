@@ -37,7 +37,7 @@
           <div
             class="register__btn"
             v-if="!event?.isRegistered"
-            @click="$togglePopup('ChooseTeamPopup')"
+            @click="register"
           >Register</div>
           <div
             class="register__btn register__btn--registered"
@@ -223,6 +223,23 @@ const getLeaderboard = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
   event.value = body;
+}
+
+const register = async () => {
+  if (event?.event?.teams && event?.event?.teams.length > 1) {
+    return $togglePopup('ChooseTeamPopup')
+  }
+
+  let resp = await $API().Events.register({
+    accessToken: localStorage.getItem('accessToken'),
+    id: event.value.event.id
+  });
+  let body = await resp.json();
+  console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
+  }
+  event.value.isRegistered = body.success;
 }
 
 onMounted(async () => {
