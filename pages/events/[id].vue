@@ -99,7 +99,7 @@
           <div>Username</div>
           <div>W-D-L</div>
           <div>Score</div>
-          <div>Team</div>
+          <div v-if="event?.event?.teams?.length > 0">Team</div>
           <div>Rewards</div>
         </div>
         <div
@@ -117,7 +117,7 @@
           </div>
           <div>{{ rank.winsCount }}-{{ rank.drawsCount }}-{{ rank.losesCount }}</div>
           <div>{{ rank.score }}</div>
-          <div>{{ rank.team }}</div>
+          <div v-if="event?.event?.teams?.length > 0">{{ rank.team }}</div>
           <div>{{ rank.reward }}</div>
         </div>
       </div>
@@ -209,15 +209,15 @@ const formatDate = (date) => {
 }
 
 const getLeaderboard = async () => {
-  resp = await $API().Events.getLeaderboard({ id: event.value.event.id });
-  body = await resp.json();
+  let resp = await $API().Events.getLeaderboard({ id: event.value.event.id });
+  let body = await resp.json();
   if (body.errors) {
     return $showToast(body.errors[0].message, 'error')
   }
   participants.value = body.participants
 
-  let resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
-  let body = await resp.json();
+  resp = await $API().Events.getById({ id: useRoute().params.id, accessToken: localStorage.getItem('accessToken') });
+  body = await resp.json();
   console.log(body);
   if (body.errors) {
     return $showToast(body.errors[0].message, 'error')
