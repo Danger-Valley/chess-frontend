@@ -441,6 +441,8 @@ const sendMessage = async () => {
 const stepHistory = async (step) => {
   if (!boardAPI.value) return;
 
+  console.log('mitim', 'stepHistory', step, activeTurnIndex.value, turns.value.length)
+
   console.log(step, activeTurnIndex.value, turns.value.length)
 
   if (step == 2) {
@@ -463,18 +465,31 @@ const stepHistory = async (step) => {
 
 const afterMove = async (e) => {
   console.log("After move:", e)
+
+  console.log("mitim", 'afterMove', "After move:", e)
+  console.log("mitim", 'afterMove', "doTriggerAfterMove:", doTriggerAfterMove)
+
   if (!doTriggerAfterMove) return false;
+  
   turns.value.push(e.san);
+  
+  console.log("mitim", "afterMove", 'turns', turns);
+  
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
+
+  console.log("mitim", "afterMove", 'activeTurnIndex.value', activeTurnIndex.value);
+  console.log("mitim", "afterMove", 'socketMove', socketMove);
+
   // was if (e.color !== playerMe.value?.color || isViewer.value)
-  if(socketMove) return socketMove = false;;
+  if(socketMove) return socketMove = false;
   let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
+  console.log("mitim", "afterMove", 'body', body);
 
   if (body.errors) {
     return $showToast(body.errors[0].message, 'error')
