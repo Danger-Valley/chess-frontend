@@ -463,12 +463,16 @@ const stepHistory = async (step) => {
 
 const afterMove = async (e) => {
   console.log("After move:", e)
+
   if (!doTriggerAfterMove) return false;
+  
   turns.value.push(e.san);
+  
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
+
   // was if (e.color !== playerMe.value?.color || isViewer.value)
-  if(socketMove) return socketMove = false;;
+  if(socketMove) return socketMove = false;
   let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
@@ -577,13 +581,19 @@ onMounted(async () => {
   store.listen('game_event', async (resp) => {
     console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == game.value.id) {
+      const turnColor = boardAPI.value.getTurnColor() == 'white' ? 'w' : 'b';
+
       console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
       console.log(resp.payload.color, playerMe.value?.color);
       // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
-      socketMove = true;
-      boardAPI.value.move(resp.payload.move);
+
+      if (turnColor == resp.payload.color){
+        socketMove = true;
+        boardAPI.value.move(resp.payload.move);
+      }
 
       if (resp.payload.playerId == playerMe.value.id) {
+        // console.log('mitim', 'playerMe');
         timer.value.me =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -593,12 +603,14 @@ onMounted(async () => {
           100 +
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.opponent);
+
         clearInterval(timerMeInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-        activeTimer.value = 'opponent'
         lastTimerValue = timer.value.opponent
+        activeTimer.value = 'opponent'
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
+        // console.log('mitim', 'playerOpponent');
         timer.value.opponent =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -608,11 +620,13 @@ onMounted(async () => {
           100 +
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.me);
+
         clearInterval(timerOpponentInterval)
         timerMeInterval = setInterval(timerMeFunc, 100)
-        activeTimer.value = 'me'
         lastTimerValue = timer.value.me
+        activeTimer.value = 'me'
       }
+      
       lastTimeForInterval = new Date(resp.payload.createdAt)
       console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
     }
@@ -762,13 +776,6 @@ onMounted(async () => {
     if (body.game.playerTwo.joined) playerOpponent.value = body.game.playerTwo;
 
     isViewer.value;
-
-    console.log("mitim", "playerMe", playerMe.value);
-    console.log("mitim", "playerOpponent", playerOpponent.value);
-    console.log("mitim", "game.status", game.value.status);
-    console.log("mitim", "body?.game?.playerOne?.joined", body?.game?.playerOne?.joined);
-    console.log("mitim", "body?.game?.playerTwo?.joined", body?.game?.playerTwo?.joined);
-
 
     if (game.value.status == "CREATED") {
       if (!body?.game?.playerOne?.joined || !body?.game?.playerTwo?.joined) {
