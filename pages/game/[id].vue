@@ -599,7 +599,11 @@ onMounted(async () => {
       console.log('mitim', 'move2', 'move:', resp.payload.move);
       boardAPI.value.move(resp.payload.move);
 
-      if (resp.payload.playerId == playerMe.value.id) {
+      console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerMe.value.id:', playerMe.value.id, 'resp.payload.color:', resp.payload.color, 'playerMe.value.color:', playerMe.value.color);
+      console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerOpponent.value.id:', playerOpponent.value.id, 'resp.payload.color:', resp.payload.color, 'playerOpponent.value.color:', playerOpponent.value.color);
+
+      if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
+        console.log('mitim', 'PLAYER ME');
         timer.value.me =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -614,7 +618,8 @@ onMounted(async () => {
         activeTimer.value = 'opponent'
         lastTimerValue = timer.value.opponent
       }
-      else if (resp.payload.playerId == playerOpponent.value.id) {
+      else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
+        console.log('mitim', 'PLAYER OPPONENT');
         timer.value.opponent =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -628,6 +633,9 @@ onMounted(async () => {
         timerMeInterval = setInterval(timerMeFunc, 100)
         activeTimer.value = 'me'
         lastTimerValue = timer.value.me
+      }
+      else {
+        console.log('mitim', 'PLAYER NONE!');
       }
       lastTimeForInterval = new Date(resp.payload.createdAt)
       console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
