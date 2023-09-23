@@ -592,53 +592,57 @@ onMounted(async () => {
   store.listen('game_event', async (resp) => {
     console.log("Game event:", resp)
     if (resp.type == 'GAME_MOVE' && resp.gameId == game.value.id) {
-      console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
-      console.log(resp.payload.color, playerMe.value?.color);
-      // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
-      socketMove = true;
-      console.log('mitim', 'move2', 'move:', resp.payload.move);
-      boardAPI.value.move(resp.payload.move);
+      const turnColor = boardAPI.value.getTurnColor() == 'white' ? 'w' : 'b';
 
-      console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerMe.value.id:', playerMe.value.id, 'resp.payload.color:', resp.payload.color, 'playerMe.value.color:', playerMe.value.color);
-      console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerOpponent.value.id:', playerOpponent.value.id, 'resp.payload.color:', resp.payload.color, 'playerOpponent.value.color:', playerOpponent.value.color);
+      if (turnColor == resp.payload.color){
+        console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
+        console.log(resp.payload.color, playerMe.value?.color);
+        // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
+        socketMove = true;
+        console.log('mitim', 'move2', 'move:', resp.payload.move);
+        boardAPI.value.move(resp.payload.move);
 
-      if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
-        console.log('mitim', 'PLAYER ME');
-        timer.value.me =
-          // 3600 * 1000
-          (game.value.config.timeForGame * 1000) -
-          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-          (timeAddedPerMove * 1000) -
-          // minus 100 - because interval is not immediate
-          100 +
-          // 'restore' from opponent's time
-          (game.value.config.timeForGame * 1000 - timer.value.opponent);
-        clearInterval(timerMeInterval)
-        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-        activeTimer.value = 'opponent'
-        lastTimerValue = timer.value.opponent
+        console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerMe.value.id:', playerMe.value.id, 'resp.payload.color:', resp.payload.color, 'playerMe.value.color:', playerMe.value.color);
+        console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerOpponent.value.id:', playerOpponent.value.id, 'resp.payload.color:', resp.payload.color, 'playerOpponent.value.color:', playerOpponent.value.color);
+
+        if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
+          console.log('mitim', 'PLAYER ME');
+          timer.value.me =
+            // 3600 * 1000
+            (game.value.config.timeForGame * 1000) -
+            (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+            (timeAddedPerMove * 1000) -
+            // minus 100 - because interval is not immediate
+            100 +
+            // 'restore' from opponent's time
+            (game.value.config.timeForGame * 1000 - timer.value.opponent);
+          clearInterval(timerMeInterval)
+          timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+          activeTimer.value = 'opponent'
+          lastTimerValue = timer.value.opponent
+        }
+        else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
+          console.log('mitim', 'PLAYER OPPONENT');
+          timer.value.opponent =
+            // 3600 * 1000
+            (game.value.config.timeForGame * 1000) -
+            (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+            (timeAddedPerMove * 1000) -
+            // minus 100 - because interval is not immediate
+            100 +
+            // 'restore' from opponent's time
+            (game.value.config.timeForGame * 1000 - timer.value.me);
+          clearInterval(timerOpponentInterval)
+          timerMeInterval = setInterval(timerMeFunc, 100)
+          activeTimer.value = 'me'
+          lastTimerValue = timer.value.me
+        }
+        else {
+          console.log('mitim', 'PLAYER NONE!');
+        }
+        lastTimeForInterval = new Date(resp.payload.createdAt)
+        console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
       }
-      else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
-        console.log('mitim', 'PLAYER OPPONENT');
-        timer.value.opponent =
-          // 3600 * 1000
-          (game.value.config.timeForGame * 1000) -
-          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-          (timeAddedPerMove * 1000) -
-          // minus 100 - because interval is not immediate
-          100 +
-          // 'restore' from opponent's time
-          (game.value.config.timeForGame * 1000 - timer.value.me);
-        clearInterval(timerOpponentInterval)
-        timerMeInterval = setInterval(timerMeFunc, 100)
-        activeTimer.value = 'me'
-        lastTimerValue = timer.value.me
-      }
-      else {
-        console.log('mitim', 'PLAYER NONE!');
-      }
-      lastTimeForInterval = new Date(resp.payload.createdAt)
-      console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
