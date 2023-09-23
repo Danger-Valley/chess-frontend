@@ -583,15 +583,16 @@ onMounted(async () => {
     if (resp.type == 'GAME_MOVE' && resp.gameId == game.value.id) {
       const turnColor = boardAPI.value.getTurnColor() == 'white' ? 'w' : 'b';
 
+      console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
+      console.log(resp.payload.color, playerMe.value?.color);
+      // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
+
       if (turnColor == resp.payload.color){
-        console.log(resp.payload.playerId, playerMe.value.id, playerOpponent.value.id)
-        console.log(resp.payload.color, playerMe.value?.color);
-        // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
         socketMove = true;
         boardAPI.value.move(resp.payload.move);
       }
 
-      if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
+      if (resp.payload.playerId == playerMe.value.id) {
         timer.value.me =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -606,7 +607,7 @@ onMounted(async () => {
         activeTimer.value = 'opponent'
         lastTimerValue = timer.value.opponent
       }
-      else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
+      else if (resp.payload.playerId == playerOpponent.value.id) {
         timer.value.opponent =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
