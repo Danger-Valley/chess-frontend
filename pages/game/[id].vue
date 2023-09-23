@@ -603,10 +603,13 @@ onMounted(async () => {
           100 +
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.opponent);
+
+        if (turnColor == resp.payload.color){
         clearInterval(timerMeInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-        activeTimer.value = 'opponent'
         lastTimerValue = timer.value.opponent
+        }
+        activeTimer.value = 'opponent'
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
         console.log('mitim', 'playerOpponent');
@@ -619,10 +622,13 @@ onMounted(async () => {
           100 +
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.me);
-        clearInterval(timerOpponentInterval)
-        timerMeInterval = setInterval(timerMeFunc, 100)
+
+        if (turnColor == resp.payload.color){
+          clearInterval(timerOpponentInterval)
+          timerMeInterval = setInterval(timerMeFunc, 100)
+          lastTimerValue = timer.value.me
+        }
         activeTimer.value = 'me'
-        lastTimerValue = timer.value.me
       }
 
       lastTimeForInterval = new Date(resp.payload.createdAt)
