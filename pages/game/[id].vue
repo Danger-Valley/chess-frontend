@@ -441,8 +441,6 @@ const sendMessage = async () => {
 const stepHistory = async (step) => {
   if (!boardAPI.value) return;
 
-  console.log('mitim', 'stepHistory', step, activeTurnIndex.value, turns.value.length)
-
   console.log(step, activeTurnIndex.value, turns.value.length)
 
   if (step == 2) {
@@ -466,20 +464,12 @@ const stepHistory = async (step) => {
 const afterMove = async (e) => {
   console.log("After move:", e)
 
-  console.log("mitim", 'afterMove', "After move:", e)
-  console.log("mitim", 'afterMove', "doTriggerAfterMove:", doTriggerAfterMove)
-
   if (!doTriggerAfterMove) return false;
   
   turns.value.push(e.san);
   
-  console.log("mitim", "afterMove", 'turns', turns);
-  
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
-
-  console.log("mitim", "afterMove", 'activeTurnIndex.value', activeTurnIndex.value);
-  console.log("mitim", "afterMove", 'socketMove', socketMove);
 
   // was if (e.color !== playerMe.value?.color || isViewer.value)
   if(socketMove) return socketMove = false;
@@ -489,7 +479,6 @@ const afterMove = async (e) => {
     accessToken: localStorage.getItem('accessToken')
   })
   let body = await resp.json();
-  console.log("mitim", "afterMove", 'body', body);
 
   if (body.errors) {
     return $showToast(body.errors[0].message, 'error')
@@ -599,50 +588,42 @@ onMounted(async () => {
         console.log(resp.payload.color, playerMe.value?.color);
         // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
         socketMove = true;
-        console.log('mitim', 'move2', 'move:', resp.payload.move);
         boardAPI.value.move(resp.payload.move);
-
-        console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerMe.value.id:', playerMe.value.id, 'resp.payload.color:', resp.payload.color, 'playerMe.value.color:', playerMe.value.color);
-        console.log('mitim', 'GAME_MOVE', 'resp.payload.playerId:', resp.payload.playerId, 'playerOpponent.value.id:', playerOpponent.value.id, 'resp.payload.color:', resp.payload.color, 'playerOpponent.value.color:', playerOpponent.value.color);
-
-        if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
-          console.log('mitim', 'PLAYER ME');
-          timer.value.me =
-            // 3600 * 1000
-            (game.value.config.timeForGame * 1000) -
-            (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-            (timeAddedPerMove * 1000) -
-            // minus 100 - because interval is not immediate
-            100 +
-            // 'restore' from opponent's time
-            (game.value.config.timeForGame * 1000 - timer.value.opponent);
-          clearInterval(timerMeInterval)
-          timerOpponentInterval = setInterval(timerOpponentFunc, 100)
-          activeTimer.value = 'opponent'
-          lastTimerValue = timer.value.opponent
-        }
-        else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
-          console.log('mitim', 'PLAYER OPPONENT');
-          timer.value.opponent =
-            // 3600 * 1000
-            (game.value.config.timeForGame * 1000) -
-            (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
-            (timeAddedPerMove * 1000) -
-            // minus 100 - because interval is not immediate
-            100 +
-            // 'restore' from opponent's time
-            (game.value.config.timeForGame * 1000 - timer.value.me);
-          clearInterval(timerOpponentInterval)
-          timerMeInterval = setInterval(timerMeFunc, 100)
-          activeTimer.value = 'me'
-          lastTimerValue = timer.value.me
-        }
-        else {
-          console.log('mitim', 'PLAYER NONE!');
-        }
-        lastTimeForInterval = new Date(resp.payload.createdAt)
-        console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
       }
+
+      if (resp.payload.playerId == playerMe.value.id && resp.payload.color == playerMe.value.color) {
+        timer.value.me =
+          // 3600 * 1000
+          (game.value.config.timeForGame * 1000) -
+          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+          (timeAddedPerMove * 1000) -
+          // minus 100 - because interval is not immediate
+          100 +
+          // 'restore' from opponent's time
+          (game.value.config.timeForGame * 1000 - timer.value.opponent);
+        clearInterval(timerMeInterval)
+        timerOpponentInterval = setInterval(timerOpponentFunc, 100)
+        activeTimer.value = 'opponent'
+        lastTimerValue = timer.value.opponent
+      }
+      else if (resp.payload.playerId == playerOpponent.value.id && resp.payload.color == playerOpponent.value.color) {
+        timer.value.opponent =
+          // 3600 * 1000
+          (game.value.config.timeForGame * 1000) -
+          (new Date(resp.payload.createdAt) - new Date(game.value.startedAt)) +
+          (timeAddedPerMove * 1000) -
+          // minus 100 - because interval is not immediate
+          100 +
+          // 'restore' from opponent's time
+          (game.value.config.timeForGame * 1000 - timer.value.me);
+        clearInterval(timerOpponentInterval)
+        timerMeInterval = setInterval(timerMeFunc, 100)
+        activeTimer.value = 'me'
+        lastTimerValue = timer.value.me
+      }
+
+      lastTimeForInterval = new Date(resp.payload.createdAt)
+      console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
@@ -791,13 +772,6 @@ onMounted(async () => {
 
     isViewer.value;
 
-    console.log("mitim", "playerMe", playerMe.value);
-    console.log("mitim", "playerOpponent", playerOpponent.value);
-    console.log("mitim", "game.status", game.value.status);
-    console.log("mitim", "body?.game?.playerOne?.joined", body?.game?.playerOne?.joined);
-    console.log("mitim", "body?.game?.playerTwo?.joined", body?.game?.playerTwo?.joined);
-
-
     if (game.value.status == "CREATED") {
       if (!body?.game?.playerOne?.joined || !body?.game?.playerTwo?.joined) {
         $togglePopup('SignInPopup');
@@ -847,7 +821,6 @@ const initAfterBoardCreated = async () => {
       if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
       else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
       lastTime = el.createdAt;
-      console.log('mitim', 'move1', 'move:', el.move);
       boardAPI.value.move(el.move);
     })
 
