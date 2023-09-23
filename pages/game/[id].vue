@@ -593,6 +593,7 @@ onMounted(async () => {
       }
 
       if (resp.payload.playerId == playerMe.value.id) {
+        console.log('mitim', 'playerMe');
         timer.value.me =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -608,6 +609,7 @@ onMounted(async () => {
         lastTimerValue = timer.value.opponent
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
+        console.log('mitim', 'playerOpponent');
         timer.value.opponent =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
