@@ -592,9 +592,8 @@ onMounted(async () => {
         boardAPI.value.move(resp.payload.move);
       }
 
-      if (turnColor == resp.payload.color){
       if (resp.payload.playerId == playerMe.value.id) {
-        console.log('mitim', 'playerMe');
+        // console.log('mitim', 'playerMe');
         timer.value.me =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -605,15 +604,13 @@ onMounted(async () => {
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.opponent);
 
-        if (turnColor == resp.payload.color){
         clearInterval(timerMeInterval)
         timerOpponentInterval = setInterval(timerOpponentFunc, 100)
         lastTimerValue = timer.value.opponent
-        }
         activeTimer.value = 'opponent'
       }
       else if (resp.payload.playerId == playerOpponent.value.id) {
-        console.log('mitim', 'playerOpponent');
+        // console.log('mitim', 'playerOpponent');
         timer.value.opponent =
           // 3600 * 1000
           (game.value.config.timeForGame * 1000) -
@@ -624,19 +621,14 @@ onMounted(async () => {
           // 'restore' from opponent's time
           (game.value.config.timeForGame * 1000 - timer.value.me);
 
-        if (turnColor == resp.payload.color){
-          clearInterval(timerOpponentInterval)
-          timerMeInterval = setInterval(timerMeFunc, 100)
-          lastTimerValue = timer.value.me
-        }
+        clearInterval(timerOpponentInterval)
+        timerMeInterval = setInterval(timerMeFunc, 100)
+        lastTimerValue = timer.value.me
         activeTimer.value = 'me'
       }
-
+      
       lastTimeForInterval = new Date(resp.payload.createdAt)
       console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
-
-      }
-
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
