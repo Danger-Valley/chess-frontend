@@ -581,6 +581,7 @@ onMounted(async () => {
       console.log(resp.payload.color, playerMe.value?.color);
       // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
       socketMove = true;
+      console.log('mitim', 'move2', 'move:', resp.payload.move);
       boardAPI.value.move(resp.payload.move);
 
       if (resp.payload.playerId == playerMe.value.id) {
@@ -819,6 +820,7 @@ const initAfterBoardCreated = async () => {
       if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
       else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
       lastTime = el.createdAt;
+      console.log('mitim', 'move1', 'move:', el.move);
       boardAPI.value.move(el.move);
     })
 
