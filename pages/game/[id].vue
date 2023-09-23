@@ -592,6 +592,7 @@ onMounted(async () => {
         boardAPI.value.move(resp.payload.move);
       }
 
+      if (turnColor == resp.payload.color){
       if (resp.payload.playerId == playerMe.value.id) {
         console.log('mitim', 'playerMe');
         timer.value.me =
@@ -633,6 +634,9 @@ onMounted(async () => {
 
       lastTimeForInterval = new Date(resp.payload.createdAt)
       console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
+
+      }
+
     }
     else if (resp.type == 'GAME_START') {
       resp = await $API().Chess.get({
