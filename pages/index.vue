@@ -19,7 +19,10 @@
         <div class="block rating">
           <template v-if="!useUserStore()?.getUser?.value?.id">
             <div class="rating--signin__text">Sign In to play Chess</div>
-            <div class="rating--signin__btn" @click="$togglePopup('SignInPopup')">Sign In</div>
+            <div
+              class="rating--signin__btn"
+              @click="$togglePopup('SignInPopup')"
+            >Sign In</div>
           </template>
 
           <template v-else-if="lobby?.user.rating != null">
@@ -179,7 +182,7 @@ onMounted(async () => {
   let resp = await $API().Lobby.get(localStorage.getItem('accessToken'));
   let body = await resp.json();
   console.log(body);
-  
+
   if (body.errors) {
     console.error(body.errors);
     return $showToast(body.errors[0].message, 'error')
@@ -188,6 +191,9 @@ onMounted(async () => {
   lobby.value = body;
 
   bannerBg.value = lobby.value?.banner?.image;
+
+  if (window.innerWidth < 1440 && window.innerWidth > 833) bannerBg.value = lobby.value?.banner?.imageSquare;
+  else bannerBg.value = lobby.value?.banner?.image;
 
   window.addEventListener('resize', () => {
     if (window.innerWidth < 1440 && window.innerWidth > 833) bannerBg.value = lobby.value?.banner?.imageSquare;
@@ -233,7 +239,7 @@ onMounted(async () => {
     padding: 0;
   }
 
-  &--coming-soon{
+  &--coming-soon {
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -626,5 +632,4 @@ onMounted(async () => {
       order: 0;
     }
   }
-}
-</style>
+}</style>

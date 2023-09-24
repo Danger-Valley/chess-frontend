@@ -44,6 +44,10 @@
             v-else-if="new Date() < new Date(event?.event.startAt)"
           >Registered</div>
           <div
+            class="register__btn register__btn--ended"
+            v-else-if="event?.event.status == 'FINISHED'"
+          >Ended</div>
+          <div
             class="register__btn"
             v-else
             @click="play"
@@ -386,6 +390,12 @@ onMounted(async () => {
 
     &--registered {
       background: #27F4BA;
+    }
+
+    &--ended {
+      background: rgba(255, 255, 255, 0.10);
+      color: #FFF;
+      cursor: auto;
     }
   }
 }
