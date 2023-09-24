@@ -372,6 +372,20 @@ const openGameHintsShopPopup = () => {
 }
 
 const openGameSearchPopup = async () => {
+  // if it is event game
+  if(game.value.eventId) {
+    let resp = await $API().Chess.initEventGame({
+      id: game.value.eventId,
+      accessToken: localStorage.getItem('accessToken')
+    })
+    let body = await resp.json();
+    console.log(body);
+    if (body.errors) {
+      return $showToast(body.errors[0].message, 'error')
+    }
+    await navigateTo(`/game/${body.game.id}`)
+  }
+  
   //localStorage.setItem('autoJoin', true);
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
@@ -1165,6 +1179,8 @@ onUnmounted(() => {
     display: grid;
     grid-template-columns: auto auto;
     justify-content: space-between;
+    max-height: calc(100vh - 375px);
+    overflow: auto;
   }
 
   display: flex;

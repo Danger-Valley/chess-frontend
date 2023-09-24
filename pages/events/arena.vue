@@ -44,6 +44,10 @@
             v-else-if="new Date() < new Date(arena?.event.startAt)"
           >Registered</div>
           <div
+            class="register__btn register__btn--ended"
+            v-else-if="arena?.event.status == 'FINISHED'"
+          >Ended</div>
+          <div
             class="register__btn"
             v-else
             @click="play"
@@ -60,7 +64,10 @@
           </div>
           <div class="prize">
             <div class="prize__heading">Prize Pool</div>
-            <div class="prize__underheading" v-html="arena?.event.prizePool.all"></div>
+            <div
+              class="prize__underheading"
+              v-html="arena?.event.prizePool.all"
+            ></div>
           </div>
         </div>
       </div>
@@ -118,7 +125,7 @@ useHead({
       content: 'Play Arena - competitive Web3 Chess on Solana blockchain - xChess'
     }, {
       property: 'og:url',
-      content: 'xchess.io'+useRequestURL().pathname
+      content: 'xchess.io' + useRequestURL().pathname
     }
   ]
 })
@@ -184,7 +191,7 @@ const register = async () => {
 
 onMounted(async () => {
   console.log(useNuxtApp().ssrContext?.event.node.req.headers, useRequestURL());
-  let resp = await $API().Events.getArena({ accessToken: localStorage.getItem('accessToken')});
+  let resp = await $API().Events.getArena({ accessToken: localStorage.getItem('accessToken') });
   let body = await resp.json();
   console.log(body);
   if (body.errors) {
@@ -325,9 +332,15 @@ onMounted(async () => {
     line-height: 100%;
     cursor: pointer;
 
-    &--registered{
+    &--registered {
       color: #181B20;
       background: #27F4BA;
+    }
+
+    &--ended {
+      background: rgba(255, 255, 255, 0.10);
+      color: #FFF;
+      cursor: auto;
     }
   }
 }
