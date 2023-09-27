@@ -140,7 +140,7 @@ import GameModeTime from "@/assets/imgs/game-mode-time.svg"
 import GameModeCoins from "@/assets/imgs/game-mode-coins.svg"
 import gameModes from "@/assets/content/gameModes.json"
 
-let { $API, $showToast } = useNuxtApp();
+let { $togglePopup, $API, $showToast } = useNuxtApp();
 
 let resp = await $API().Events.getById({ id: useRoute().params.id });
 let body = await resp.json();
@@ -230,7 +230,7 @@ const getLeaderboard = async () => {
 }
 
 const register = async () => {
-  if (event?.event?.teams && event?.event?.teams.length > 1) {
+  if (event?.value?.event?.teams && event?.value?.event?.teams.length > 1) {
     return $togglePopup('ChooseTeamPopup')
   }
 
