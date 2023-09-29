@@ -243,7 +243,7 @@
         :me="playerMe"
         :opponent="playerOpponent"
         :whoWon="whoWon"
-        @find-game="$togglePopup('GameSettingsPopup')"
+        @find-game="game.eventId ? searchEventGame : $togglePopup('GameSettingsPopup')"
       />
       <PopupsGameConfirmDraw v-if="!isViewer" />
       <PopupsGameIncomeDraw
@@ -279,6 +279,10 @@
       />
       <PopupsSignIn></PopupsSignIn>
     </div>
+    
+    <audio id="chess-move" style="display: hidden;">
+      <source src="@/assets/chess_move.wav" type="audio/wav" />
+    </audio>
   </ClientOnly>
 </template>
 
@@ -371,21 +375,21 @@ const openGameHintsShopPopup = () => {
   })
 }
 
-const openGameSearchPopup = async () => {
+const searchEventGame = async () => {
   // if it is event game
-  if(game.value.eventId) {
-    let resp = await $API().Chess.initEventGame({
-      id: game.value.eventId,
-      accessToken: localStorage.getItem('accessToken')
-    })
-    let body = await resp.json();
-    console.log(body);
-    if (body.errors) {
-      return $showToast(body.errors[0].message, 'error')
-    }
-    await navigateTo(`/game/${body.game.id}`)
+  let resp = await $API().Chess.initEventGame({
+    id: game.value.eventId,
+    accessToken: localStorage.getItem('accessToken')
+  })
+  let body = await resp.json();
+  console.log(body);
+  if (body.errors) {
+    return $showToast(body.errors[0].message, 'error')
   }
-  
+  await navigateTo(`/game/${body.game.id}`)
+}
+
+const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
@@ -476,17 +480,18 @@ const stepHistory = async (step) => {
 }
 
 const afterMove = async (e) => {
+  document.querySelector('#chess-move')?.play();
   console.log("After move:", e)
 
   if (!doTriggerAfterMove) return false;
-  
+
   turns.value.push(e.san);
-  
+
   boardAPI.value.stopViewingHistory()
   activeTurnIndex.value = turns.value.length;
 
   // was if (e.color !== playerMe.value?.color || isViewer.value)
-  if(socketMove) return socketMove = false;
+  if (socketMove) return socketMove = false;
   let resp = await $API().Chess.move({
     id: useRoute().params.id,
     move: e.san,
@@ -601,7 +606,7 @@ onMounted(async () => {
       console.log(resp.payload.color, playerMe.value?.color);
       // was if (resp.payload?.color !== playerMe.value?.color || isViewer.value)
 
-      if (turnColor == resp.payload.color){
+      if (turnColor == resp.payload.color) {
         socketMove = true;
         boardAPI.value.move(resp.payload.move);
       }
@@ -640,7 +645,7 @@ onMounted(async () => {
         lastTimerValue = timer.value.me
         activeTimer.value = 'me'
       }
-      
+
       lastTimeForInterval = new Date(resp.payload.createdAt)
       console.log(timerMeInterval, timerOpponentInterval, activeTimer.value, lastTimerValue)
     }
@@ -801,7 +806,7 @@ onMounted(async () => {
 
   // set board config
   boardConfig = {
-    //fen: body.game.state.fen,
+    fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
     coordinates: true,
     viewOnly: isViewer.value,
@@ -840,7 +845,9 @@ const initAfterBoardCreated = async () => {
       if (el.playerId == playerMe.value.id) timer.value.me = timer.value.me - (new Date(el.createdAt) - new Date(lastTime))
       else if (el.playerId == playerOpponent.value.id) timer.value.opponent = timer.value.opponent - (new Date(el.createdAt) - new Date(lastTime))
       lastTime = el.createdAt;
-      boardAPI.value.move(el.move);
+      
+      console.log(el);
+      //boardAPI.value.move(el.move);
     })
 
     if (game.value.moves.at(-1).playerId == playerMe.value.id) {
