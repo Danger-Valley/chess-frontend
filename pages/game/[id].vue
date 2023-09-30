@@ -281,7 +281,7 @@
     </div>
     
     <audio id="chess-move" style="display: hidden;">
-      <source src="@/assets/chess_move.wav" type="audio/wav" />
+      <source src="@/assets/chess_move.mp3" type="audio/mp3" />
     </audio>
   </ClientOnly>
 </template>
