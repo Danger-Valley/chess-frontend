@@ -9,6 +9,15 @@ export default defineNuxtConfig({
     '@nuxtjs/robots',
     'nuxt-simple-sitemap'
   ],
+  sitemap: {
+    exclude: [
+      '/twitterAuth',
+      '/discordAuth'
+    ],
+    urls: [
+      '/events/650b45ee29a1098682821e4a'
+    ]
+  },
   googleSignIn: {
     clientId: process.env.GOOGLE_CLIENT_ID,
   },

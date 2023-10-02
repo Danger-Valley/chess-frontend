@@ -216,7 +216,7 @@
             <div class="aside__divider"></div>
             <div class="hints__text">
               You have {{ hints }} hints. You can use them on your
-              move in any game. AI will analyse the board and give the move suggestion.
+              move in any game. AI will analyze the board and give the move suggestion.
             </div>
             <div class="hints__actions">
               <div
@@ -806,7 +806,6 @@ onMounted(async () => {
 
   // set board config
   boardConfig = {
-    fen: body.game.state.fen,
     orientation: playerMe.value?.color == 'w' ? 'white' : 'black',
     coordinates: true,
     viewOnly: isViewer.value,
@@ -834,6 +833,9 @@ onMounted(async () => {
 })
 
 const initAfterBoardCreated = async () => {
+  // load pgn
+  boardAPI.value.loadPgn(game.value.state.pgn)
+
   // calculate timer by counting moves and their timestamps
   console.warn("Moves:", game.value.moves.length)
   if (game.value.moves.length > 0) {
