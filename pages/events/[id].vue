@@ -153,17 +153,23 @@ useHead({
       property: 'description',
       content: `${body?.event?.description || 'Tournament - xChess'}`
     }, {
+      property: 'og:description',
+      content: `${body?.event?.description || 'Tournament - xChess'}`
+    }, {
       property: 'og:title',
-      content: 'Tournament - xChess'
+      content: `${body?.event?.title || 'Tournament - xChess'}`
     }, {
       property: 'twitter:title',
-      content: 'Tournament - xChess'
-    }, {
-      property: 'og:description',
-      content: 'Tournament - xChess'
+      content: `${body?.event?.title || 'Tournament - xChess'}`
     }, {
       property: 'og:url',
       content: 'xchess.io' + useRequestURL().pathname
+    }, {
+      property: 'og:image',
+      content: `${body?.event?.image || 'https://images.xchess.io/static/thumbnail.png'}`
+    }, {
+      property: 'twitter:image',
+      content: `${body?.event?.image || 'https://images.xchess.io/static/thumbnail.png'}`
     }
   ]
 })
