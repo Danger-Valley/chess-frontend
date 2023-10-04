@@ -472,7 +472,7 @@ onMounted(async () => {
 }
 
 .team {
-  min-width: 370px;
+  min-width: 420px;
   display: flex;
   flex-direction: row;
   border-radius: 20px;
@@ -500,7 +500,7 @@ onMounted(async () => {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 190px;
+    max-width: 240px;
   }
 
   &__info {
