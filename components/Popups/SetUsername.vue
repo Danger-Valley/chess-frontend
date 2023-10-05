@@ -57,8 +57,9 @@ const update = async () => {
 const check = async () => {
   clearTimeout(checkTimeout)
   checkTimeout = setTimeout(async () => {
-    let username = document.querySelector('.field__input').value;
-
+    let username = document.querySelector('.field__input').value;    
+    if (username.length < 3) return status.value = "Too short";
+    
     let resp = await $API().User.checkUsername({
       accessToken: localStorage.getItem('accessToken'),
       username
