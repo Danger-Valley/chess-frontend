@@ -56,10 +56,15 @@
           @click="emits('findGame')"
         >Find a new game</div>
         <div
-          v-if="!isViewer"
+          v-if="!isViewer && !isEvent"
           class="button"
           @click="offerRevenge"
         >Offer revenge</div>
+        <div
+          v-else-if="!isViewer && isEvent"
+          class="button"
+          @click="navigateTo('/')"
+        >Back to lobby</div>
         <div
           class="button"
           @click="$togglePopup('GameEndsPopup')"
@@ -72,7 +77,7 @@
 <script setup>
 let { $togglePopup, $API, $showToast } = useNuxtApp();
 
-let props = defineProps(['me', 'opponent', 'whoWon', 'isViewer'])
+let props = defineProps(['me', 'opponent', 'whoWon', 'isViewer', 'isEvent'])
 let emits = defineEmits(['findGame'])
 
 watch(() => props.whoWon, () => {
@@ -172,5 +177,4 @@ onMounted(() => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-}
-</style>
+}</style>

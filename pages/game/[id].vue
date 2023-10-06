@@ -243,7 +243,8 @@
         :me="playerMe"
         :opponent="playerOpponent"
         :whoWon="whoWon"
-        @find-game="game.eventId ? searchEventGame : $togglePopup('GameSettingsPopup')"
+        :isEvent="!!game?.eventId"
+        @find-game="game?.eventId ? searchEventGame() : $togglePopup('GameSettingsPopup')"
       />
       <PopupsGameConfirmDraw v-if="!isViewer" />
       <PopupsGameIncomeDraw
@@ -377,6 +378,7 @@ const openGameHintsShopPopup = () => {
 
 const searchEventGame = async () => {
   // if it is event game
+  console.log(game.value.eventId)
   let resp = await $API().Chess.initEventGame({
     id: game.value.eventId,
     accessToken: localStorage.getItem('accessToken')
