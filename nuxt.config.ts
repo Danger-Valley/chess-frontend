@@ -15,7 +15,9 @@ export default defineNuxtConfig({
       '/discordAuth'
     ],
     urls: [
-      '/events/650b45ee29a1098682821e4a'
+      '/events/650b45ee29a1098682821e4a',
+      '/events/651c82a692b7ab49135eb95e',
+      '/events/651dba85ff503ad2576a668f'
     ]
   },
   googleSignIn: {
