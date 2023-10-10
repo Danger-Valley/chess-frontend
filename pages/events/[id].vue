@@ -166,10 +166,10 @@ useHead({
       content: 'xchess.io' + useRequestURL().pathname
     }, {
       property: 'og:image',
-      content: `${body?.event?.image || 'https://images.xchess.io/static/thumbnail.png'}`
+      content: `${body?.event?.shareImage || 'https://images.xchess.io/static/thumbnail.png'}`
     }, {
       property: 'twitter:image',
-      content: `${body?.event?.image || 'https://images.xchess.io/static/thumbnail.png'}`
+      content: `${body?.event?.shareImage || 'https://images.xchess.io/static/thumbnail.png'}`
     }
   ]
 })
