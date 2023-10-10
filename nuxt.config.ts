@@ -17,7 +17,8 @@ export default defineNuxtConfig({
     urls: [
       '/events/650b45ee29a1098682821e4a',
       '/events/651c82a692b7ab49135eb95e',
-      '/events/651dba85ff503ad2576a668f'
+      '/events/651dba85ff503ad2576a668f',
+      '/events/6525af073919a9c269fa561e',
     ]
   },
   googleSignIn: {
