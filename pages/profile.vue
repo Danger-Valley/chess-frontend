@@ -48,10 +48,11 @@
                   id="social-discord"
                   @click="$connectDiscord('update')"
                 >
-                  <IconDiscord
+                  <img
+                    src="@/assets/imgs/discord-logo.png"
                     class="social__icon"
                     alt="discord icon"
-                  ></IconDiscord>
+                  />
                   <div class="user">
                     <template v-if="user?.discordUser">
                       <img
@@ -457,6 +458,7 @@ watch(user, () => {
   }
 
   &__icon {
+    width: 24px;
     margin-left: 5px;
   }
 }

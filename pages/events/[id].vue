@@ -130,6 +130,8 @@
         :teams="event?.event.teams"
         @register="getLeaderboard"
       />
+
+      <PopupsEventEmail/>
     </div>
   </ClientOnly>
 </template>
@@ -250,6 +252,7 @@ const register = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
   event.value.isRegistered = body.success;
+  if(body.value.isEmailNeeded) $togglePopup('EnterEmailPopup');
 }
 
 onMounted(async () => {

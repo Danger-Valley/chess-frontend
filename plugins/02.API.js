@@ -170,6 +170,17 @@ class User {
     });
   }
 
+  async saveEmail({accessToken, email}){
+    return await fetch(`${this.localPath}/saveEmail`, {
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        email
+      })
+    })
+  }
 }
 class Wallet {
   constructor(path) {
