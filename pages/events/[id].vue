@@ -90,7 +90,7 @@
               <br />
               Games played: {{ team.winsCount + team.losesCount + team.drawsCount }}
               <br />
-              Win rate: {{ Math.round((team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) * 100) / 100  }}%
+              Win rate: {{ Math.round((team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) * 100)  }}%
               <br />
             </div>
           </div>
