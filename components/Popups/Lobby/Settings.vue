@@ -96,7 +96,9 @@ import BlackFigure from "@/assets/imgs/blackFigure.svg"
 import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
-let props = defineProps(['isAI'])
+let props = defineProps({
+  preset: "Anyone" || "Friend" || "AI" || "Arena"
+})
 
 let playWith = ref(0),
   gameType = ref(gameModes?.[0]),
@@ -105,10 +107,18 @@ let playWith = ref(0),
 
 const emit = defineEmits(['playNow'])
 
-watch(() => props.isAI, () => {
-  // hardcode for AI
-  if(props.isAI) playWith.value = 2;
-  else playWith.value = 0;
+watch(() => props.preset, () => {
+  switch (props.preset) {
+    case "Anyone":
+      playWith.value = 0;
+      break;
+    case "Friend":
+      playWith.value = 1;
+      break;
+    case "AI":
+      playWith.value = 2;
+      break;
+  }
 })
 
 defineExpose({ playWith, gameMode, color })
@@ -124,7 +134,7 @@ defineExpose({ playWith, gameMode, color })
   gap: 10px;
   color: #fff;
 
-  &__wrapper--active{
+  &__wrapper--active {
     z-index: 101;
   }
 
