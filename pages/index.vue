@@ -33,7 +33,7 @@
           <div class="section__heading">Play</div>
           <div
             class="item"
-            @click="createFastGame"
+            @click="user ? createFastGame() : $togglePopup('SignInPopup')"
           >
             <svg
               class="item__img"
@@ -449,11 +449,18 @@
         <div class="nav__badge"></div>
 
         <template v-if="!user">
-          <div class="nav__register" @click="$togglePopup('SignInPopup')">Register</div>
-          <div class="nav__login" @click="$togglePopup('SignInPopup')">Log in</div>
+          <div
+            class="nav__register"
+            @click="$togglePopup('SignInPopup')"
+          >Register</div>
+          <div
+            class="nav__login"
+            @click="$togglePopup('SignInPopup')"
+          >Log in</div>
         </template>
-        <div
+        <NuxtLink
           v-else
+          to="profile"
           class="nav__user"
         >
           <img
@@ -461,7 +468,7 @@
             :src="user.avatar"
           />
           <div class="nav__user-name">{{ user.username || user.email }}</div>
-        </div>
+        </NuxtLink>
       </nav>
 
       <main class="main">
@@ -553,43 +560,35 @@
             <div
               class="game"
               id="game-1"
+              @click="settingsPreset = 'Anyone'; $togglePopup('GameSettingsPopup')"
             >
               <div class="game__heading">New game</div>
-              <div
-                class="game__action"
-                @click="settingsPreset = 'Anyone'; $togglePopup('GameSettingsPopup')"
-              >Create game</div>
+              <div class="game__action">Create game</div>
             </div>
             <div
               class="game"
               id="game-2"
+              @click="settingsPreset = 'AI'; $togglePopup('GameSettingsPopup')"
             >
               <div class="game__heading">Play with AI</div>
-              <div
-                class="game__action"
-                @click="settingsPreset = 'AI'; $togglePopup('GameSettingsPopup')"
-              >Play bot</div>
+              <div class="game__action">Play bot</div>
             </div>
             <div
               class="game"
               id="game-3"
+              @click="settingsPreset = 'Friend'; $togglePopup('GameSettingsPopup')"
             >
               <div class="game__heading">Play a Friend</div>
-              <div
-                class="game__action"
-                @click="settingsPreset = 'Friend'; $togglePopup('GameSettingsPopup')"
-              >Play now</div>
+              <div class="game__action">Play now</div>
             </div>
-            <div
+            <NuxtLink
               class="game"
+              to="events/arena"
               id="game-4"
             >
               <div class="game__heading">Arena</div>
-              <NuxtLink
-                class="game__action"
-                to="events/arena"
-              >Compete now</NuxtLink>
-            </div>
+              <div class="game__action">Compete now</div>
+            </NuxtLink>
           </div>
         </section>
 
@@ -864,7 +863,7 @@ const swipeBanner = () => {
   document.querySelector('.banners').addEventListener("touchend", (e) => {
     let diff = startPos - e.changedTouches[0].clientX;
 
-    if(Math.abs(diff) > 20) changeSlide(Math.sign(diff));
+    if (Math.abs(diff) > 20) changeSlide(Math.sign(diff));
   })
 }
 
@@ -1294,6 +1293,7 @@ onMounted(async () => {
       background: rgba(31, 36, 42, 0.40);
       backdrop-filter: blur(50px);
       overflow: hidden;
+      cursor: pointer;
 
       &s {
         width: 100%;
@@ -1335,8 +1335,6 @@ onMounted(async () => {
         font-style: normal;
         font-weight: 400;
         line-height: 14px;
-
-        cursor: pointer;
       }
     }
 
