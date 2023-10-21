@@ -170,6 +170,17 @@ class User {
     });
   }
 
+  async saveEmail({accessToken, email}){
+    return await fetch(`${this.localPath}/saveEmail`, {
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      body: JSON.stringify({
+        email
+      })
+    })
+  }
 }
 class Wallet {
   constructor(path) {
@@ -367,15 +378,21 @@ class Chess {
 }
 class Lobby {
   constructor(path) {
-    this.localPath = `${path}/lobby`;
+    this.localPath = `${path}`;
   }
 
   async get(accessToken) {
-    return await fetch(`${this.localPath}`, {
+    return await fetch(`${this.localPath}/lobby`, {
       method: "GET",
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
+    });
+  }
+
+  async getLeaderboard(accessToken) {
+    return await fetch(`${this.localPath}/leaderboards`, {
+      method: "GET"
     });
   }
 }

@@ -442,9 +442,7 @@ onMounted(async () => {
     flex-direction: column;
     grid-template-columns: 50px 300px repeat(3, calc((100% - 350px - 20px * 4) / 3));
     font-family: "Space Mono";
-    margin: 0 50px;
-    max-height: 50vh;
-    overflow: auto;
+    margin: 0 50px 50px 50px;
 
     &__heading {
       display: grid;

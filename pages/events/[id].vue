@@ -90,7 +90,7 @@
               <br />
               Games played: {{ team.winsCount + team.losesCount + team.drawsCount }}
               <br />
-              Win rate: {{ Math.round((team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) * 100) / 100  }}%
+              Win rate: {{ Math.round((team.winsCount / (team.winsCount + team.losesCount + team.drawsCount) || 0) * 100)  }}%
               <br />
             </div>
           </div>
@@ -130,6 +130,8 @@
         :teams="event?.event.teams"
         @register="getLeaderboard"
       />
+
+      <PopupsEventEmail/>
     </div>
   </ClientOnly>
 </template>
@@ -250,6 +252,7 @@ const register = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
   event.value.isRegistered = body.success;
+  if(body.value.isEmailNeeded) $togglePopup('EnterEmailPopup');
 }
 
 onMounted(async () => {
@@ -554,9 +557,7 @@ onMounted(async () => {
     flex-direction: column;
     grid-template-columns: 50px 300px repeat(4, calc((100% - 350px - 20px * 5) / 4));
     font-family: "Space Mono";
-    margin: 0 50px;
-    max-height: 50vh;
-    overflow: auto;
+    margin: 0 50px 50px 50px;
 
     &__heading {
       display: grid;
