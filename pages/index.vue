@@ -679,8 +679,8 @@
                 {{ row.user.username }}
               </div>
               <div>{{ row.winsCount }} - {{ row.drawsCount }} - {{ row.losesCount }}</div>
-              <div>{{ row.rating }}</div>
-              <div>{{ row.rank }}</div>
+              <div>{{ row.rating || "{hidden}" }}</div>
+              <div>{{ row.rank || "{hidden}" }}</div>
             </div>
           </div>
         </section>
