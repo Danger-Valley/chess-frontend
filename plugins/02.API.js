@@ -392,10 +392,7 @@ class Lobby {
 
   async getLeaderboard(accessToken) {
     return await fetch(`${this.localPath}/leaderboards`, {
-      method: "GET",
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+      method: "GET"
     });
   }
 }
