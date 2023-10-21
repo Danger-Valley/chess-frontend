@@ -64,7 +64,7 @@
           </div>
           <div
             class="item"
-            @click="settingsPreset = 'Anyone'; $togglePopup('GameSettingsPopup')"
+            @click="settingsPreset = 'Anyone'; user ? $togglePopup('GameSettingsPopup') : $togglePopup('SignInPopup')"
           >
             <svg
               class="item__img"
@@ -560,7 +560,7 @@
             <div
               class="game"
               id="game-1"
-              @click="settingsPreset = 'Anyone'; $togglePopup('GameSettingsPopup')"
+              @click="settingsPreset = 'Anyone'; user ? $togglePopup('GameSettingsPopup') : $togglePopup('SignInPopup')"
             >
               <div class="game__heading">New game</div>
               <div class="game__action">Create game</div>
@@ -568,7 +568,7 @@
             <div
               class="game"
               id="game-2"
-              @click="settingsPreset = 'AI'; $togglePopup('GameSettingsPopup')"
+              @click="settingsPreset = 'AI'; user ? $togglePopup('GameSettingsPopup') : $togglePopup('SignInPopup')"
             >
               <div class="game__heading">Play with AI</div>
               <div class="game__action">Play bot</div>
@@ -576,7 +576,7 @@
             <div
               class="game"
               id="game-3"
-              @click="settingsPreset = 'Friend'; $togglePopup('GameSettingsPopup')"
+              @click="settingsPreset = 'Friend'; user ? $togglePopup('GameSettingsPopup') : $togglePopup('SignInPopup')"
             >
               <div class="game__heading">Play a Friend</div>
               <div class="game__action">Play now</div>
