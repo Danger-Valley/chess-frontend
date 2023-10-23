@@ -1396,7 +1396,6 @@ onMounted(async () => {
         font-style: normal;
         font-weight: 400;
         line-height: 140%;
-        text-transform: capitalize;
       }
 
       &__user {
