@@ -1643,6 +1643,7 @@ onMounted(async () => {
     &--expanded {
       left: 0;
       overflow-y: auto;
+      border-radius: 0;
     }
 
     &__cross {
@@ -1651,6 +1652,10 @@ onMounted(async () => {
       z-index: 1001;
       right: 30px;
       top: 43px;
+    }
+
+    &__badge {
+      order: 2;
     }
   }
 
