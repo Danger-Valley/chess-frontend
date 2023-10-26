@@ -451,11 +451,11 @@
         <template v-if="!user">
           <div
             class="nav__register"
-            @click="$togglePopup('SignInPopup')"
+            @click="isNavExpanded = false; $togglePopup('SignInPopup')"
           >Register</div>
           <div
             class="nav__login"
-            @click="$togglePopup('SignInPopup')"
+            @click="isNavExpanded = false; $togglePopup('SignInPopup')"
           >Log in</div>
         </template>
         <NuxtLink
