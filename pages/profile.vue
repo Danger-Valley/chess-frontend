@@ -658,6 +658,7 @@ watch(user, () => {
 @media screen and (max-width: #{map-get($sizes, "tablet") + px}) {
   .main {
     margin: 8px 50px;
+    margin-bottom: 150px;
   }
 }
 </style>

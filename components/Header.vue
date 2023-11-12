@@ -200,6 +200,7 @@ const toggleMenu = (blockOnMobile = false) => {
   if(blockOnMobile && window.innerWidth <= 1440 && isToggled.value) return;
   isToggled.value = !isToggled.value;
   isClosed.value = !isClosed.value;
+  document.body.classList.toggle('no-overflow')
 }
 
 onMounted(async () => {
