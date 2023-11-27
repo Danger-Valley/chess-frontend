@@ -1635,7 +1635,7 @@ onMounted(async () => {
     left: 100vw;
     z-index: 1000;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     transition: .5s;
     padding: 38px 30px;
 
