@@ -252,7 +252,7 @@ const register = async () => {
     return $showToast(body.errors[0].message, 'error')
   }
   event.value.isRegistered = body.success;
-  if(body.value.isEmailNeeded) $togglePopup('EnterEmailPopup');
+  if(body.isEmailNeeded) $togglePopup('EnterEmailPopup');
 }
 
 onMounted(async () => {

@@ -172,6 +172,7 @@ class User {
 
   async saveEmail({accessToken, email}){
     return await fetch(`${this.localPath}/saveEmail`, {
+      method: "POST",
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
