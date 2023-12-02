@@ -1035,7 +1035,7 @@ onUnmounted(() => {
 .page {
   display: grid;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
   grid-template-rows: 14px auto;
   grid-template-columns: max(230px, 18%) auto max(290px, 18%);
   gap: 25px 20px;
@@ -1393,7 +1393,7 @@ onUnmounted(() => {
     overflow: hidden;
     position: absolute;
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     z-index: 100;
     background: #25272B;
     padding: unset;
