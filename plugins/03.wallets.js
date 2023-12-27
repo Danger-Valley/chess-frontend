@@ -19,7 +19,7 @@ const walletOptions = {
     new BraveWalletAdapter(),
     //new WalletConnectWalletAdapter()
   ],
-  autoConnect: false,
+  autoConnect: true,
 };
 
 export default defineNuxtPlugin((nuxtApp) => {
