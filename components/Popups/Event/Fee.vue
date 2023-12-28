@@ -52,19 +52,31 @@ import { Transaction } from "@solana/web3.js"
 
 let { $API, $togglePopup, $showToast } = useNuxtApp();
 
-const { publicKey, signTransaction, connect, select, ready } = useWallet();
+const { publicKey: pK, signTransaction, connect, select, ready: r } = useWallet();
 
 let props = defineProps(['amount', 'id'])
 let emits = defineEmits(['reregister'])
 
 const waiting = ref(false),
   success = ref(false),
-  walletModalProviderRef = ref()
+  walletModalProviderRef = ref(),
+  publicKey = computed(() => pK.value),
+  ready = computed(() => r.value)
+
+watch(() => [publicKey, ready], async () => {
+  if(!ready.value || !publicKey.value) return
+
+  await payFunc();
+})
 
 const pay = async () => {
   if(!publicKey.value && !ready.value ) return walletModalProviderRef.value.openModal();
   else if (!publicKey.value && ready.value) await connect();
 
+  await payFunc();
+}
+
+const payFunc = async () => {
   waiting.value = true;
   let resp = await $API().Events.payFee({
     accessToken: localStorage.getItem("accessToken"),
