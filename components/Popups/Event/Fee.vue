@@ -1,62 +1,69 @@
 <template>
-  <div
-    class="popup__wrapper"
-    id="RegistrationFeePopup"
-    @click="$togglePopup('RegistrationFeePopup')"
-  >
+  <ClientOnly>
     <div
-      class="popup"
-      @click.stop
+      class="popup__wrapper"
+      id="RegistrationFeePopup"
+      @click="$togglePopup('RegistrationFeePopup')"
     >
-      <div class="popup__heading">Registration fee</div>
-      <div class="popup__underheading">
-        It costs {{ props.amount }} to participate in this tournament.
-        <br />
-        Please, connect your wallet and pay the registration fee.
-      </div>
-      <div class="status">
-        <div
-          class="btn"
-          :class="{ 'status__btn--success': success }"
-          @click="pay"
-        >
-          <template v-if="success">Completed!</template>
-          <template v-else-if="waiting">
-            <SpinnerDiamond />
-          </template>
-          <template v-else>Pay registration fee</template>
-        </div>
-        <div
-          class="status__wait"
-          v-if="waiting"
-        >
-          Verifying your transaction.
+      <div
+        class="popup"
+        @click.stop
+      >
+        <div class="popup__heading">Registration fee</div>
+        <div class="popup__underheading">
+          It costs {{ props.amount }} to participate in this tournament.
           <br />
-          This could take up to 10 seconds.
+          Please, connect your wallet and pay the registration fee.
+        </div>
+        <div class="status">
+          <div
+            class="btn"
+            :class="{ 'status__btn--success': success }"
+            @click="pay"
+          >
+            <template v-if="success">Completed!</template>
+            <template v-else-if="waiting">
+              <SpinnerDiamond />
+            </template>
+            <template v-else>Pay registration fee</template>
+          </div>
+          <div
+            class="status__wait"
+            v-if="waiting"
+          >
+            Verifying your transaction.
+            <br />
+            This could take up to 10 seconds.
+          </div>
         </div>
       </div>
     </div>
-  </div>
+
+    <WalletModalProvider
+      dark
+      ref="walletModalProviderRef"
+    ></WalletModalProvider>
+  </ClientOnly>
 </template>
 
 <script setup>
-import { useWallet } from "solana-wallets-vue";
+import { WalletModalProvider, useWallet } from "solana-wallets-vue";
 import { Transaction } from "@solana/web3.js"
 
 let { $API, $togglePopup, $showToast } = useNuxtApp();
 
-const { publicKey, signTransaction, connect, select } = useWallet();
+const { publicKey, signTransaction, connect, select, ready } = useWallet();
 
 let props = defineProps(['amount', 'id'])
 let emits = defineEmits(['reregister'])
 
 const waiting = ref(false),
-  success = ref(false)
+  success = ref(false),
+  walletModalProviderRef = ref()
 
 const pay = async () => {
-  if(!publicKey.value) {
-    await connect();
-  }
+  if(!publicKey.value && !ready.value ) return walletModalProviderRef.value.openModal();
+  else if (!publicKey.value && ready.value) await connect();
 
   waiting.value = true;
   let resp = await $API().Events.payFee({

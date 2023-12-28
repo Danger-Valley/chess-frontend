@@ -142,6 +142,7 @@ import GameModeFigure from "@/assets/imgs/game-mode-figure.svg"
 import GameModeTime from "@/assets/imgs/game-mode-time.svg"
 import GameModeCoins from "@/assets/imgs/game-mode-coins.svg"
 import gameModes from "@/assets/content/gameModes.json"
+import { useWallet } from "solana-wallets-vue";
 
 let { $togglePopup, $API, $showToast } = useNuxtApp();
 
