@@ -256,6 +256,8 @@ const register = async () => {
   }
   event.value.isRegistered = body.success;
   if(body.isEmailNeeded) $togglePopup('EnterEmailPopup');
+
+  await getLeaderboard();
 }
 
 onMounted(async () => {

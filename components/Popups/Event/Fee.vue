@@ -52,7 +52,7 @@ import { Transaction } from "@solana/web3.js"
 
 let { $API, $togglePopup, $showToast } = useNuxtApp();
 
-const { publicKey: pK, signTransaction, connect, select, ready: r } = useWallet();
+const { publicKey: pK, signTransaction, connect, select, ready: r, connected, readyState } = useWallet();
 
 let props = defineProps(['amount', 'id'])
 let emits = defineEmits(['reregister'])
@@ -63,7 +63,7 @@ const waiting = ref(false),
   publicKey = computed(() => pK.value),
   ready = computed(() => r.value)
 
-watch(() => [publicKey, ready], async () => {
+watch(() => [publicKey, ready, connected, readyState], async () => {
   if(!ready.value || !publicKey.value) return
 
   await payFunc();
