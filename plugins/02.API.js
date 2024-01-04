@@ -78,17 +78,17 @@ class User {
   }
 
   async get(accessToken) {
-    if (accessToken){
+    if (accessToken) {
       return await fetch(`${this.localPath}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
-      });        
+      });
     }
   }
 
   async getPaymentProfile(accessToken) {
-    if (accessToken){
+    if (accessToken) {
       return await fetch(`${this.path}/payments/api/v1/users`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -170,7 +170,7 @@ class User {
     });
   }
 
-  async saveEmail({accessToken, email}){
+  async saveEmail({ accessToken, email }) {
     return await fetch(`${this.localPath}/saveEmail`, {
       method: "POST",
       headers: {
@@ -477,8 +477,9 @@ class Deposit {
   }
 }
 class Events {
-  constructor(path) {
-    this.localPath = `${path}/events`;
+  constructor(localPath, path) {
+    this.localPath = `${localPath}/events`;
+    this.path = `${path}/payments/api/v1`;
   }
 
   async getArena({ accessToken }) {
@@ -505,6 +506,17 @@ class Events {
     return await fetch(`${this.localPath}/${id}/register`, {
       method: "POST",
       body: teamId ? JSON.stringify({ teamId }) : null,
+      headers: {
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      }
+    });
+  }
+
+  async payFee({ accessToken, id, walletAddress }) {
+    return await fetch(`${this.path}/store/events/${id}/fee`, {
+      method: "POST",
+      body: JSON.stringify({ walletAddress }),
       headers: {
         'content-type': 'application/json',
         'Authorization': `Bearer ${accessToken}`
@@ -551,7 +563,7 @@ export default defineNuxtPlugin(() => {
             Deposit: new Deposit(`${path}/payments/api/v1`),
             Rewards: new Rewards(`${path}/payments/api/v1`)
           },
-          Events: new Events(`${path}/events/api/v1`)
+          Events: new Events(`${path}/events/api/v1`, path)
         }
       }
     }

@@ -132,6 +132,7 @@
       />
 
       <PopupsEventEmail/>
+      <PopupsEventFee :amount="event?.event?.participationFee" :id="event?.event?.id" @reregister="register"/>
     </div>
   </ClientOnly>
 </template>
@@ -141,6 +142,7 @@ import GameModeFigure from "@/assets/imgs/game-mode-figure.svg"
 import GameModeTime from "@/assets/imgs/game-mode-time.svg"
 import GameModeCoins from "@/assets/imgs/game-mode-coins.svg"
 import gameModes from "@/assets/content/gameModes.json"
+import { useWallet } from "solana-wallets-vue";
 
 let { $togglePopup, $API, $showToast } = useNuxtApp();
 
@@ -249,10 +251,13 @@ const register = async () => {
   let body = await resp.json();
   console.log(body);
   if (body.errors) {
-    return $showToast(body.errors[0].message, 'error')
+    if(resp.status == 700) $togglePopup('RegistrationFeePopup');
+    else return $showToast(body.errors[0].message, 'error')
   }
   event.value.isRegistered = body.success;
   if(body.isEmailNeeded) $togglePopup('EnterEmailPopup');
+
+  await getLeaderboard();
 }
 
 onMounted(async () => {

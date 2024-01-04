@@ -659,6 +659,7 @@ watch(user, () => {
   .main {
     margin: 8px 50px;
     margin-bottom: 150px;
+    min-height: 100dvh;
   }
 }
 </style>

@@ -15,7 +15,7 @@
         <div class="options__list">
           <div
             class="option"
-            v-for="(option, counter) in ['Anyone', 'Friend', 'AI']"
+            v-for="(option, counter) in ['Friend', 'AI']"
             :class="{ 'option--active': playWith == counter }"
             @click="playWith = counter"
           >
@@ -97,7 +97,7 @@ import AnyFigure from "@/assets/imgs/Board-Squares.svg"
 import WhiteFigure from "@/assets/imgs/whiteFigure.svg"
 
 let props = defineProps({
-  preset: "Anyone" || "Friend" || "AI" || "Arena"
+  preset: "Friend" || "AI" || "Arena"
 })
 
 let playWith = ref(0),
@@ -109,14 +109,15 @@ const emit = defineEmits(['playNow'])
 
 watch(() => props.preset, () => {
   switch (props.preset) {
+    // TODO removed "Anyone". When come back - make playWith = 0 1 2
     case "Anyone":
       playWith.value = 0;
       break;
     case "Friend":
-      playWith.value = 1;
+      playWith.value = 0;
       break;
     case "AI":
-      playWith.value = 2;
+      playWith.value = 1;
       break;
   }
 })

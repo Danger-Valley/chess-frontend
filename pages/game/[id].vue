@@ -395,10 +395,11 @@ const openGameSearchPopup = async () => {
   //localStorage.setItem('autoJoin', true);
   $togglePopup('GameSearchPopup')
   GameSearchPopupRef.value.startTimeTracking()
+  // TODO removed "Anyone". When come back - change comment
   let body = {
     mode: GameSettingsPopupRef.value.gameMode,
     accessToken: localStorage.getItem('accessToken'),
-    everyoneCanJoin: GameSettingsPopupRef.value.playWith == 0
+    everyoneCanJoin: false //GameSettingsPopupRef.value.playWith == 0
   }
   if (GameSettingsPopupRef.value.color) body = {
     ...body,
